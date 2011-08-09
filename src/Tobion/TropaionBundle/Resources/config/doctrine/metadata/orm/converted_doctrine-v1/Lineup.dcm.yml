@@ -1,0 +1,39 @@
+Lineup:
+  type: entity
+  table: lineups
+  fields:
+    team_id:
+      id: true
+      type: integer
+      length: '4'
+      notnull: true
+    season_round:
+      id: true
+      type: integer
+      length: '1'
+      notnull: true
+    athlete_id:
+      id: true
+      type: integer
+      length: '4'
+      notnull: true
+    position:
+      type: integer
+      length: '1'
+      notnull: true
+  oneToMany:
+    Team:
+      targetEntity: Team
+      cascade: {  }
+      mappedBy: Lineups
+      inversedBy: null
+      orphanRemoval: false
+      orderBy: null
+    Athlete:
+      targetEntity: Athlete
+      cascade: {  }
+      mappedBy: Lineups
+      inversedBy: null
+      orphanRemoval: false
+      orderBy: null
+  lifecycleCallbacks: {  }

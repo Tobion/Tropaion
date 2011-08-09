@@ -1,0 +1,242 @@
+{% extends "TobionTropaionBundle::layout.html.twig" %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<link rel="stylesheet" type="text/css" href="{{ asset('bundles/tobiontropaion/css/teammatch.css') }}" />
+{% endblock %}
+
+{% block head_javascripts %}
+    {{ parent() }}
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+	<script type="text/javascript" src="{{ asset('bundles/tobiontropaion/js/DataTables-1.8.1/media/js/jquery.dataTables.min.js') }}"></script>
+	
+	<script type="text/javascript">
+		jQuery.fn.dataTableExt.oSort['time-element-asc']  = function(a,b) {
+			var x = Date.parse(a.match(/datetime="(.*?)"/)[1]);
+			var y = Date.parse(b.match(/datetime="(.*?)"/)[1]);
+			return ((x < y) ? -1 : ((x > y) ?  1 : 0));
+		};
+
+		jQuery.fn.dataTableExt.oSort['time-element-desc'] = function(a,b) {
+			var x = Date.parse(a.match(/datetime="(.*?)"/)[1]);
+			var y = Date.parse(b.match(/datetime="(.*?)"/)[1]);
+			return ((x < y) ?  1 : ((x > y) ? -1 : 0));
+		};
+		
+		jQuery.fn.dataTableExt.oSort['margin-of-victory-asc']  = function(a,b) {
+			var x = a.match(/data-mov="(.*?)"/)[1];
+			var y = b.match(/data-mov="(.*?)"/)[1];
+			return ((x < y) ? -1 : ((x > y) ?  1 : 0));
+		};
+		
+		jQuery.fn.dataTableExt.oSort['margin-of-victory-desc'] = function(a,b) {
+			var x = a.match(/data-mov="(.*?)"/)[1];
+			var y = b.match(/data-mov="(.*?)"/)[1];
+			return ((x < y) ?  1 : ((x > y) ? -1 : 0));
+		};
+	
+		$(document).ready(function() {
+			$('#teammatches table').dataTable({
+				"bPaginate": false,
+				"bLengthChange": false,
+				"bFilter": false,
+				"bSort": true,
+				"bInfo": false,
+				"bAutoWidth": false,
+				"aoColumns": [
+					{ "sType": "time-element" },
+					null,
+					null,
+					null,
+					{ "sType": "margin-of-victory", "asSorting": [ "desc", "asc" ] },
+					{ "bSortable": false },
+					null,
+					{ "bSortable": false },
+					{ "bSortable": false },
+					{ "bSortable": false }
+				],
+				// "aaSorting": [[0,'asc']]
+			});
+		} );
+	</script> 
+{% endblock %}
+
+{# set pageRdfId = path('team_show', team.routingParams|merge({ '_format': 'html' }) ) ~ '.html' #}
+
+{% block title %}
+
+{% endblock %}
+
+{% block metas %}
+	{{ parent() }}
+
+	<meta property="og:type" content="sports_team" />
+
+{% endblock %}
+
+{% block content %}
+
+<article id="team-{{ team.id }}" about="{{ path('team_show', team.routingParams ) }}" typeof="sport:Team">
+
+<h1>{{ team }}</h1>
+
+<h2>{{ team.league }} || {{ team.league.tournament }}</h2>
+
+<section id="lineup" rel="sport:teamMate">
+<h2>{% trans %}Aufstellung{% endtrans %}</h2>
+
+{% macro lineup_athlete(lineup, gender, team) %}
+	<li about="{{ path('athlete_show', lineup.athlete.routingParams ) }}" typeof="sport:Athlete" property="foaf:gender" xml:lang="en" content="{{ gender }}">
+		<a rel="foaf:page" href="{{ path('tournament_athlete_show', 
+			lineup.athlete.routingParams | merge({
+				'owner': team.league.tournament.owner.slug,
+				'tournament': team.league.tournament.slug
+			}) ) }}" xml:lang="de">{{ lineup.athlete }}</a></li>
+{% endmacro %}
+
+<div id="lineup-first-half">
+	<h3>{% if hasSecondRoundLineup and not lineupChanged %}
+			{% trans %}Hinrunde &amp; Rückrunde{% endtrans %}
+		{% else %}
+			{% trans %}Hinrunde{% endtrans %}
+		{% endif %}</h3>
+	<div class="male">
+		<h4>{% trans %}Männer{% endtrans %}</h4>
+		<ol>
+			{%- for lineup in team.firstRoundMaleLineups %}
+			{{ _self.lineup_athlete(lineup, 'male', team) }}
+			{%- endfor %}
+		</ol>
+	</div>
+	<div class="female">
+		<h4>{% trans %}Frauen{% endtrans %}</h4>
+		<ol>
+			{%- for lineup in team.firstRoundFemaleLineups %}
+			{{ _self.lineup_athlete(lineup, 'female', team) }}
+			{%- endfor %}
+		</ol>
+	</div>
+</div>
+
+{% if hasSecondRoundLineup and lineupChanged %}
+<div id="lineup-second-half">
+	<h3>{% trans %}Rückrunde{% endtrans %}</h3>
+	<div class="male">
+		<h4>{% trans %}Männer{% endtrans %}</h4>
+		<ol>
+			{%- for lineup in team.secondRoundMaleLineups %}
+			{{ _self.lineup_athlete(lineup, 'male', team) }}
+			{%- endfor %}
+		</ol>
+	</div>
+	<div class="female">
+		<h4>{% trans %}Frauen{% endtrans %}</h4>
+		<ol>
+			{%- for lineup in team.secondRoundFemaleLineups %}
+			{{ _self.lineup_athlete(lineup, 'female', team) }}
+			{%- endfor %}
+		</ol>
+	</div>
+</div>
+{% endif %}
+
+</section>
+
+<dl>
+	<dt>{% trans %}Turnier{% endtrans %}</dt>
+	<dd><a href="{{ path('tournament_show', team.league.tournament.routingParams ) }}">{{ team.league.tournament.fullName }}</a></dd>
+	<dt>{% trans %}Klasse{% endtrans %}</dt>
+	<dd><a href="{{ path('league_show', team.league.routingParams ) }}#team-{{ team.id }}">{{ team.league.className }}{% if team.league.division %} {{ team.league.division }}{% endif %}</a></dd>
+	<dt>{% trans %}Verein{% endtrans %}</dt>
+	<dd><a href="{{ path('club_show', team.club.routingParams ) }}">{{ team.club.name }}</a></dd>
+</dl>
+
+<section id="teammatches">
+<h2>{% trans with { '%team%': team.__toString } %}Spiele von %team%{% endtrans %}</h2>
+<table class="teammatch-list">
+<thead>
+	<tr>
+		<th scope="col" class="date">{% trans %}Termin{% endtrans %}</th>
+		<th scope="col" class="venue">{% trans %}Halle{% endtrans %}</th>
+		<th scope="col" class="stage">{% trans %}Runde{% endtrans %}</th>
+		<th scope="col" class="homeaway">{% trans %}<abbr title="Heim / Auswärts">H/A</abbr>{% endtrans %}</th>
+		<th scope="col" class="current-team-result"><abbr title="{% trans with { '%team%': team.__toString } %}Resultat für %team% (Sieg / Unentschieden / Niederlage){% endtrans %}">{% trans %}S/U/N{% endtrans %}</abbr></th>
+		<th scope="col" class="score">{% trans %}Ergeb.{% endtrans %}</th>
+		<th scope="col" class="team opponent">{% trans %}Gegner{% endtrans %}</th>
+		<th scope="col" class="games">{% trans %}Sätze{% endtrans %}</th>
+		<th scope="col" class="points">{% trans %}Punkte{% endtrans %}</th>
+		<th scope="col" class="status">{% trans %}Status{% endtrans %}</th>
+	</tr>
+</thead>
+<tbody>
+{% for teammatch in teammatches %}
+	<tr id="teammatch-{{ teammatch.id }}">
+		<td class="date">{% if teammatch.annulled %}<del>{% endif %}
+			<time datetime="{{ teammatch.performedAt | date('c') }}">{{ teammatch.performedAt | date('d.m.Y H:i') }}</time>
+			{% if teammatch.annulled %}</del>{% endif %}
+		</td>
+		<td class="venue"><a href="{{ path('venue_show', teammatch.venue.routingParams ) }}">{{ teammatch.venue.code }}</a></td>
+		<td class="stage">{% if teammatch.seasonRound == 1 %}{% trans %}Hin{% endtrans %}{% else %}{% trans %}Rück{% endtrans %}{% endif %}</td>
+		<td class="homeaway">{% if teammatch.team1 == team %}{% trans %}Heim{% endtrans %}{% else %}{% trans %}Ausw.{% endtrans %}{% endif %}</td>
+		<td class="current-team-result">
+		{% if teammatch.isDraw %}
+			<img data-mov="{{ teammatch.marginOfVictorySortableString(team) }}" src="{{ asset('bundles/tobiontropaion/images/icons/status/thumb-sideways.png') }}" width="16" height="9" alt="{% trans %}U{% endtrans %}" title="{% trans %}Unentschieden{% endtrans %}" />
+		{% elseif teammatch.isWinnerTeam(team) %}
+			{% set movRotateDeg = teammatch.team1 == team ? (8 - teammatch.team1Score) * 22.5 : (8 - teammatch.team2Score) * 22.5 %}
+			<img data-mov="{{ teammatch.marginOfVictorySortableString(team) }}" src="{{ asset('bundles/tobiontropaion/images/icons/status/thumb-up.png') }}" {% 
+				if movRotateDeg > 0 %}style="-webkit-transform:rotate({{ movRotateDeg }}deg); -moz-transform:rotate({{ movRotateDeg }}deg); -o-transform:rotate({{ movRotateDeg }}deg); -ms-transform:rotate({{ movRotateDeg }}deg);" {% 
+				endif %}width="9" height="16" alt="{% trans %}S{% endtrans %}" title="{% trans %}Sieg{% endtrans %}" />
+		{% elseif teammatch.hasResult %}
+			{% set movRotateDeg = teammatch.team1 == team ? teammatch.team1Score * 22.5 : teammatch.team2Score * 22.5 %}
+			<img data-mov="{{ teammatch.marginOfVictorySortableString(team) }}" src="{{ asset('bundles/tobiontropaion/images/icons/status/thumb-down.png') }}" {% 
+				if movRotateDeg > 0 %}style="-webkit-transform:rotate(-{{ movRotateDeg }}deg); -moz-transform:rotate(-{{ movRotateDeg }}deg); -o-transform:rotate(-{{ movRotateDeg }}deg); -ms-transform:rotate(-{{ movRotateDeg }}deg);" {% 
+				endif %}width="9" height="16" alt="{% trans %}N{% endtrans %}" title="{% trans %}Niederlage{% endtrans %}" />
+		{% endif %}
+		</td>
+		<td class="score"><a href="{{ path('teammatch_show', teammatch.routingParams ) }}" title="{% trans %}Zum Spielbericht{% endtrans %}">
+			{{ teammatch.team1Score is none ? (teammatch.submittedBy ? '‒' : '?') : teammatch.team1Score }} : {{ teammatch.team2Score is none ? (teammatch.submittedBy ? '‒' : '?') : teammatch.team2Score }}
+		</a></td>
+		<td class="team opponent">
+			{% if teammatch.team1 == team %}
+			<a href="{{ path('team_show', teammatch.team2.routingParams ) }}">{{ teammatch.team2 }}
+			{% else %}
+			<a href="{{ path('team_show', teammatch.team1.routingParams ) }}">{{ teammatch.team1 }}
+			{% endif %}
+		</a></td>
+		{# <td class="team hometeam">{% if teammatch.team1 == team %}<mark>{% else %}<a href="{{ path('team_show', teammatch.team1.routingParams ) }}">{% endif %}
+			{% if teammatch.isTeam1Winner %}<strong>{% endif %}
+			{{ teammatch.team1 }}
+			{% if teammatch.isTeam1Winner %}</strong>{% endif %}
+			{% if teammatch.team1 == team %}</mark>{% else %}</a>{% endif %}
+		</td> #}
+		{% if teammatch.hasDetailedResult %}
+			<td class="games">{{ teammatch.team1Games | pad(2, '&#8199;', constant('STR_PAD_LEFT')) }} : {{ teammatch.team2Games | pad(2, '&#8199;', constant('STR_PAD_RIGHT')) }}</td>
+			<td class="points">{{ teammatch.team1Points | pad(3, '&#8199;', constant('STR_PAD_LEFT')) }} : {{ teammatch.team2Points | pad(3, '&#8199;', constant('STR_PAD_RIGHT')) }}</td>
+		{% elseif teammatch.hasResult %}
+			<td colspan="2" class="missing-detailed-result"><img src="{{ asset('bundles/tobiontropaion/images/icons/status/submission-due.png') }}" width="16" height="16" alt="" /> {% trans %}<abbr title="Fehlendes Detailergebnis">Fehl. Detailergeb.</abbr>{% endtrans %}</td>
+		{% elseif teammatch.isSubmissionDue %}
+			<td colspan="2" class="submission-due"><img src="{{ asset('bundles/tobiontropaion/images/icons/status/submission-due.png') }}" width="16" height="16" alt="" /> {% trans %}Eingabe ausstehend{% endtrans %}</td>
+		{% else %}
+			<td colspan="2" class="no-result"></td>
+		{% endif %}
+		<td class="status">{% if teammatch.annulled %}<img src="{{ asset('bundles/tobiontropaion/images/icons/status/annulled.png') }}" width="16" height="16" alt="{% trans %}Annulliert{% endtrans %}" title="{% trans %}Spiel wurde gestrichen und aus der Wertung genommen{% endtrans %}" />{% endif %}
+			{% if teammatch.revaluationWrongdoer %}<img src="{{ asset('bundles/tobiontropaion/images/icons/status/revaluation.png') }}" width="16" height="16" alt="{% trans %}Umwertung{% endtrans %}" title="{% trans %}Spiel wurde umgewertet{% endtrans %}" />{% endif %}
+			{% if teammatch.noFight %}<img src="{{ asset('bundles/tobiontropaion/images/icons/status/nofight.png') }}" width="16" height="16" alt="{% trans %}Kampflos{% endtrans %}" title="{% trans %}Ergebnis ist kampflos zustande gekommen{% endtrans %}" />{% endif %}
+			{% if teammatch.revisedScore %}<img src="{{ asset('bundles/tobiontropaion/images/icons/status/revised.png') }}" width="16" height="16" alt="{% trans %}Geändert{% endtrans %}" title="{% trans %}Mannschaftsspiel enthält Individualspiele, deren Ergebnisse geändert wurden{% endtrans %}" />{% endif %}
+			{% if teammatch.confirmedBy %}<img src="{{ asset('bundles/tobiontropaion/images/icons/status/confirmed.png') }}" width="16" height="16" alt="{% trans %}Bestätigt{% endtrans %}" title="{% trans %}Ergebnis bestätigt{% endtrans %}" />{% endif %}
+			{% if teammatch.approvedBy %}<img src="{{ asset('bundles/tobiontropaion/images/icons/status/approved.png') }}" width="16" height="16" alt="{% trans %}Genehmigt{% endtrans %}" title="{% trans %}Ergebnis genehmigt{% endtrans %}" />{% endif %}
+			{% if teammatch.incompleteLineup %}<img src="{{ asset('bundles/tobiontropaion/images/icons/status/incomplete-lineup.png') }}" width="16" height="16" alt="{% trans %}Unvollständig{% endtrans %}" title="{% trans %}Unvollständige Aufstellung (fehlende Spieler){% endtrans %}" />{% endif %}
+			{% if teammatch.movedAt %}<img src="{{ asset('bundles/tobiontropaion/images/icons/status/rearranged.png') }}" width="16" height="16" alt="{% trans %}Verlegt{% endtrans %}" title="{% trans %}Verlegter Termin{% endtrans %}" />{% endif %}
+		</td>
+	</tr>
+{% endfor %}
+</tbody>
+</table>
+
+</section>
+
+<p>Mögl. Erweiterungen: Tabelle, Spielerstatistiken für diese Mannschaft + welche Spieler wären zum aktuellen Zeitpunkt in der Mannschaft einsatzberechtigt?</p>
+
+</article>
+
+{% endblock %}

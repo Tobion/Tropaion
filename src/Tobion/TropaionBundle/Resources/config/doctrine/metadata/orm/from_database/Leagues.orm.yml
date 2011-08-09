@@ -1,0 +1,43 @@
+Leagues:
+  type: entity
+  table: leagues
+  fields:
+    id:
+      id: true
+      type: integer
+      unsigned: false
+      nullable: false
+      generator:
+        strategy: IDENTITY
+    season:
+      type: string
+      length: 10
+      fixed: false
+      nullable: false
+    leagueAbbr:
+      type: string
+      length: 10
+      fixed: false
+      nullable: false
+      column: league_abbr
+    leagueName:
+      type: string
+      length: 50
+      fixed: false
+      nullable: false
+      column: league_name
+    division:
+      type: boolean
+      nullable: false
+    level:
+      type: boolean
+      nullable: false
+    promotedNumber:
+      type: boolean
+      nullable: false
+      column: promoted_number
+    relegatedNumber:
+      type: boolean
+      nullable: false
+      column: relegated_number
+  lifecycleCallbacks: {  }

@@ -1,0 +1,182 @@
+{% extends "TobionTropaionBundle::layout.html.twig" %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<link rel="stylesheet" type="text/css" href="{{ asset('bundles/tobiontropaion/css/teammatch.css') }}" />
+	<link rel="stylesheet" type="text/css" href="{{ asset('bundles/tobiontropaion/css/jquery-ui-1.8.14.custom.css') }}" />
+{% endblock %}
+
+{% block head_javascripts %}
+    {{ parent() }}
+	<script type="text/javascript" src="{{ asset('bundles/tobiontropaion/js/ext-4.0.2a/ext.js') }}"></script>
+	
+	<script type="text/javascript"><!--//--><![CDATA[//><!--
+	
+	window.ratinghistoryStore = Ext.create('Ext.data.JsonStore', {
+		fields: [
+			{ name: 'singles_rating', type: 'int' },
+			{ name: 'doubles_rating', type: 'int' },
+			{ name: 'mixed_rating', type: 'int' },
+			{ name: 'created_at', type: 'date' }
+		],
+        data: {{ ratinghistory | json_encode | raw }}
+    });
+	
+	Ext.require('Ext.chart.*');
+
+Ext.onReady(function () {
+
+	var chart = Ext.create('Ext.chart.Chart', {
+		renderTo: 'rating-graph',
+		width: 850,
+		height: 350,
+		animate: false,
+		store: ratinghistoryStore,
+		shadow: false,
+		theme: 'Category1',
+		legend: {
+			position: 'right'
+		},
+		axes: [{
+			type: 'Numeric',
+			position: 'left',
+			fields: ['singles_rating','doubles_rating','mixed_rating'],
+			title: '{% trans %}Rating{% endtrans %}',
+			grid: true
+		}, {
+			type: 'Time',
+			position: 'bottom',
+			fields: ['created_at'],
+			title: '{% trans %}Zeit{% endtrans %}',
+			dateFormat: 'M y',
+			groupBy: 'year,month',
+			aggregateOp: 'max',
+			// majorTickSteps : 1,
+			// timeUnit: 'year,month',
+			// step: [Ext.Date.MONTH, 1],
+			label: {
+				orientation: 'horizontal',
+				rotate: {
+					degrees: -90
+				}
+			}
+			
+		}],
+		series: [{
+			type: 'line',
+			axis: 'left',
+			xField: 'created_at',
+			yField: 'singles_rating',
+			highlight: true,
+			title: 'Einzel-Rating',
+			showInLegend: {
+				size: 10,
+				radius: 1
+			},
+			tips: {
+				trackMouse: true,
+				width: 80,
+				height: 40,
+				renderer: function(storeItem, item) {
+					this.setTitle('Einzel-Rating im ' + storeItem.get('created_at').getMonth() + ' ' + storeItem.get('created_at').getFullYear() + ': ' + storeItem.get('singles_rating'));
+				}
+			},
+			markerConfig: {
+				type: 'cross',
+				size: 3,
+				radius: 3,
+				'stroke-width': 0
+			},
+			style: {
+				lineColor: 0xffffff,
+				lineAlpha:.5,
+				borderColor:0xB5BAC8,
+				fillColor:0xB5BAC8
+			}
+		},
+		{
+			type: 'line',
+			axis: 'left',
+			xField: 'created_at',
+			yField: 'doubles_rating',
+			highlight: true,
+			title: 'Doppel-Rating',
+			showInLegend: {
+				size: 10,
+				radius: 1
+			},
+			tips: {
+				trackMouse: true,
+				width: 80,
+				height: 40,
+				renderer: function(storeItem, item) {
+					this.setTitle('Doppel-Rating im ' + storeItem.get('created_at').getMonth() + ' ' + storeItem.get('created_at').getFullYear() + ': ' + storeItem.get('doubles_rating'));
+				}
+			},
+			markerConfig: {
+				type: 'cross',
+				size: 3,
+				radius: 3,
+				'stroke-width': 0
+			}
+		},
+		{
+			type: 'line',
+			axis: 'left',
+			xField: 'created_at',
+			yField: 'mixed_rating',
+			highlight: true,
+			title: 'Mixed-Rating',
+			showInLegend: {
+				size: 10,
+				radius: 1
+			},
+			tips: {
+				trackMouse: true,
+				width: 80,
+				height: 40,
+				renderer: function(storeItem, item) {
+					this.setTitle('Mixed-Rating im ' + storeItem.get('created_at').getMonth() + ' ' + storeItem.get('created_at').getFullYear() + ': ' + storeItem.get('mixed_rating'));
+				}
+			},
+			markerConfig: {
+				type: 'circle',
+				size: 3,
+				radius: 3,
+				'stroke-width': 0
+			}
+		}]
+	});
+
+});
+	
+	//--><!]]>
+	</script> 
+{% endblock %}
+
+{# set pageRdfId = path('profile_athlete', athlete.routingParams|merge({ '_format': 'html' }) ) ~ '.html' #}
+
+{% block title %}
+
+{% endblock %}
+
+{% block metas %}
+	{{ parent() }}
+
+	<meta property="og:type" content="athlete" />
+
+{% endblock %}
+
+{% block content %}
+
+<article id="athlete-{{ athlete.id }}" about="{{ path('profile_athlete', athlete.routingParams ) }}" typeof="sport:Athlete">
+
+
+
+<h1>{{ athlete }}</h1>
+
+<div id="rating-graph" style="width: 850px; height: 350px;"></div>
+
+</article>
+
+{% endblock %}

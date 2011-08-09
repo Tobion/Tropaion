@@ -1,0 +1,98 @@
+Athletes:
+  type: entity
+  table: athletes
+  fields:
+    id:
+      id: true
+      type: integer
+      unsigned: false
+      nullable: false
+      generator:
+        strategy: IDENTITY
+    lastName:
+      type: string
+      length: 20
+      fixed: false
+      nullable: false
+      column: last_name
+    firstName:
+      type: string
+      length: 20
+      fixed: false
+      nullable: false
+      column: first_name
+    gender:
+      type: string
+      length: 6
+      fixed: true
+      nullable: false
+    birthday:
+      type: date
+      nullable: false
+    country:
+      type: string
+      length: 2
+      fixed: true
+      nullable: false
+    isActive:
+      type: boolean
+      nullable: false
+      column: is_active
+    zip:
+      type: string
+      length: 10
+      fixed: false
+      nullable: false
+    city:
+      type: string
+      length: 70
+      fixed: false
+      nullable: false
+    street:
+      type: string
+      length: 70
+      fixed: false
+      nullable: false
+    singlesRating:
+      type: smallint
+      nullable: true
+      column: singles_rating
+    doublesRating:
+      type: smallint
+      nullable: true
+      column: doubles_rating
+    mixedRating:
+      type: smallint
+      nullable: true
+      column: mixed_rating
+    singlesMatches:
+      type: smallint
+      nullable: false
+      column: singles_matches
+    doublesMatches:
+      type: smallint
+      nullable: false
+      column: doubles_matches
+    mixedMatches:
+      type: smallint
+      nullable: false
+      column: mixed_matches
+    createdAt:
+      type: datetime
+      nullable: false
+      column: created_at
+    updatedAt:
+      type: datetime
+      nullable: false
+      column: updated_at
+  oneToOne:
+    club:
+      targetEntity: Clubs
+      cascade: {  }
+      mappedBy: null
+      inversedBy: null
+      joinColumns:
+        club_id:
+          referencedColumnName: id
+      orphanRemoval: false
+  lifecycleCallbacks: {  }

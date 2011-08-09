@@ -1,0 +1,494 @@
+<?php
+/**
+ * Tropaion - A social and semantic sport results service
+ *
+ * @copyright (c) Tobias Schultze <http://www.tobion.de>
+ *
+ * @link http://tropaion.tobion.de
+ * @license http://www.gnu.org/licenses/gpl-3.0.html GPL v3
+ */
+
+namespace Tobion\TropaionBundle\Controller;
+
+use Tobion\TropaionBundle\Entity;
+
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+
+/**
+ * Tournament Controller
+ *
+ * @author Tobias Schultze <http://www.tobion.de>
+ *
+ * @Route("/{owner}/{tournament}")
+ */
+class TournamentController extends Controller
+{
+	
+	/**
+     * @Route("/teammatch/create")
+     */
+    public function createAction()
+    {
+        $teammatch = new Entity\Teammatch();
+		$teammatch->setPerformedAt(new \DateTime());
+		$teammatch->setDescription('Lorem ipsum dolor');
+		
+		$team1 = new Entity\Team();
+		$team2 = new Entity\Team();
+		
+		$athlete1 = new Entity\Athlete();
+		$athlete1->setFirstName('Tobias');
+		$athlete2 = new Entity\Athlete();
+		$athlete2->setFirstName('Kehrberg');
+		
+		$club1 = new Entity\Club();
+		$club1->setCode('KWO');
+		$club1->setName('Kabelwerk');
+		$club1->setContactPerson($athlete1);
+		$club2 = new Entity\Club();
+		$club2->setCode('EBT');
+		$club2->setName('Empor');
+		$club2->setContactPerson($athlete2);
+		
+		$team1->setClub($club1);
+		$team2->setClub($club2);
+		$teammatch->setTeam1($team1);
+		$teammatch->setTeam2($team2);
+		
+		$match = new Entity\Match();
+		$teammatch->addMatches($match);
+		
+		
+
+		$em = $this->getDoctrine()->getEntityManager();
+		$em->persist($athlete1);
+		$em->persist($athlete2);
+		$em->persist($club1);
+		$em->persist($club2);
+		$em->persist($team1);
+		$em->persist($team2);
+		$em->persist($match);
+		$em->persist($teammatch);
+		$em->flush();
+
+		return new Response('Created teammatch id ' . $teammatch->getId());
+	}
+
+	private function getTournament()
+    {
+		$em = $this->getDoctrine()->getEntityManager();
+	
+		$qb = $em->createQueryBuilder();
+		$qb->select(array('r','o'))
+			->from('TobionTropaionBundle:Tournament', 'r')
+			->innerJoin('r.Owner', 'o')
+			->where($qb->expr()->eq('o.slug', '?0'))
+			->andWhere($qb->expr()->eq('r.slug', '?1'))
+			->setParameters(array(
+				$this->getRequest()->get('owner'), 
+				$this->getRequest()->get('tournament')
+			));
+
+		try {
+			return $qb->getQuery()->getSingleResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
+		} catch (\Doctrine\Orm\NoResultException $e) {
+			throw $this->createNotFoundException('Tournament not found.');
+		}
+	}
+
+    /**
+     * @Route(".{_format}", 
+     *     name="tournament",
+     *     defaults={"_format" = "html"},
+	 *     requirements={"_format" = "html|atom"}
+     * ) 
+     * @Template()
+     */
+    public function tournamentAction()
+    {
+		$tournament = $this->getTournament();
+		
+		return array(
+			'tournament' => $tournament,
+		);
+
+	}
+
+
+    /**
+     * @Route("/{league}.{_format}", 
+     *     name="tournament_league",
+     *     defaults={"_format" = "html"},
+	 *     requirements={"_format" = "html|json"}
+     * ) 
+     * @Template()
+     */
+    public function leagueAction()
+    {
+		$tournament = $this->getTournament();
+
+		$em = $this->getDoctrine()->getEntityManager();
+		$rep = $this->getDoctrine()->getRepository('TobionTropaionBundle:League');
+		
+		$leagueParts = \Tobion\TropaionBundle\Entity\League::parseSlug($this->getRequest()->get('league'));
+		
+		$qb = $em->createQueryBuilder();
+		$qb->select(array('l'))
+			->from('TobionTropaionBundle:League', 'l')
+			->where($qb->expr()->eq('l.tournament_id', '?0'))
+			->andWhere($qb->expr()->eq('l.class_abbr', '?1'))
+			->andWhere($qb->expr()->eq('l.division', '?2'))
+			->setParameters(array(
+				$tournament->getId(), 
+				$leagueParts['classAbbr'], 
+				$leagueParts['division']
+			));
+
+		try {
+			$league = $qb->getQuery()->getSingleResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
+		} catch (\Doctrine\Orm\NoResultException $e) {
+			throw $this->createNotFoundException('League not found.');
+		}
+		
+		$round = intval($this->getRequest()->get('round'));
+		$homeaway = intval($this->getRequest()->get('homeaway'));
+		
+		$standings = $rep->getStandings(
+			$league->getId(), 
+			$round,
+			$homeaway
+		);
+		
+		if ($this->getRequest()->get('_format') == 'json') {
+			return new Response(json_encode($standings));
+		}
+	
+		$qb = $em->createQueryBuilder();
+		$qb->select(array('tm','t1','t2','c1','c2'))
+			->from('TobionTropaionBundle:Teammatch', 'tm')
+			->innerJoin('tm.Team1', 't1')
+	    	->innerJoin('tm.Team2', 't2')
+    		->innerJoin('t1.Club', 'c1')
+	    	->innerJoin('t2.Club', 'c2')
+			->where($qb->expr()->eq('t1.league_id', ':id'))
+			->setParameter('id', $league->getId());
+		
+		$teammatches = $qb->getQuery()->getResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
+
+		$teammatchesCrossover = array();
+		foreach ($teammatches as $teammatch) {
+			// set league which is not hydrated but needed for teammatches methods 
+			$teammatch->setLeague($league);
+			$teammatchesCrossover[$teammatch->getTeam1Id()][$teammatch->getTeam2Id()] = $teammatch;
+		}
+			
+		$previousLeague = $rep->findHierarchicallyPrevious($league);
+		$nextLeague = $rep->findHierarchicallyNext($league);
+	
+		return array(
+			'tournament' => $tournament,
+			'league' => $league,
+			'standings' => $standings,
+			'teammatches' => $teammatches,
+			'teammatchesCrossover' => $teammatchesCrossover,
+			'round' => $round,
+			'homeaway' => $homeaway,
+			'previousLeague' => $previousLeague,
+			'nextLeague' => $nextLeague
+		);
+	}
+
+    /**
+     * @Route("/{league}/{team1Club}-{team1Number}_{team2Club}-{team2Number}.{_format}", 
+     *     name="tournament_teammatch",
+     *     defaults={"_format" = "html"},
+	 *     requirements={"team1Club" = ".+", "team1Number" = "\d+", "team2Number" = "\d+", "team2Club" = ".+", "_format" = "html|basic|json|ics"}
+     * ) 
+     * // Route("/{owner}/{tournament}/{league}/{teammatch}", name="teammatch_show") 
+     * @Template()
+     */
+    public function teammatchAction()
+    {
+		$tournament = $this->getTournament();
+
+		$em = $this->getDoctrine()->getEntityManager();
+		$rep = $this->getDoctrine()->getRepository('TobionTropaionBundle:Teammatch');
+		
+		/*
+		$teammatch = $this->getDoctrine()
+			->getRepository('TobionTropaionBundle:Teammatch')
+			->find($id);
+			
+		
+		$query = $em->createQuery(
+			'SELECT tm FROM TobionTropaionBundle:Teammatch tm JOIN tm.Matches m WHERE tm.id = :id'
+		)->setParameter('id', $id);
+		$teammatch = $query->getArrayResult();
+		*/
+		
+		/*
+		$qb = $em->createQueryBuilder();
+		$qb->select(array('tm','t1','t2','c1','c2','l','r','v','m','y','g','t1p1','t1p2','t2p1','t2p2'))
+			->from('TobionTropaionBundle:Teammatch', 'tm')
+			->innerJoin('tm.Team1', 't1')
+	    	->leftJoin('tm.Matches', 'm')
+			->where($qb->expr()->eq('tm.id', ':id'))
+			->setParameter('id', $id);
+			
+		$teammatch = $qb->getQuery()->getSingleResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
+		*/
+		
+		$hydrateMode = $this->getRequest()->get('_format') == 'json' ? \Doctrine\ORM\Query::HYDRATE_ARRAY : \Doctrine\ORM\Query::HYDRATE_OBJECT;
+
+		$leagueParts = \Tobion\TropaionBundle\Entity\League::parseSlug($this->getRequest()->get('league'));
+		
+		$teammatch = $rep->findByParamsJoinedAll(
+			$this->getRequest()->get('owner'),
+			$this->getRequest()->get('tournament'),
+			$leagueParts['classAbbr'],
+			$leagueParts['division'],
+			$this->getRequest()->get('team1Club'),
+			$this->getRequest()->get('team1Number'),
+			$this->getRequest()->get('team2Club'),
+			$this->getRequest()->get('team2Number'),
+			$hydrateMode
+		);
+		
+		if (!$teammatch) {
+			throw $this->createNotFoundException('No teammatch found.');
+		}
+		
+	
+		if ($this->getRequest()->get('_format') == 'json') {
+			// TODO exclude athlete birthday and other private data (email, password etc.) from array before encoding it
+		
+			$response = new Response(json_encode($teammatch));
+			// $response->headers->set('Content-Type', 'application/json');
+			return $response;
+		}
+		
+		$previousTeammatch = $rep->findChronologicallyPrevious($teammatch);
+		$nextTeammatch = $rep->findChronologicallyNext($teammatch);
+		
+		$returnTeammatch = $rep->findReturnTeammatch($teammatch);
+		
+		return array(
+			'tournament' => $tournament,
+			'teammatch' => $teammatch,
+			'previousTeammatch' => $previousTeammatch,
+			'nextTeammatch' => $nextTeammatch,
+			'returnTeammatch' => $returnTeammatch
+		);
+	}
+
+
+    /**
+     * @Route("/teams/{club}-{teamNumber}.{_format}",
+     *     name="tournament_team",
+     *     defaults={"_format" = "html"},
+	 *     requirements={"club" = ".+", "teamNumber" = "\d+", "_format" = "html|atom"}
+     * ) 
+     * @Template()
+     */
+    public function teamAction()
+    {
+
+		$tournament = $this->getTournament();
+	
+		$em = $this->getDoctrine()->getEntityManager();
+	
+		$qb = $em->createQueryBuilder();
+		$qb->select(array('t','c','l','lu','a'))
+			->from('TobionTropaionBundle:Team', 't')
+			->innerJoin('t.Club', 'c')
+	    	->innerJoin('t.League', 'l')
+			->leftJoin('t.Lineups', 'lu')
+			->leftJoin('lu.Athlete', 'a')
+			->where($qb->expr()->eq('l.tournament_id', '?0'))
+			->andWhere($qb->expr()->eq('c.code', '?1'))
+			->andWhere($qb->expr()->eq('t.team_number', '?2'))
+			->setParameters(array(
+				$tournament->getId(), 
+				$this->getRequest()->get('club'), 
+				$this->getRequest()->get('teamNumber')
+			));
+
+		try {
+			$team = $qb->getQuery()->getSingleResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
+		} catch (\Doctrine\Orm\NoResultException $e) {
+			throw $this->createNotFoundException('Team not found.');
+		}
+
+		$qb = $em->createQueryBuilder();
+		$qb->select(array('tm','t1','t2','c1','c2','v'))
+			->from('TobionTropaionBundle:Teammatch', 'tm')
+			->innerJoin('tm.Team1', 't1')
+    		->innerJoin('tm.Team2', 't2')
+			->innerJoin('t1.Club', 'c1')
+	    	->innerJoin('t2.Club', 'c2')
+			->innerJoin('tm.Venue', 'v')
+			->where('tm.team1_id = :id OR tm.team2_id = :id')
+			->orderBy('tm.performed_at', 'ASC')
+			->setParameter('id', $team->getId());
+		
+		$teammatches = $qb->getQuery()->getResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
+		
+		foreach ($teammatches as $teammatch) {
+			$teammatch->transformToTeamView($team);
+		}
+		
+		return array(
+			'tournament' => $tournament,
+			'team' => $team,
+			'teammatches' => $teammatches,
+			'lineupChanged' => $team->hasLineupChanged(),
+			'hasSecondRoundLineup' => $team->hasSecondRoundLineup()
+		);
+
+	} 
+
+
+    /**
+     * @Route("/clubs/{club}.{_format}",
+     *     name="tournament_club",
+     *     defaults={"_format" = "html"},
+	 *     requirements={"club" = ".+", "_format" = "html"}
+     * ) 
+     * @Template()
+     */
+    public function clubAction()
+    {
+		// Alle Mannschaften + Aufstellungen + Ersatzspieler
+		
+		$tournament = $this->getTournament();
+		
+		$em = $this->getDoctrine()->getEntityManager();
+	
+		$qb = $em->createQueryBuilder();
+		$qb->select(array('c','t','l','lu','a'))
+			->from('TobionTropaionBundle:Club', 'c')
+			->innerJoin('c.Teams', 't')
+	    	->innerJoin('t.League', 'l')
+			->leftJoin('t.Lineups', 'lu')
+			->leftJoin('lu.Athlete', 'a')
+			->where($qb->expr()->eq('l.tournament_id', '?0'))
+			->andWhere($qb->expr()->eq('c.code', '?1'))
+			->setParameters(array(
+				$tournament->getId(), 
+				$this->getRequest()->get('club')
+			));
+
+		try {
+			$club = $qb->getQuery()->getSingleResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
+		} catch (\Doctrine\Orm\NoResultException $e) {
+			throw $this->createNotFoundException('Club in tournament not found.');
+		}
+
+		$qb = $em->createQueryBuilder();
+		$qb->select(array('tm','t1','t2','c1','c2','v'))
+			->from('TobionTropaionBundle:Teammatch', 'tm')
+			->innerJoin('tm.Team1', 't1')
+    		->innerJoin('tm.Team2', 't2')
+			->innerJoin('t1.Club', 'c1')
+	    	->innerJoin('t2.Club', 'c2')
+			->innerJoin('t1.League', 'l')
+			->innerJoin('tm.Venue', 'v')
+			->where('t1.club_id = :club_id OR t2.club_id = :club_id')
+			->andWhere($qb->expr()->eq('l.tournament_id', ':tournament_id'))
+			->orderBy('tm.performed_at', 'ASC')
+			->setParameter('club_id', $club->getId())
+			->setParameter('tournament_id', $tournament->getId());
+		
+		$teammatches = $qb->getQuery()->getResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
+		
+		foreach ($teammatches as $teammatch) {
+			$teammatch->transformToClubView($club);
+		}
+		
+		return array(
+			'tournament' => $tournament,
+			'club' => $club,
+			'teammatches' => $teammatches
+		);
+	}
+	
+
+	
+    /**
+     * @Route("/athlete/{firstName}-{lastName}_{id}.{_format}",
+     *     name="tournament_athlete",
+     *     defaults={"_format" = "html"},
+	 *     requirements={"firstName" = ".+", "lastName" = ".+", "id" = "\d+", "_format" = "html"}
+     * ) 
+     * @Template()
+     */
+    public function athleteAction()
+    {
+	
+		$tournament = $this->getTournament();
+		
+		$em = $this->getDoctrine()->getEntityManager();
+		
+		$qb = $em->createQueryBuilder();
+		$qb->select(array('a'))
+			->from('TobionTropaionBundle:Athlete', 'a')
+			->where($qb->expr()->eq('a.id', '?0'))
+			->setParameters(array(
+				$this->getRequest()->get('id')
+			));
+
+		try {
+			$athlete = $qb->getQuery()->getSingleResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
+		} catch (\Doctrine\Orm\NoResultException $e) {
+			throw $this->createNotFoundException('Athlete not found.');
+		}
+		
+		/* 
+			Fetch the league of both teams. Otherwise strange fatal error when trying to access one teams league.
+			Usually this is not necessary, for example in clubAction(). Doctrine should recognize that the same league is already loaded.
+		*/
+		$qb = $em->createQueryBuilder();
+		$qb->select(array('m','tm','t1','t2','c1','c2','l','l2','v','y','g','t1p1','t1p2','t2p1','t2p2'))
+			->from('TobionTropaionBundle:Match', 'm')
+			->innerJoin('m.Teammatch', 'tm')
+			->innerJoin('tm.Team1', 't1')
+    		->innerJoin('tm.Team2', 't2')
+			->innerJoin('t1.Club', 'c1')
+	    	->innerJoin('t2.Club', 'c2')
+			->innerJoin('t1.League', 'l')
+			->innerJoin('t2.League', 'l2')
+			->innerJoin('tm.Venue', 'v')
+			->leftJoin('m.MatchType', 'y')
+	    	->leftJoin('m.Games', 'g')
+	    	->leftJoin('m.Team1_Player', 't1p1')
+	    	->leftJoin('m.Team1_Partner', 't1p2')
+	    	->leftJoin('m.Team2_Player', 't2p1')
+	    	->leftJoin('m.Team2_Partner', 't2p2')
+			->where('m.team1_player_id = :athlete_id OR m.team1_partner_id = :athlete_id OR ' .
+			        'm.team2_player_id = :athlete_id OR m.team2_partner_id = :athlete_id')
+			->andWhere($qb->expr()->eq('l.tournament_id', ':tournament_id'))
+			->orderBy('tm.performed_at', 'ASC')
+			->addOrderBy('m.match_type_id', 'ASC')
+			// addOrderBy game_sequence ASC is added automatically
+			->setParameter('athlete_id', $athlete->getId())
+			->setParameter('tournament_id', $tournament->getId());
+		
+		$matches = $qb->getQuery()->getResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
+		
+		foreach ($matches as $match) {
+			$match->transformToAthleteView($athlete);
+		}
+
+		return array(
+			'tournament' => $tournament,
+			'athlete' => $athlete,
+			'matches' => $matches
+		);
+		
+	}
+	
+
+}

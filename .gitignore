@@ -1,0 +1,10 @@
+/app/config/parameters.ini
+/app/cache/*
+/app/logs/*
+/app/bootstrap*
+/app/phpunit.xml
+/app/DoctrineMigrations/*
+/web/bundles/*
+/vendor/*
+*.php~
+/src/Acme

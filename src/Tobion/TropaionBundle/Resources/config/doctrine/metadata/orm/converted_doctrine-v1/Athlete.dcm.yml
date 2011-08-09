@@ -1,0 +1,87 @@
+Athlete:
+  type: entity
+  table: athletes
+  indexes:
+    gender_index:
+      columns:
+        - gender
+    is_active_index:
+      columns:
+        - is_active
+  fields:
+    id:
+      id: true
+      type: integer
+      length: '4'
+      generator:
+        strategy: AUTO
+    last_name:
+      type: string
+      length: '20'
+      notnull: true
+    first_name:
+      type: string
+      length: '20'
+      notnull: true
+    gender:
+      type: string
+      notnull: true
+    birthday:
+      type: date
+      notnull: true
+    country:
+      type: string
+      length: '2'
+      notnull: true
+    club_id:
+      type: integer
+      length: '4'
+      notnull: true
+    is_active:
+      type: boolean
+      notnull: true
+    zip:
+      type: string
+      length: '10'
+      notnull: true
+    city:
+      type: string
+      length: '70'
+      notnull: true
+    street:
+      type: string
+      length: '70'
+      notnull: true
+    singles_rating:
+      type: integer
+      length: '2'
+      notnull: false
+    doubles_rating:
+      type: integer
+      length: '2'
+      notnull: false
+    mixed_rating:
+      type: integer
+      length: '2'
+      notnull: false
+    singles_matches:
+      type: integer
+      length: '2'
+      notnull: true
+    doubles_matches:
+      type: integer
+      length: '2'
+      notnull: true
+    mixed_matches:
+      type: integer
+      length: '2'
+      notnull: true
+  oneToMany:
+    Club:
+      targetEntity: Club
+      cascade: {  }
+      mappedBy: Athletes
+      inversedBy: null
+      orphanRemoval: false
+      orderBy: null
+  lifecycleCallbacks: {  }

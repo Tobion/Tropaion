@@ -1,0 +1,85 @@
+Clubs:
+  type: entity
+  table: clubs
+  fields:
+    id:
+      id: true
+      type: integer
+      unsigned: false
+      nullable: false
+      generator:
+        strategy: IDENTITY
+    code:
+      type: string
+      length: 10
+      fixed: false
+      nullable: false
+    name:
+      type: string
+      length: 100
+      fixed: false
+      nullable: false
+    website:
+      type: string
+      length: 255
+      fixed: false
+      nullable: true
+    logo:
+      type: string
+      length: 100
+      fixed: false
+      nullable: true
+    description:
+      type: text
+      nullable: true
+    updatedAt:
+      type: datetime
+      nullable: false
+      column: updated_at
+  oneToOne:
+    clubSyndicate1:
+      targetEntity: Clubs
+      cascade: {  }
+      mappedBy: null
+      inversedBy: null
+      joinColumns:
+        club_syndicate_1:
+          referencedColumnName: id
+      orphanRemoval: false
+    clubSyndicate2:
+      targetEntity: Clubs
+      cascade: {  }
+      mappedBy: null
+      inversedBy: null
+      joinColumns:
+        club_syndicate_2:
+          referencedColumnName: id
+      orphanRemoval: false
+    clubSyndicate3:
+      targetEntity: Clubs
+      cascade: {  }
+      mappedBy: null
+      inversedBy: null
+      joinColumns:
+        club_syndicate_3:
+          referencedColumnName: id
+      orphanRemoval: false
+    clubSyndicate4:
+      targetEntity: Clubs
+      cascade: {  }
+      mappedBy: null
+      inversedBy: null
+      joinColumns:
+        club_syndicate_4:
+          referencedColumnName: id
+      orphanRemoval: false
+    contactPerson:
+      targetEntity: Athletes
+      cascade: {  }
+      mappedBy: null
+      inversedBy: null
+      joinColumns:
+        contact_person_id:
+          referencedColumnName: id
+      orphanRemoval: false
+  lifecycleCallbacks: {  }

@@ -1,0 +1,147 @@
+Teammatch:
+  type: entity
+  table: teammatches
+  indexes:
+    performed_at_index:
+      columns:
+        - performed_at
+  fields:
+    id:
+      id: true
+      type: integer
+      length: '4'
+      generator:
+        strategy: AUTO
+    location_id:
+      type: integer
+      length: '4'
+      notnull: false
+    scheduled_at:
+      type: datetime
+      notnull: true
+    performed_at:
+      type: datetime
+      notnull: true
+    season_round:
+      type: integer
+      length: '1'
+      notnull: true
+    team1_id:
+      type: integer
+      length: '4'
+      notnull: true
+    team2_id:
+      type: integer
+      length: '4'
+      notnull: true
+    team1_score:
+      type: integer
+      length: '1'
+      notnull: false
+    team2_score:
+      type: integer
+      length: '1'
+      notnull: false
+    team1_games:
+      type: integer
+      length: '1'
+      notnull: false
+    team2_games:
+      type: integer
+      length: '1'
+      notnull: false
+    team1_points:
+      type: integer
+      length: '2'
+      notnull: false
+    team2_points:
+      type: integer
+      length: '2'
+      notnull: false
+    no_fight:
+      type: boolean
+      notnull: true
+    annulled:
+      type: boolean
+      notnull: true
+    revised_score:
+      type: boolean
+      notnull: true
+    wrongdoer:
+      type: integer
+      length: '1'
+      notnull: true
+    wrongdoing_reason:
+      type: integer
+      length: '1'
+      notnull: true
+    incomplete_lineup:
+      type: boolean
+      notnull: true
+    submitted_by_id:
+      type: integer
+      length: '4'
+      notnull: false
+    submitted_at:
+      type: datetime
+      notnull: false
+    confirmed_by_id:
+      type: integer
+      length: '4'
+      notnull: false
+    confirmed_at:
+      type: datetime
+      notnull: false
+    approved_by_id:
+      type: integer
+      length: '4'
+      notnull: false
+    approved_at:
+      type: datetime
+      notnull: false
+    description:
+      type: text
+  oneToMany:
+    Location:
+      targetEntity: Location
+      cascade: {  }
+      mappedBy: Teammatch
+      inversedBy: null
+      orphanRemoval: false
+      orderBy: null
+    Team1:
+      targetEntity: Team
+      cascade: {  }
+      mappedBy: Teammatch
+      inversedBy: null
+      orphanRemoval: false
+      orderBy: null
+    Team2:
+      targetEntity: Team
+      cascade: {  }
+      mappedBy: Teammatch
+      inversedBy: null
+      orphanRemoval: false
+      orderBy: null
+    Submitted_By:
+      targetEntity: User
+      cascade: {  }
+      mappedBy: Teammatch
+      inversedBy: null
+      orphanRemoval: false
+      orderBy: null
+    Confirmed_By:
+      targetEntity: User
+      cascade: {  }
+      mappedBy: Teammatch
+      inversedBy: null
+      orphanRemoval: false
+      orderBy: null
+    Approved_By:
+      targetEntity: User
+      cascade: {  }
+      mappedBy: Teammatch
+      inversedBy: null
+      orphanRemoval: false
+      orderBy: null
+  lifecycleCallbacks: {  }

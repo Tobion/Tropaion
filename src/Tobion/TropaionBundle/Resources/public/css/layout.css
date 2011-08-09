@@ -1,0 +1,96 @@
+/* BVBB Colors:
+Logo:
+Red: 	#AF1619
+Black
+Blue:  	#027FAF
+Gray: 	#D7DBDC
+Tabellenhintergrund in Auswertungen: #FFFF66;
+http://colorschemedesigner.com/#5C32qrZmaw0w0
+*/
+
+
+article,aside,canvas,details,figcaption,figure,
+footer,header,hgroup,menu,nav,section,summary { 
+    display: block;
+}
+
+body {
+	font: 14px/1.15 "Droid Sans",  Arial, sans-serif, Verdana;
+}
+
+table {
+	font-size: inherit;
+	font: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+img {
+	border: 0;
+}
+
+dl {
+	line-height: 115%;
+	padding: 0;
+	margin: 5px auto 15px;
+	width: 90%;
+}
+dt, dd {
+	margin: 0;
+	padding: 2px 3px;
+	border-top: 1px dashed gray;
+}
+dt {
+	width: 190px;
+	float: left;
+	clear: both;
+}
+dd {
+	margin-left: 193px;
+}
+dt:first-child, dt:first-child+dd {
+	border-top-width: 0;
+}
+
+
+#menu ul {
+	margin: 0px;
+	padding: 0px;
+}
+
+#menu ul li {
+	float: left;
+	list-style-type: none;
+	margin-right: 20px;
+}
+
+#content {
+	padding-top: 20px;
+	clear: both;
+}
+
+.opensearch {
+	background: transparent url(/images/opensearch-icon-16x16.png) no-repeat scroll 0 0;
+	padding-left: 20px;
+}
+
+.license {
+	margin-top: 25px;
+}
+.license img {
+	vertical-align: text-bottom;
+}
+.validation img {
+	vertical-align: text-bottom;
+}
+
+@media print {
+
+.validation { 
+	display: none;
+}
+.license img {
+	display: none;
+}
+
+}

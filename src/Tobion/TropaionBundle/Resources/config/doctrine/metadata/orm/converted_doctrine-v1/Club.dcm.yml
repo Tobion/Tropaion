@@ -1,0 +1,87 @@
+Club:
+  type: entity
+  table: clubs
+  uniqueConstraints:
+    club_code_index:
+      columns:
+        - code
+  fields:
+    id:
+      id: true
+      type: integer
+      length: '4'
+      generator:
+        strategy: AUTO
+    code:
+      type: string
+      length: '10'
+      notnull: true
+    name:
+      type: string
+      length: '100'
+      notnull: true
+    contact_person_id:
+      type: integer
+      length: '4'
+      notnull: true
+    club_syndicate_1:
+      type: integer
+      length: '4'
+      notnull: false
+    club_syndicate_2:
+      type: integer
+      length: '4'
+      notnull: false
+    club_syndicate_3:
+      type: integer
+      length: '4'
+      notnull: false
+    club_syndicate_4:
+      type: integer
+      length: '4'
+      notnull: false
+    website:
+      type: string
+      length: '255'
+    logo:
+      type: string
+      length: '100'
+    description:
+      type: text
+  oneToMany:
+    Contact_Person:
+      targetEntity: Athlete
+      cascade: {  }
+      mappedBy: InChargeOfClubs
+      inversedBy: null
+      orphanRemoval: false
+      orderBy: null
+    Syndicate1:
+      targetEntity: Club
+      cascade: {  }
+      mappedBy: ClubSyndicates
+      inversedBy: null
+      orphanRemoval: false
+      orderBy: null
+    Syndicate2:
+      targetEntity: Club
+      cascade: {  }
+      mappedBy: ClubSyndicates
+      inversedBy: null
+      orphanRemoval: false
+      orderBy: null
+    Syndicate3:
+      targetEntity: Club
+      cascade: {  }
+      mappedBy: ClubSyndicates
+      inversedBy: null
+      orphanRemoval: false
+      orderBy: null
+    Syndicate4:
+      targetEntity: Club
+      cascade: {  }
+      mappedBy: ClubSyndicates
+      inversedBy: null
+      orphanRemoval: false
+      orderBy: null
+  lifecycleCallbacks: {  }

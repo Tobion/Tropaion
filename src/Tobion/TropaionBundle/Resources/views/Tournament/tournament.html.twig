@@ -1,0 +1,25 @@
+{% extends "TobionTropaionBundle::layout.html.twig" %}
+
+{% block stylesheets %}
+    {{ parent() }}
+
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/tournament.css') }}" />
+{% endblock %}
+
+{% set pageRdfId = path('tournament', tournament.routingParams|merge({ '_format': 'html' }) ) ~ '.html' %}
+
+{% block title %}
+	{{ tournament.shortName }}  - {{ tournament.owner }}
+{% endblock %}
+
+{% block metas %}
+
+{% endblock %}
+
+{% block content %}
+
+<article id="tournament-{{ tournament.id }}">
+
+</article>
+
+{% endblock %}

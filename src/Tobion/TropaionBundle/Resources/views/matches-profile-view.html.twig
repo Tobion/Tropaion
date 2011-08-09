@@ -1,0 +1,161 @@
+{% import "TobionTropaionBundle::macros.html.twig" as macros %}
+
+<table class="match-list profile-view" about="{{ path('profile_athlete', athlete.routingParams ) }}" typeof="sport:Athlete" xmlns:rel="http://purl.org/vocab/relationship/">
+<caption>
+{#<details class="filter">:
+	<summary>{% trans %}Filter{% endtrans %}</summary>#}
+<fieldset class="filter">
+    <legend>{% trans %}Filter{% endtrans %}</legend>
+<div id="match-filters">
+	<label><span>{% trans %}Runde{% endtrans %}:</span>
+		<select id="stage-filter">
+			<option selected="selected" value="">{% trans %}-- Runde --{% endtrans %}</option>
+			<option value="first-half">{% trans %}Hinrunde{% endtrans %}</option>
+			<option value="second-half">{% trans %}Rückrunde{% endtrans %}</option>
+		</select>
+	</label>
+	<label><span>{% trans %}H/A{% endtrans %}:</span>
+		<select id="homeaway-filter">
+			<option selected="selected" value="">{% trans %}-- H/A --{% endtrans %}</option>
+			<option value="home">{% trans %}Heimspiel{% endtrans %}</option>
+			<option value="away">{% trans %}Auswärtsspiel{% endtrans %}</option>
+		</select>
+	</label>
+	<label><span>{% trans %}Disziplin{% endtrans %}:</span>
+		<select id="matchtype-filter">
+			<option selected="selected" value="">{% trans %}-- Disziplin --{% endtrans %}</option>
+			<optgroup id="combined-matchtypes" label="{% trans %}Kombiniert{% endtrans %}">
+				<option value="all-singles">{% trans %}Alle Einzel{% endtrans %}</option>
+				<option value="all-doubles">{% trans %}Alle Doppel{% endtrans %}</option>
+			</optgroup>
+			<optgroup id="discrete-matchtypes" label="{% trans %}Getrennt{% endtrans %}">
+			</optgroup>
+		</select>
+	</label>
+	<label><span>{% trans %}Spieler{% endtrans %}:</span>
+		<input id="players-filter" type="text" placeholder="{% trans %}-- Partner / Gegner --{% endtrans %}" />
+	</label>
+	<label><span>{% trans %}Mannschaft{% endtrans %}:</span>
+		<input id="teams-filter" type="text" placeholder="{% trans %}-- Mannschaft --{% endtrans %}" />
+	</label>
+</div>
+</fieldset>
+{#</details>#}
+</caption>
+<thead>
+	<tr>
+		<th scope="col" class="date">{% trans %}Termin{% endtrans %}</th>
+		<th scope="col" class="league">{% trans %}Staffel{% endtrans %}</th>
+		<th scope="col" class="stage">{% trans %}Runde{% endtrans %}</th>
+		<th scope="col" class="homeaway">{% trans %}<abbr title="Heim / Auswärts">H/A</abbr>{% endtrans %}</th>
+		<th scope="col" class="matchtype partner">{% trans %}Disziplin{% endtrans %} {% trans %}(Partner){% endtrans %}</th>
+		<th scope="col" class="match score" title="{% trans with { '%perspective%': athlete.firstName ~ ' ' ~ athlete.lastName } %}Resultat aus Sicht von %perspective% | Sortierbar nach der Höhe des Sieges{% endtrans %}">{% trans %}Ergebnis{% endtrans %}</th>
+		<th scope="col" class="players opponent">{% trans %}Gegner{% endtrans %}</th>
+		<th scope="col" class="games">{% trans %}Sätze{% endtrans %}</th>
+		<th scope="col" class="team self">{% trans %}<abbr title="Gespielt für Mannschaft">Für Team</abbr>{% endtrans %}{# Für / Unterstütztes / Begünstigtes Team , Gespielt für #}</th>
+		<th scope="col" class="teammatch score" title="{% trans %}Mannschaftsergebnis{% endtrans %}">{% trans %}Erg.{% endtrans %}</th>
+		<th scope="col" class="team opponent">{% trans %}<abbr title="Gegnerische Mannschaft">Gegn. Team</abbr>{% endtrans %}</th>
+		<th scope="col" class="status">{% trans %}Status{% endtrans %}</th>
+	</tr>
+</thead>
+<tbody>
+{% for match in matches %}
+	{% set teammatch = match.teammatch %}
+	<tr id="match-{{ match.id }}">
+		<td class="date">
+			{% if teammatch.annulled %}<del>{% endif %}
+			<time datetime="{{ teammatch.performedAt | date('c') }}">{{ teammatch.performedAt | date('d.m.Y H:i') }}</time>
+			{% if teammatch.annulled %}</del>{% endif %}
+		</td>
+		<td class="league"><a href="{{ path('tournament_league', teammatch.league.routingParams ) }}" data-level="{{ teammatch.league.classLevel }}" data-division="{{ teammatch.league.division }}">{{ teammatch.league.shortName }}</a></td>
+		<td class="stage"><span {% if teammatch.seasonRound == 1 %}data-stage="first-half">{% trans %}Hin{% endtrans %}</span>{% else %}data-stage="second-half">{% trans %}Rück{% endtrans %}{% endif %}</span></td>
+		<td class="homeaway"><span data-homeaway="{{ teammatch.transformedViewHomeAway }}">{% if teammatch.transformedViewHomeAway == 'home' %}{% trans %}Heim{% endtrans %}{% else %}{% trans %}Ausw.{% endtrans %}{% endif %}</span></td>
+		<td class="matchtype partner">
+			{% spaceless %}
+			<a href="#match-{{ match.id }}" data-matchtype-name="{{ match.matchType.name }}" data-matchtype-xonx="{{ match.matchType.xOnX }}" data-matchtype-gender="{{ match.matchType.gender }}">{{ match.matchType.name }}</a>
+			{% if match.team1Partner %}
+				<div rel="rel:collaboratesWith">
+					<a about="{{ path('profile_athlete', match.team1Partner.routingParams ) }}" typeof="sport:Athlete" rel="foaf:page" href="{{ path('tournament_athlete', match.team1Partner.routingParams(tournament) ) }}" property="foaf:name">{{ match.team1Partner.lastName }}, {{ match.team1Partner.firstName }}</a>
+				</div>
+			{% endif %}
+			{% endspaceless %}
+		</td>
+		<td class="match score">
+			<div>
+		{% if match.isOriginalFallbackEffectiveDraw %}
+			<img class="draw" src="{{ asset('bundles/tobiontropaion/images/icons/status/thumb-sideways.png') }}" width="16" height="9" alt="{% trans %}U{% endtrans %}" title="{% trans %}Unentschieden{% endtrans %}" />
+		{% elseif match.isTeam1OriginalFallbackEffectiveWinner %}
+			{% set movRotateDeg = match.team1OriginalFallbackEffectiveScore > 0 ? match.team2OriginalFallbackEffectiveScore / match.team1OriginalFallbackEffectiveScore * 90 : 0 %}
+			<img class="win" src="{{ asset('bundles/tobiontropaion/images/icons/status/thumb-up.png') }}" {% 
+				if movRotateDeg > 0 %}style="-webkit-transform:rotate({{ movRotateDeg }}deg); -moz-transform:rotate({{ movRotateDeg }}deg); -o-transform:rotate({{ movRotateDeg }}deg); -ms-transform:rotate({{ movRotateDeg }}deg);" {% 
+				endif %}width="9" height="16" alt="{% trans %}S{% endtrans %}" title="{% trans %}Sieg{% endtrans %}" />
+		{% elseif match.hasOriginalFallbackEffectiveResult %}
+			{% set movRotateDeg = match.team2OriginalFallbackEffectiveScore > 0 ? match.team1OriginalFallbackEffectiveScore / match.team2OriginalFallbackEffectiveScore * 90 : 0 %}
+			<img class="loss" src="{{ asset('bundles/tobiontropaion/images/icons/status/thumb-down.png') }}" {% 
+				if movRotateDeg > 0 %}style="-webkit-transform:rotate(-{{ movRotateDeg }}deg); -moz-transform:rotate(-{{ movRotateDeg }}deg); -o-transform:rotate(-{{ movRotateDeg }}deg); -ms-transform:rotate(-{{ movRotateDeg }}deg);" {% 
+				endif %}width="9" height="16" alt="{% trans %}N{% endtrans %}" title="{% trans %}Niederlage{% endtrans %}" />
+		{% endif %}
+			<a href="{{ path('tournament_teammatch', teammatch.routingParams ) }}#match-{{ match.id }}" data-mov="{{ match.marginOfVictorySortableString(match.team1Player) }}" title="{% trans %}Zum Individualspiel im Mannschaftsspielbericht{% endtrans %}">
+				{{ match.team1OriginalFallbackEffectiveScore is none ? '‒' : match.team1OriginalFallbackEffectiveScore }}:{{ match.team2OriginalFallbackEffectiveScore is none ? '‒' : match.team2OriginalFallbackEffectiveScore }}
+			</a>
+			</div>
+			{% if match.hasOriginalResult and ( 
+				match.team1Score != match.team1OriginalFallbackEffectiveScore or match.team1Score is none or 
+				match.team2Score != match.team2OriginalFallbackEffectiveScore or match.team2Score is none )	%}
+				<div class="revised">{{ match.team1Score is none ? '‒' : match.team1Score }}:{{ match.team2Score is none ? '‒' : match.team2Score }}</div>
+			{% endif %}
+		</td>
+		<td class="players opponent" rel="rel:antagonistOf">
+			{% if not match.team2Player and not match.team2Partner %}
+				<small>&lt;&lt;&lt; {% trans %}kein Spieler{% endtrans %} &gt;&gt;&gt;</small>
+			{% endif %}
+			{% spaceless %}
+			{% if match.team2Player %}
+				<a about="{{ path('profile_athlete', match.team2Player.routingParams ) }}" typeof="sport:Athlete" rel="foaf:page" href="{{ path('tournament_athlete', match.team2Player.routingParams(tournament) ) }}" property="foaf:name">{{ match.team2Player.lastName }}, {{ match.team2Player.firstName }}</a>
+				{% if match.team2Partner %}<br />{% endif %}
+			{% endif %}
+			{% if match.team2Partner %}
+				<a about="{{ path('profile_athlete', match.team2Partner.routingParams ) }}" typeof="sport:Athlete" rel="foaf:page" href="{{ path('tournament_athlete', match.team2Partner.routingParams(tournament) ) }}" property="foaf:name">{{ match.team2Partner.lastName }}, {{ match.team2Partner.firstName }}</a>
+			{% endif %}
+			{% endspaceless %}
+		</td>
+		<td class="games">
+			{% if match.annulledGames %}
+				<ol class="annulled" title="{% trans %}Ursprüngliches Ergebnis{% endtrans %}">
+				{% for game in match.annulledGames %}
+					<li id="game-{{ game.id }}">
+						<span class="score">{{ game.team1Score }}</span><abbr> : </abbr><span class="score">{{ game.team2Score }}</span>
+					</li>
+				{% endfor %}
+				</ol>
+				</del>
+			{% endif %}
+			{% if match.effectiveGames %}
+				<ol {% if match.hasOriginalResult %}class="formal" title="{% trans %}Formell umgewertetes Ergebnis{% endtrans %}"{% else %}class="effective"{% endif %}>
+				{% for game in match.effectiveGames %}
+					<li id="game-{{ game.id }}">
+						<span class="score">{{ game.team1Score }}</span><abbr> : </abbr><span class="score">{{ game.team2Score }}</span>
+					</li>
+				{% endfor %}
+				</ol>
+				{% endif %}
+		</td>
+		<td class="team self"><a href="{{ path('tournament_team', teammatch.team1.routingParams ) }}">{{ teammatch.team1.club.code }} {{ teammatch.team1.teamNumber }}</a></td>
+		<td class="teammatch score">
+			<a href="{{ path('tournament_teammatch', teammatch.routingParams ) }}" data-mov="{{ teammatch.marginOfVictorySortableString(teammatch.team1) }}" title="{% trans %}Zum Mannschaftsspiel{% endtrans %}">
+				{{ teammatch.team1Score is none ? (teammatch.submittedBy ? '‒' : '?') : teammatch.team1Score }}:{{ teammatch.team2Score is none ? (teammatch.submittedBy ? '‒' : '?') : teammatch.team2Score }}
+			</a>
+		</td>
+		<td class="team opponent">
+			<a href="{{ path('tournament_team', teammatch.team2.routingParams ) }}">{{ teammatch.team2.club.code }} {{ teammatch.team2.teamNumber }}</a>
+		</td>
+		<td class="status">{% if match.noFight %}<img src="{{ asset('bundles/tobiontropaion/images/icons/status/nofight.png') }}" width="16" height="16" alt="{% trans %}Kampflos{% endtrans %}" title="{% trans %}Ergebnis ist kampflos zustande gekommen{% endtrans %}" />{% endif %}
+			{% if match.revisedScore %}<img src="{{ asset('bundles/tobiontropaion/images/icons/status/revised.png') }}" width="16" height="16" alt="{% trans %}Geändert{% endtrans %}" title="{% trans %}Ergebnis wurde geändert{% endtrans %}" />{% endif %}
+			{% if match.givenUpBy %}<img src="{{ asset('bundles/tobiontropaion/images/icons/status/given-up.png') }}" width="16" height="16" alt="{% trans %}Aufgabe{% endtrans %}" title="{% trans %}Spiel ist durch Aufgabe entschieden worden{% endtrans %}" />{% endif %}
+			{% if teammatch.confirmedBy %}<img src="{{ asset('bundles/tobiontropaion/images/icons/status/confirmed.png') }}" width="16" height="16" alt="{% trans %}Bestätigt{% endtrans %}" title="{% trans %}Ergebnis bestätigt{% endtrans %}" />{% endif %}
+			{% if teammatch.approvedBy %}<img src="{{ asset('bundles/tobiontropaion/images/icons/status/approved.png') }}" width="16" height="16" alt="{% trans %}Genehmigt{% endtrans %}" title="{% trans %}Ergebnis genehmigt{% endtrans %}" />{% endif %}
+		</td>
+	</tr>
+{% endfor %}
+</tbody>
+</table>

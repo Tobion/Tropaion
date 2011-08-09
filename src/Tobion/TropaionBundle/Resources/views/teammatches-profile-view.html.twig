@@ -1,0 +1,124 @@
+{% import "TobionTropaionBundle::macros.html.twig" as macros %}
+
+<table class="teammatch-list profile-view">
+<caption>
+{#<details class="filter">
+	<summary>{% trans %}Filter{% endtrans %}</summary>#}
+<fieldset class="filter">
+    <legend>{% trans %}Filter{% endtrans %}</legend>
+<div id="teammatch-filters">
+	<label><span>{% trans %}Termin{% endtrans %}:</span>
+		<select id="date-filter">
+			<option selected="selected" value="">{% trans %}-- Termin --{% endtrans %}</option>
+			<option value="current">{% trans %}aktuell (&#177;1 Woche){% endtrans %}{# kürzlich + demnächst #}</option>
+			<option value="past">{% trans %}vergangen{% endtrans %}</option>
+			<option value="future">{% trans %}zukünftig{% endtrans %}</option>
+			<option value="rearranged">{% trans %}verlegt{% endtrans %}</option>
+		</select>
+	</label>
+	<label><span>{% trans %}Runde{% endtrans %}:</span>
+		<select id="stage-filter">
+			<option selected="selected" value="">{% trans %}-- Runde --{% endtrans %}</option>
+			<option value="first-half">{% trans %}Hinrunde{% endtrans %}</option>
+			<option value="second-half">{% trans %}Rückrunde{% endtrans %}</option>
+		</select>
+	</label>
+	<label><span>{% trans %}H/A{% endtrans %}:</span>
+		<select id="homeaway-filter">
+			<option selected="selected" value="">{% trans %}-- H/A --{% endtrans %}</option>
+			<option value="home">{% trans %}Heimspiel{% endtrans %}</option>
+			<option value="away">{% trans %}Auswärtsspiel{% endtrans %}</option>
+		</select>
+	</label>
+	{% if profileView == 'club' %}
+	<label><span>{% trans %}Team{% endtrans %}:</span>
+		<select id="self-filter">
+			<option selected="selected" value="">{% trans %}-- Team --{% endtrans %}</option>
+		</select>
+	</label>
+	{% endif %}
+	<label><span>{% trans %}Gegner{% endtrans %}:</span>
+		<input id="opponent-filter" type="text" placeholder="{% trans %}-- Gegner --{% endtrans %}" />
+	</label>
+</div>
+</fieldset>
+{#</details>#}
+</caption>
+<thead>
+	<tr>
+		<th scope="col" class="date">{% trans %}Termin{% endtrans %}</th>
+		<th scope="col" class="venue">{% trans %}Halle{% endtrans %}</th>
+		<th scope="col" class="stage">{% trans %}Runde{% endtrans %}</th>
+		<th scope="col" class="homeaway">{% trans %}<abbr title="Heim / Auswärts">H/A</abbr>{% endtrans %}</th>
+		{% if profileView == 'club' %}<th scope="col" class="team self">{% trans %}Team{% endtrans %}</th>{% endif %}
+		<th scope="col" class="score" title="{% trans with { '%perspective%': perspective } %}Resultat aus Sicht von %perspective% | Sortierbar nach der Höhe des Sieges{% endtrans %}">{% trans %}Ergebnis{% endtrans %}</th>
+		<th scope="col" class="team opponent">{% trans %}Gegner{% endtrans %}</th>
+		<th scope="col" class="games">{% trans %}Sätze{% endtrans %}</th>
+		<th scope="col" class="points">{% trans %}Punkte{% endtrans %}</th>
+		<th scope="col" class="status">{% trans %}Status{% endtrans %}</th>
+	</tr>
+</thead>
+<tbody>
+{% for teammatch in teammatches %}
+	<tr id="teammatch-{{ teammatch.id }}">
+		<td class="date">
+			{% if teammatch.annulled %}<del>{% endif %}
+			{% if teammatch.movedAt %}<em>{% endif %}
+			<time datetime="{{ teammatch.performedAt | date('c') }}">{{ teammatch.performedAt | date('d.m.Y H:i') }}</time>
+			{% if teammatch.movedAt %}</em>{% endif %}
+			{% if teammatch.annulled %}</del>{% endif %}
+		</td>
+		<td class="venue"><a href="{{ path('profile_venue', teammatch.venue.routingParams ) }}">{{ teammatch.venue.code }}</a></td>
+		<td class="stage"><span {% if teammatch.seasonRound == 1 %}data-stage="first-half">{% trans %}Hin{% endtrans %}</span>{% else %}data-stage="second-half">{% trans %}Rück{% endtrans %}{% endif %}</span></td>
+		<td class="homeaway"><span data-homeaway="{{ teammatch.transformedViewHomeAway }}">{% if teammatch.transformedViewHomeAway == 'home' %}{% trans %}Heim{% endtrans %}{% else %}{% trans %}Ausw.{% endtrans %}{% endif %}</span></td>
+		{% if profileView == 'club' %}
+		<td class="team self"><a href="{{ path('tournament_team', teammatch.team1.routingParams ) }}"{% if teammatch.isSameClub %} data-sameclubopponentteam="{{ teammatch.team2.teamNumber }}"{% endif %}>{{ teammatch.team1.teamNumber }}</a></td>
+		{% endif %}
+		<td class="score">
+		{% if profileView == 'club' and teammatch.isSameClub %}
+			<span class="sameclub" title="{% trans %}Ein Spiel zwischen zwei Mannschaften des gleichen Vereins. Dessen Ergebnis aus Sicht des Vereins wäre daher sowohl ein Sieg als auch eine Niederlage.{% endtrans %}">==</span>
+		{% elseif teammatch.isDraw %}
+			<img class="draw" src="{{ asset('bundles/tobiontropaion/images/icons/status/thumb-sideways.png') }}" width="16" height="9" alt="{% trans %}U{% endtrans %}" title="{% trans %}Unentschieden{% endtrans %}" />
+		{% elseif teammatch.isTeam1Winner %}
+			{% set movRotateDeg = (8 - teammatch.team1Score) * 22.5 %}
+			<img class="win" src="{{ asset('bundles/tobiontropaion/images/icons/status/thumb-up.png') }}" {% 
+				if movRotateDeg > 0 %}style="-webkit-transform:rotate({{ movRotateDeg }}deg); -moz-transform:rotate({{ movRotateDeg }}deg); -o-transform:rotate({{ movRotateDeg }}deg); -ms-transform:rotate({{ movRotateDeg }}deg);" {% 
+				endif %}width="9" height="16" alt="{% trans %}S{% endtrans %}" title="{% trans %}Sieg{% endtrans %}" />
+		{% elseif teammatch.hasResult %}
+			{% set movRotateDeg = teammatch.team1Score * 22.5 %}
+			<img class="loss" src="{{ asset('bundles/tobiontropaion/images/icons/status/thumb-down.png') }}" {% 
+				if movRotateDeg > 0 %}style="-webkit-transform:rotate(-{{ movRotateDeg }}deg); -moz-transform:rotate(-{{ movRotateDeg }}deg); -o-transform:rotate(-{{ movRotateDeg }}deg); -ms-transform:rotate(-{{ movRotateDeg }}deg);" {% 
+				endif %}width="9" height="16" alt="{% trans %}N{% endtrans %}" title="{% trans %}Niederlage{% endtrans %}" />
+		{% elseif teammatch.isSubmissionDue %}
+			<img class="submission-due" title="{% trans %}Ergebniseingabe ausstehend{% endtrans %}" src="{{ asset('bundles/tobiontropaion/images/icons/status/submission-due.png') }}" width="16" height="16" alt="{% trans %}Offen{% endtrans %}" />
+		{% endif %}
+			<a href="{{ path('tournament_teammatch', teammatch.routingParams ) }}" data-mov="{{ teammatch.marginOfVictorySortableString(teammatch.team1) }}" title="{% trans %}Zum Spielbericht{% endtrans %}">
+				{{ teammatch.team1Score is none ? (teammatch.submittedBy ? '‒' : '?') : teammatch.team1Score }}:{{ teammatch.team2Score is none ? (teammatch.submittedBy ? '‒' : '?') : teammatch.team2Score }}
+			</a>
+		</td>
+		<td class="team opponent">
+			<a href="{{ path('tournament_team', teammatch.team2.routingParams ) }}">{{ teammatch.team2.club.code }} {{ teammatch.team2.teamNumber }}</a>
+		</td>
+		{% if teammatch.hasDetailedResult %}
+			<td class="games" title="{{ macros.signed(teammatch.team1Games - teammatch.team2Games) }}">{{ teammatch.team1Games | pad(2, '&#8199;', constant('STR_PAD_LEFT')) }}:{{ teammatch.team2Games | pad(2, '&#8199;', constant('STR_PAD_RIGHT')) }}</td>
+			<td class="points" title="{{ macros.signed(teammatch.team1Points - teammatch.team2Points) }}">{{ teammatch.team1Points | pad(3, '&#8199;', constant('STR_PAD_LEFT')) }}:{{ teammatch.team2Points | pad(3, '&#8199;', constant('STR_PAD_RIGHT')) }}</td>
+		{% elseif teammatch.hasResult %}
+			<td class="games"><img class="missing-detailed-result" title="{% trans %}Fehlendes Detailergebnis{% endtrans %}" src="{{ asset('bundles/tobiontropaion/images/icons/status/submission-due.png') }}" width="16" height="16" alt="{% trans %}Fehlend{% endtrans %}" /></td>
+			<td class="points"><img class="missing-detailed-result" title="{% trans %}Fehlendes Detailergebnis{% endtrans %}" src="{{ asset('bundles/tobiontropaion/images/icons/status/submission-due.png') }}" width="16" height="16" alt="{% trans %}Fehlend{% endtrans %}" /></td>
+		{% else %}
+			<td class="games no-result"></td>
+			<td class="points no-result"></td>
+		{% endif %}
+		<td class="status">{% if teammatch.annulled %}<img src="{{ asset('bundles/tobiontropaion/images/icons/status/annulled.png') }}" width="16" height="16" alt="{% trans %}Annulliert{% endtrans %}" title="{% trans %}Spiel wurde gestrichen und aus der Wertung genommen{% endtrans %}" />{% endif %}
+			{% if teammatch.revaluationWrongdoer %}<img src="{{ asset('bundles/tobiontropaion/images/icons/status/revaluation.png') }}" width="16" height="16" alt="{% trans %}Umwertung{% endtrans %}" title="{% trans %}Spiel wurde umgewertet{% endtrans %}" />{% endif %}
+			{% if teammatch.noFight %}<img src="{{ asset('bundles/tobiontropaion/images/icons/status/nofight.png') }}" width="16" height="16" alt="{% trans %}Kampflos{% endtrans %}" title="{% trans %}Ergebnis ist kampflos zustande gekommen{% endtrans %}" />{% endif %}
+			{% if teammatch.revisedScore %}<img src="{{ asset('bundles/tobiontropaion/images/icons/status/revised.png') }}" width="16" height="16" alt="{% trans %}Geändert{% endtrans %}" title="{% trans %}Mannschaftsspiel enthält Individualspiele, deren Ergebnisse geändert wurden{% endtrans %}" />{% endif %}
+			{% if teammatch.confirmedBy %}<img src="{{ asset('bundles/tobiontropaion/images/icons/status/confirmed.png') }}" width="16" height="16" alt="{% trans %}Bestätigt{% endtrans %}" title="{% trans %}Ergebnis bestätigt{% endtrans %}" />{% endif %}
+			{% if teammatch.approvedBy %}<img src="{{ asset('bundles/tobiontropaion/images/icons/status/approved.png') }}" width="16" height="16" alt="{% trans %}Genehmigt{% endtrans %}" title="{% trans %}Ergebnis genehmigt{% endtrans %}" />{% endif %}
+			{% if teammatch.incompleteLineup %}<img src="{{ asset('bundles/tobiontropaion/images/icons/status/incomplete-lineup.png') }}" width="16" height="16" alt="{% trans %}Unvollständig{% endtrans %}" title="{% trans %}Unvollständige Aufstellung (fehlende Spieler){% endtrans %}" />{% endif %}
+			{% if teammatch.movedAt %}<img src="{{ asset('bundles/tobiontropaion/images/icons/status/rearranged.png') }}" width="16" height="16" alt="{% trans %}Verlegt{% endtrans %}" title="{% trans with { '%scheduled_at%': teammatch.scheduledAt | date('d.m.Y H:i') } %}Verlegter Termin | Ursprünglich angesetzt am %scheduled_at%{% endtrans %}" />{% endif %}
+		</td>
+	</tr>
+{% endfor %}
+</tbody>
+</table>

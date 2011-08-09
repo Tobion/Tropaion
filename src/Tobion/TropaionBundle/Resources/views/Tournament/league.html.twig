@@ -1,0 +1,193 @@
+{% extends "TobionTropaionBundle::layout.html.twig" %}
+
+{% import "TobionTropaionBundle::macros.html.twig" as macros %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" type="text/css" href="{{ asset('bundles/tobiontropaion/css/teammatch.css') }}" />
+{% endblock %}
+
+{% block head_javascripts %}
+    {{ parent() }}
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script> 
+{% endblock %}
+
+{% set pageRdfId = path('tournament_league', league.routingParams|merge({ '_format': 'html' }) ) ~ '.html' %}
+
+{% set leagueRdfUri = path('tournament_league', league.routingParams ) %}
+
+{% block title %}
+	{{ league.className }} {{ league.division }} - {{ league.tournament.shortName }}
+{% endblock %}
+
+{% block metas %}
+	{{ parent() }}
+	<link rel="canonical" href="{{ leagueRdfUri }}" />
+	<link rel="index up" href="{{ path('tournament', league.tournament.routingParams ) }}" />
+	
+	{% if previousLeague %}<link rel="prev" href="{{ path('tournament_league', previousLeague.routingParams ) }}" title="{{ previousLeague.className }} {{ previousLeague.division }}" />{% endif %}
+	{% if nextLeague %}<link rel="next" href="{{ path('tournament_league', nextLeague.routingParams ) }}" title="{{ nextLeague.className }} {{ nextLeague.division }}" />{% endif %}
+	
+	<meta property="og:type" content="sports_league" />
+	<meta property="og:url" content="{{ leagueRdfUri }}" />
+{% endblock %}
+
+{% block content %}
+
+<article id="league-{{ league.id }}">
+
+<header>
+
+<h1 about="{{ leagueRdfUri }}" typeof="sport:League" xml:lang="de">
+	<a rel="sport:partOfEvent" href="{{ path('tournament', league.tournament.routingParams ) }}"><span property="dc:title">{{ league.tournament.shortName }}</span></a>
+	&gt;
+	<span property="sport:class">{{ league.className }}</span>
+	<span {% if not league.division %}style="display:none;" {% endif %}property="sport:division">{{ league.division }}</span>
+</h1>
+
+</header>
+
+<p>{% trans %}Tabellenansicht{% endtrans %}</p>
+<menu type="list" label="{% trans %}Tabellenansicht{% endtrans %}">
+	<li><a href="?" rel="bookmark">{% trans %}Vollständig{% endtrans %}</a></li>
+	<li><a href="?round=1">{% trans %}Hinrunde{% endtrans %}</a></li>
+	<li><a href="?round=2">{% trans %}Rückrunde{% endtrans %}</a></li>
+	<li><a href="?homeaway=1">{% trans %}Heim{% endtrans %}</a></li>
+	<li><a href="?homeaway=2">{% trans %}Auswärts{% endtrans %}</a></li>
+</menu>
+
+<table class="standings{% if round == 1 %} first-half-table{% elseif round == 2 %} second-half-table{% endif %}{% if homeaway == 1 %} home-table{% elseif homeaway == 2 %} away-table{% endif %}" id="standings-league-{{ league.id }}">
+	<caption><a href="#standings-league-{{ league.id }}">{% trans %}Tabelle{% endtrans %}</a>
+		<details>
+		<summary>{% trans %}Hilfe{% endtrans %}</summary>
+		{% trans %}<p>Aufstiegsplätze sind grün markiert und Abstiegsplätze rot. In der Kreuztabelle ist oben das Heimspiel und unten das Auswärtsspiel beschrieben.
+			Kampflose Spiele sind rot gehalten, revidierte violett und annullierte sind durchgestrichen. Spiele mit unvollständiger Aufstellung sind orange.
+			Liegt noch kein Ergebnis vor, wird stattdessen das Austragungsdatum angezeigt.
+		</p>
+		<p>Farbige Markierung in der Punktespalte repräsentiert die Punktausbeute als Balkendiagramm. Sie gibt den prozentualen Anteil der 
+			erzielten Punkte von den maximal möglichen Punkten unter Berücksichtigung der Anzahl der absolvierten Spiele an. 
+			Dieses Feature wurde bisher in keiner anderen Sporttabelle beobachtet, obwohl es nützliche Informationen offenbart. 
+			Man erkennt, welche Plätze hart umkämpft sind und es wird deutlich, wenn eine Mannschaft nur aufgrund weniger absolvierter Spiele 
+			schlechter platziert ist als eine Mannschaft mit mehr Punkten.
+		</p>{% endtrans %}
+		</details>
+	</caption>
+	<thead>
+		<tr>
+			<th scope="col" class="place">{% trans %}Platz{% endtrans %}</th>
+			<th scope="col" class="team">{% trans %}Mannschaft{% endtrans %}</th>
+			<th scope="col" class="played">{% trans %}Gespielt{% endtrans %}</th>
+			<th scope="col" class="points">{% trans %}Punkte{% endtrans %}</th>
+			<th scope="col" class="won" title="{% trans %}Siege{% endtrans %}">{% trans %}S{% endtrans %}</th>
+			<th scope="col" class="drawn" title="{% trans %}Unentschieden{% endtrans %}">{% trans %}U{% endtrans %}</th>
+			<th scope="col" class="lost" title="{% trans %}Niederlagen{% endtrans %}">{% trans %}N{% endtrans %}</th>
+			<th scope="col" class="matches">{% trans %}Spiele{% endtrans %}</th>
+			<th scope="col" class="games">{% trans %}Sätze{% endtrans %}</th>
+			<th scope="col" class="score">{% trans %}Spielpunkte{% endtrans %}</th>
+			{% for teamStanding in standings %}{# for i in range(1, standings | length) #}
+			<th scope="col" class="crossover" title="{{ teamStanding.club_name }} {{ teamStanding.team_number }}">{{ loop.index }}</th>
+			{% endfor %}
+		</tr>
+	</thead>
+	<tbody about="{{ leagueRdfUri }}" typeof="sport:League">
+		{% for teamStanding in standings %}
+		<tr id="team-{{ teamStanding.id }}" {{ {
+				'promoted': loop.index <= league.promotedNumber, 
+				'relegated': loop.revindex <= league.relegatedNumber,
+				'withdrawn': teamStanding.withdrawn
+			} | class_attribute }}>
+			<td class="place"><div><a href="#team-{{ teamStanding.id }}">{{ loop.index }}</a></div></td>
+			<th scope="row" class="team"><a href="{{ path('tournament_team', {
+				'owner': league.tournament.owner.slug,
+				'tournament': league.tournament.slug,
+				'club': teamStanding.club_code,
+				'teamNumber': teamStanding.team_number
+				}) }}">{{ teamStanding.club_name }} {{ teamStanding.team_number }}</a></th>
+			<td class="played">{{ teamStanding.number_teammatches }}</td>
+			<td class="points"><div title="{% trans with {
+					'%points%': teamStanding.points,
+					'%lost_points%': teamStanding.lost_points,
+					'%points_percent%': teamStanding.points_percent
+				} %}%points%:%lost_points% Punkte (Ausbeute: %points_percent%%%){% endtrans %}"><span>{{ teamStanding.points }}</span> <meter style="width:{{ teamStanding.points_percent }}%;" min="0" max="100" optimum="100" value="{{ teamStanding.points_percent }}">{{ teamStanding.points_percent }}%</meter></div></td>
+			<td class="won">{{ teamStanding.won_teammatches }}</td>
+			<td class="drawn">{{ teamStanding.drawn_teammatches }}</td>
+			<td class="lost">{{ teamStanding.lost_teammatches }}</td>
+			<td class="matches" title="{{ teamStanding.won_matches }} : {{ teamStanding.lost_matches }}">{{ macros.signed(teamStanding.diff_matches) }}</td>
+			<td class="games" title="{{ teamStanding.won_games }} : {{ teamStanding.lost_games }}">{{ macros.signed(teamStanding.diff_games) }}</td>
+			<td class="score" title="{{ teamStanding.won_score }} : {{ teamStanding.lost_score }}">{{ macros.signed(teamStanding.diff_score) }}</td>
+			{% for i in 0 .. ( standings | length - 1 ) %}
+			{% if i + 1 == loop.parent.loop.index %}
+			<td class="crossover blank"></td>
+			{% else %}
+			{% set hometeammatch = teammatchesCrossover[teamStanding.id][standings[i].id] %}
+			{% set awayteammatch = teammatchesCrossover[standings[i].id][teamStanding.id] %}
+			<td class="crossover">
+				<a {{ {
+						'home': true, 
+						'first-half': hometeammatch.seasonRound == 1,
+						'second-half': hometeammatch.seasonRound == 2,
+						'nofight': hometeammatch.noFight,
+						'revised': hometeammatch.revisedScore,
+						'incomplete': hometeammatch.incompleteLineup
+					} | class_attribute }} rel="sport:subEvent" href="{{ path('tournament_teammatch', hometeammatch.routingParams ) }}" title="{{ hometeammatch.__toString }}">
+				{% if hometeammatch.annulled %}<del>{% endif %}
+				{% if hometeammatch.hasResult %}
+					{{ hometeammatch.team1Score }} : {{ hometeammatch.team2Score }}
+				{% else %}
+					<time datetime="{{ hometeammatch.performedAt | date('c') }}">{{ hometeammatch.performedAt | date('j.n.') }}</time>
+				{% endif %}
+				{% if hometeammatch.annulled %}</del>{% endif %}
+				</a>
+				<a {{ {
+						'away': true, 
+						'first-half': awayteammatch.seasonRound == 1,
+						'second-half': awayteammatch.seasonRound == 2,
+						'nofight': awayteammatch.noFight,
+						'revised': awayteammatch.revisedScore,
+						'incomplete': awayteammatch.incompleteLineup
+					} | class_attribute }} rel="sport:subEvent" href="{{ path('tournament_teammatch', awayteammatch.routingParams ) }}" title="{{ awayteammatch.__toString }}">
+				{% if awayteammatch.annulled %}<del>{% endif %}
+				{% if awayteammatch.hasResult %}
+					{{ awayteammatch.team2Score }} : {{ awayteammatch.team1Score }}
+				{% else %}
+					<time datetime="{{ awayteammatch.performedAt | date('c') }}">{{ awayteammatch.performedAt | date('j.n.') }}</time>
+				{% endif %}
+				{% if awayteammatch.annulled %}</del>{% endif %}
+				</a>
+			</td>
+			{% endif %}
+			{% endfor %}
+		</tr>
+		{% else %}
+			<tr class="no-matches"><td colspan="10">{% trans %}Keine Ergebnisse{% endtrans %}</td></tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+<script type="text/javascript">
+//<![CDATA[
+	var crossover_first_cellindex = $("td.crossover").get(0).cellIndex; // get DOM node's property
+	// $("td.crossover").attr("cellIndex"); // = first().attr() // does not work for application/xhtml+xml
+	$("td.crossover").mouseover(function() {
+		$(this).parent().parent().children().eq(this.cellIndex - crossover_first_cellindex).addClass("crossover-opponent");
+	}).mouseout(function(){
+		$(this).parent().parent().children().eq(this.cellIndex - crossover_first_cellindex).removeClass("crossover-opponent");
+	});
+//]]>
+</script>
+
+<footer>
+<p>Alternate formats:</p>
+<ul>
+	<li><a rel="alternate nofollow" type="text/html" href="{{ path('tournament_league', league.routingParams|merge({ '_format': 'html' }) ) ~ '.html' }}">
+		<abbr title="Extensible Hypertext Markup Language 5">(X)HTML5</abbr> with <abbr title="Resource Description Framework in attributes">RDFa</abbr>
+	</a></li>
+	<li><a rel="alternate nofollow" type="application/json" href="{{ path('tournament_league', league.routingParams|merge({ '_format': 'json' }) ) }}">
+		<abbr title="JavaScript Object Notation">JSON</abbr>
+	</a></li>
+</ul>
+</footer>
+
+</article>
+
+{% endblock %}

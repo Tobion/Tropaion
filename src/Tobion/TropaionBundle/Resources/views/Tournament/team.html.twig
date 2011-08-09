@@ -1,0 +1,164 @@
+{% extends "TobionTropaionBundle::layout.html.twig" %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<link rel="stylesheet" type="text/css" href="{{ asset('bundles/tobiontropaion/css/teammatch.css') }}" />
+	<link rel="stylesheet" type="text/css" href="{{ asset('bundles/tobiontropaion/css/jquery-ui-1.8.14.custom.css') }}" />
+{% endblock %}
+
+{% block head_javascripts %}
+    {{ parent() }}
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+	<script type="text/javascript" src="{{ asset('bundles/tobiontropaion/js/Placeholder-jQuery-Plugin/jquery.placeholder.min.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('bundles/tobiontropaion/js/DataTables-1.8.1/media/js/jquery.dataTables.min.js') }}"></script>
+	
+	<script type="text/javascript">
+	//<![CDATA[
+		/* Global variables used to activate filters and access the matrix column in the filtering functions */
+		var filter_date_cellindex      = 0, 	// $("th.date").get(0).cellIndex
+			filter_stage_cellindex     = 2, 
+			filter_homeaway_cellindex  = 3, 
+			filter_opponent_cellindex  = 5;	
+	//]]>
+	</script>
+	
+	<script type="text/javascript" src="{{ asset('bundles/tobiontropaion/js/dataTables-custom-functions.js') }}"></script>
+	
+	<script type="text/javascript">
+	//<![CDATA[
+		$(document).ready(function() {
+			var dataTable = $('#teammatches table').dataTable({
+				"bPaginate": false,
+				"bLengthChange": false,
+				"bFilter": true,
+				"bSort": true,
+				"bInfo": false,
+				"bAutoWidth": false,
+				"bJQueryUI": true,
+				"sDom": '',
+				"aoColumns": [
+					{ "sType": "time-element" },
+					null,
+					null,
+					null,
+					{ "sType": "margin-of-victory", "asSorting": [ "desc", "asc" ] },
+					null,
+					{ "bSortable": false },
+					{ "bSortable": false },
+					{ "bSortable": false }
+				],
+				// "aaSorting": [[0,'asc']]
+			});
+			
+			/* Add event listeners to filtering inputs */
+			$('#date-filter').change( function() { dataTable.fnDraw(); } );
+			$('#stage-filter').change( function() { dataTable.fnDraw(); } );
+			$('#homeaway-filter').change( function() { dataTable.fnDraw(); } );
+			$('#opponent-filter').keyup( function() { dataTable.fnFilter( $(this).val(), filter_opponent_cellindex ); } );
+		} );
+	//]]>
+	</script> 
+{% endblock %}
+
+{% set pageRdfId = path('tournament_team', team.routingParams|merge({ '_format': 'html' }) ) ~ '.html' %}
+
+{% block title %}
+
+{% endblock %}
+
+{% block metas %}
+	{{ parent() }}
+
+	<meta property="og:type" content="sports_team" />
+
+{% endblock %}
+
+{% block content %}
+
+<h1>{{ tournament }}</h1>
+
+<article id="team-{{ team.id }}" about="{{ path('tournament_team', team.routingParams ) }}" typeof="sport:Team">
+
+<h1>{{ team }}</h1>
+
+<h2>{{ team.league.className }} {{ team.league.division }}</h2>
+
+<section id="lineup" rel="sport:teamMate">
+<h2>{% trans %}Aufstellung{% endtrans %}</h2>
+
+{% macro lineup_athlete(lineup, gender, tournament) %}
+	<li about="{{ path('profile_athlete', lineup.athlete.routingParams ) }}" typeof="sport:Athlete" property="foaf:gender" xml:lang="en" content="{{ gender }}">
+		<a rel="foaf:page" href="{{ path('tournament_athlete',	lineup.athlete.routingParams(tournament) ) }}" xml:lang="de">{{ lineup.athlete }}</a></li>
+{% endmacro %}
+
+<div id="lineup-first-half">
+	<h3>{% if hasSecondRoundLineup and not lineupChanged %}
+			{% trans %}Hinrunde &amp; Rückrunde{% endtrans %}
+		{% else %}
+			{% trans %}Hinrunde{% endtrans %}
+		{% endif %}</h3>
+	<div class="male">
+		<h4>{% trans %}Männer{% endtrans %}</h4>
+		<ol>
+			{%- for lineup in team.firstRoundMaleLineups %}
+			{{ _self.lineup_athlete(lineup, 'male', tournament) }}
+			{%- endfor %}
+		</ol>
+	</div>
+	<div class="female">
+		<h4>{% trans %}Frauen{% endtrans %}</h4>
+		<ol>
+			{%- for lineup in team.firstRoundFemaleLineups %}
+			{{ _self.lineup_athlete(lineup, 'female', tournament) }}
+			{%- endfor %}
+		</ol>
+	</div>
+</div>
+
+{% if hasSecondRoundLineup and lineupChanged %}
+<div id="lineup-second-half">
+	<h3>{% trans %}Rückrunde{% endtrans %}</h3>
+	<div class="male">
+		<h4>{% trans %}Männer{% endtrans %}</h4>
+		<ol>
+			{%- for lineup in team.secondRoundMaleLineups %}
+			{{ _self.lineup_athlete(lineup, 'male', tournament) }}
+			{%- endfor %}
+		</ol>
+	</div>
+	<div class="female">
+		<h4>{% trans %}Frauen{% endtrans %}</h4>
+		<ol>
+			{%- for lineup in team.secondRoundFemaleLineups %}
+			{{ _self.lineup_athlete(lineup, 'female', tournament) }}
+			{%- endfor %}
+		</ol>
+	</div>
+</div>
+{% endif %}
+
+</section>
+
+<dl>
+	<dt>{% trans %}Turnier{% endtrans %}</dt>
+	<dd><a href="{{ path('tournament', tournament.routingParams ) }}">{{ tournament.fullName }}</a></dd>
+	<dt>{% trans %}Klasse{% endtrans %}</dt>
+	<dd><a href="{{ path('tournament_league', team.league.routingParams ) }}#team-{{ team.id }}">{{ team.league.className }}{% if team.league.division %} {{ team.league.division }}{% endif %}</a></dd>
+	<dt>{% trans %}Verein{% endtrans %}</dt>
+	<dd><a href="{{ path('tournament_club', team.club.routingParams(tournament) ) }}">{{ team.club.name }}</a></dd>
+</dl>
+
+<section id="teammatches">
+<h2>{% trans with { '%team%': team.__toString } %}Spiele der Mannschaft <em>%team%</em>{% endtrans %}</h2>
+
+{% include 'TobionTropaionBundle::teammatches-profile-view.html.twig' with {'teammatches': teammatches, 'profileView' : 'team', 'perspective': team.__toString} %}
+
+</section>
+
+<p>Zusätzl. Filter / Suche: Status: Ausstehende Ergebniseingabe, Fehlende Ergebnisbestätigung</p>
+
+<p>Mögl. Erweiterungen: Tabelle, Spielerstatistiken für diese Mannschaft + welche Spieler wären zum aktuellen Zeitpunkt in der Mannschaft einsatzberechtigt?</p>
+
+</article>
+
+{% endblock %}

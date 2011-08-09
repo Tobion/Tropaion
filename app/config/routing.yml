@@ -1,0 +1,5 @@
+TobionTropaionBundle:
+    resource: "@TobionTropaionBundle/Controller/"
+    type:     annotation
+    prefix:   /
+

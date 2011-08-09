@@ -1,0 +1,176 @@
+{% set teammatchRdfUri = path('tournament_teammatch', teammatch.routingParams ) %}
+
+<table class="scoresheet" id="scoresheet-teammatch-{{ teammatch.id }}" about="{{ teammatchRdfUri }}" typeof="sport:Match">
+	<caption><a href="#scoresheet-teammatch-{{ teammatch.id }}">{% trans %}Spielbericht{% endtrans %}</a>
+		<details>
+		<summary>{% trans %}Hilfe{% endtrans %}</summary>
+		<p>{% trans %}Spielbericht des Mannschaftsspiels mit allen seinen Individualspielen und deren Sätzen.
+			Eingesetzte Ersatzspieler sind in grauer Schrift geschrieben. 
+			Ergebnislose und ungewerte Spiele sind durchgestrichen.
+			Kampflose Diszplinen sind rot.
+			Wurde ein Ergebnis aus formalen Gründen geändert ist das Spielergebnis violett. Liegen dabei die ursprüngliche Satzergebnisse vor werden diese rot angezeigt.
+			Bei vorzeitiger Aufgabe eines Spielers (z.B. durch Verletzung) ist das Spielergebnis silber hinterlegt.
+			Wenn man ein bestimmtes Spiel referenzieren will, kann man durch Klicken auf die Diszplin einen Anker darauf setzen.{% endtrans %}</p>
+		</details>
+	</caption>
+	<thead rel="sport:outcome">
+		<tr>
+			<th scope="col" class="matchtype">{% trans %}Disziplin{% endtrans %}</th>
+			<th scope="col" class="team hometeam" title="{% trans %}Heimmannschaft{% endtrans %}" about="[_:hometeam]" typeof="sport:TeamScore" rel="sport:participant">
+				{% if teammatch.isTeam1Winner %}
+				<strong class="winner">
+				{% endif %}
+				<a xml:lang="de" href="{{ path('tournament_team', teammatch.team1.routingParams ) }}" typeof="sport:IndependentTeam" property="sport:teamNumber" content="{{ teammatch.team1.teamNumber }}">
+					<span rel="sport:associatedSportsClub"><span about="{{ path('profile_club', teammatch.team1.club.routingParams ) }}" typeof="sport:SportsClub" property="foaf:name">{{ teammatch.team1.club.name }}</span></span>
+					{# the same could also be expressed with <span rel="sport:associatedSportsClub" resource="{{ path('tournament_club', teammatch.team1.club.routingParams ) }}"><span rel="rdf:type" resource="[sport:SportsClub]" property="foaf:name">{{ teammatch.team1.club.name }}</span></span> #}
+					{{ teammatch.team1.teamNumberAsRomanNumeral }}
+				</a>
+				{% if teammatch.isTeam1Winner %}
+				</strong>
+				{% endif %}
+			</th>
+			<td class="score"><div><mark class="teammatch-result" title="{% spaceless %}
+				{% if teammatch.isBothTeamsLost %}
+					{% trans %}Mannschaftsergebnis: Beide haben verloren{% endtrans %}
+				{% elseif teammatch.isDraw %}
+					{% trans %}Mannschaftsergebnis: Unentschieden{% endtrans %}
+				{% else %}
+					{% trans with {
+						'%team%': teammatch.winnerTeam.__toString,
+						'%score1%': teammatch.team1Score,
+						'%score2%': teammatch.team2Score
+					} %}Mannschaftsergebnis: %team% gewinnt %score1%:%score2%{% endtrans %}
+				{% endif %}
+				{% endspaceless %}">
+				{% spaceless %}
+					<span about="[_:hometeam]" property="sport:homeAdvantage" datatype="xsd:boolean" content="true"><span property="sport:score" datatype="xsd:unsignedShort">{{ teammatch.team1Score }}</span></span>
+					<abbr>:</abbr>
+					<span about="[_:awayteam]" property="sport:homeAdvantage" datatype="xsd:boolean" content="false"><span property="sport:score" datatype="xsd:unsignedShort">{{ teammatch.team2Score }}</span></span>
+				{% endspaceless %}
+			</mark></div></td>
+			<th scope="col" class="team awayteam" title="{% trans %}Auswärtsmannschaft{% endtrans %}" about="[_:awayteam]" typeof="sport:TeamScore" rel="sport:participant">
+				{% if teammatch.isTeam2Winner %}
+				<strong class="winner">
+				{% endif %}
+				<a xml:lang="de" href="{{ path('tournament_team', teammatch.team2.routingParams ) }}" typeof="sport:IndependentTeam" property="sport:teamNumber" content="{{ teammatch.team2.teamNumber }}">
+					<span rel="sport:associatedSportsClub"><span about="{{ path('profile_club', teammatch.team2.club.routingParams ) }}" typeof="sport:SportsClub" property="foaf:name">{{ teammatch.team2.club.name }}</span></span>
+					{{ teammatch.team2.teamNumberAsRomanNumeral }}
+				</a>
+				{% if teammatch.isTeam2Winner %}
+				</strong>
+				{% endif %}
+			</th>	
+			<th scope="col" class="games">{% trans %}Sätze{% endtrans %}</th>
+		</tr>
+	</thead>
+	<tfoot>
+		<tr class="sum">
+			<th scope="row">{% trans %}Summe{% endtrans %}</th>
+			<td></td>
+			<td class="score" title="{% trans %}Satzergebnis{% endtrans %}">{{ teammatch.team1Games }}:{{ teammatch.team2Games }}{# teammatch.sumTeam1WonGames }}:{{ teammatch.sumTeam2WonGames #}</td>
+			<td></td>
+			<td class="games" title="{% trans %}Punktergebnis{% endtrans %}">{{ teammatch.team1Points }}:{{ teammatch.team2Points }}{# teammatch.sumTeam1Score }}:{{ teammatch.sumTeam2Score #}</td>
+		</tr>
+	</tfoot>
+	<tbody xml:lang="de" rel="sport:subEvent">
+		{% for match in teammatch.matches %}
+		<tr class="match{% 
+					if not match.hasResult %} noresult{% endif %}{% 
+					if match.noFight %} nofight{% endif %}{% 
+					if match.revisedScore %} revised{% endif %}{% 
+					if match.givenUpBy %} givenup{% endif %}" id="match-{{ match.id }}" about="{{ teammatchRdfUri }}#match-{{ match.id }}" typeof="sport:Match">
+			<th scope="row" class="matchtype" property="sport:characteristic" datatype="xsd:string"><a href="#match-{{ match.id }}">{{ match.matchType }}</a></th>
+			<td class="team hometeam" rel="sport:outcome">
+				{% if match.isTeam1Winner %}<em class="winner"{% else %}<span{% endif %} typeof="sport:TeamScore" property="sport:score" datatype="xsd:unsignedShort" content="{{ match.team1Score }}" rel="sport:participant">
+				{% if match.team1Player and match.team1Partner %}<span about="[_:match-{{ match.id }}_team1]" typeof="sport:Team" rel="sport:teamMate">{% endif %}
+				{% if not match.team1Player and not match.team1Partner %}
+				<small>&lt;&lt;&lt; {% trans %}kein Spieler{% endtrans %} &gt;&gt;&gt;</small>
+				{% endif %}
+				{% spaceless %}{# Otherwise Google Chrome displays a strange space at the end of the players name ruining the alignment #}
+				{% if match.team1Player %}
+				<a class="athlete{% if match.isTeam1PlayerSubstitute %} substitute{% endif %}" about="{{ path('profile_athlete', match.team1Player.routingParams ) }}" typeof="sport:Athlete" rel="foaf:page" href="{{ path('tournament_athlete', match.team1Player.routingParams(tournament) ) }}">
+					<span about="{{ path('profile_athlete', match.team1Player.routingParams ) }}" property="foaf:gender" content="{{ match.team1Player.gender }}">
+						<span property="foaf:familyName">{{ match.team1Player.lastName }}</span>, <span property="foaf:givenName">{{ match.team1Player.firstName }}</span>
+					</span>
+				</a>
+				{% if match.team1Partner %}<br />{% endif %}
+				{% endif %}
+				{% if match.team1Partner %}
+				<a class="athlete{% if match.isTeam1PartnerSubstitute %} substitute{% endif %}" about="{{ path('profile_athlete', match.team1Partner.routingParams ) }}" typeof="sport:Athlete" rel="foaf:page" href="{{ path('tournament_athlete', match.team1Partner.routingParams(tournament) ) }}">
+					<span about="{{ path('profile_athlete', match.team1Partner.routingParams ) }}" property="foaf:gender" content="{{ match.team1Partner.gender }}">
+						<span property="foaf:familyName">{{ match.team1Partner.lastName }}</span>, <span property="foaf:givenName">{{ match.team1Partner.firstName }}</span>
+					</span>
+				</a>
+				{% endif %}
+				{% endspaceless %}
+				{% if match.team1Player and match.team1Partner %}</span>{% endif %}
+				{% if match.isTeam1Winner %}</em>{% else %}</span>{% endif %}
+			</td>
+			<td class="score" title="{% trans %}Spielergebnis{% endtrans %}"><span class="match-result">{{ match.team1Score is none ? '‒' : match.team1Score }}:{{ match.team2Score is none ? '‒' : match.team2Score }}</span></td>
+			<td class="team awayteam" rel="sport:outcome">
+				{% if match.isTeam2Winner %}<em class="winner"{% else %}<span{% endif %} typeof="sport:TeamScore" property="sport:score" datatype="xsd:unsignedShort" content="{{ match.team2Score }}" rel="sport:participant">
+				{% if match.team2Player and match.team2Partner %}<span about="[_:match-{{ match.id }}_team2]" typeof="sport:Team" rel="sport:teamMate">{% endif %}
+				{% if not match.team2Player and not match.team2Partner %}
+				<small>&lt;&lt;&lt; {% trans %}kein Spieler{% endtrans %} &gt;&gt;&gt;</small>
+				{% endif %}
+				{% spaceless %}
+				{% if match.team2Player %}
+				<a class="athlete{% if match.isTeam2PlayerSubstitute %} substitute{% endif %}" about="{{ path('profile_athlete', match.team2Player.routingParams ) }}" typeof="sport:Athlete" rel="foaf:page" href="{{ path('tournament_athlete', match.team2Player.routingParams(tournament) ) }}">
+					<span about="{{ path('profile_athlete', match.team2Player.routingParams ) }}" property="foaf:gender" content="{{ match.team2Player.gender }}">
+						<span property="foaf:familyName">{{ match.team2Player.lastName }}</span>, <span property="foaf:givenName">{{ match.team2Player.firstName }}</span>
+					</span>
+				</a>
+				{% if match.team2Partner %}<br />{% endif %}
+				{% endif %}
+				{% if match.team2Partner %}
+				<a class="athlete{% if match.isTeam2PartnerSubstitute %} substitute{% endif %}" about="{{ path('profile_athlete', match.team2Partner.routingParams ) }}" typeof="sport:Athlete" rel="foaf:page" href="{{ path('tournament_athlete', match.team2Partner.routingParams(tournament) ) }}">
+					<span about="{{ path('profile_athlete', match.team2Partner.routingParams ) }}" property="foaf:gender" content="{{ match.team2Partner.gender }}">
+						<span property="foaf:familyName">{{ match.team2Partner.lastName }}</span>, <span property="foaf:givenName">{{ match.team2Partner.firstName }}</span>
+					</span>
+				</a>
+				{% endif %}
+				{% endspaceless %}
+				{% if match.team2Player and match.team2Partner %}</span>{% endif %}
+				{% if match.isTeam2Winner %}</em>{% else %}</span>{% endif %}
+			</td>
+			<td class="games"{% if match.effectiveGames %} rel="sport:subEvent" resource="[_:match-{{ match.id }}_game0]"{% endif %}>
+				{% if match.effectiveGames %}
+				<ol {% if match.hasOriginalResult %}class="formal" title="{% trans %}Formell umgewertetes Ergebnis{% endtrans %}"{% else %}class="effective"{% endif %}>
+				{% for game in match.effectiveGames %}
+					<li id="game-{{ game.id }}" about="[_:match-{{ match.id }}_game{{ loop.index0 }}]" typeof="rdf:List" rel="rdf:first" resource="{{ teammatchRdfUri }}#game-{{ game.id }}">
+						<span about="{{ teammatchRdfUri }}#game-{{ game.id }}" typeof="sport:Match" rel="sport:outcome">
+							<span typeof="sport:TeamScore">
+								{% if match.team1Player or match.team1Partner %}
+								<span style="display:none;" rel="sport:participant" resource="{% if match.isTeam1Single %}{{ path('profile_athlete', match.team1SingleAthlete.routingParams ) }}{% else %}[_:match-{{ match.id }}_team1]{% endif %}"></span>
+								{% endif %}
+								<span class="score" property="sport:score" datatype="xsd:unsignedShort">{{ game.team1Score }}</span>
+							</span>
+							<abbr> : </abbr>
+							<span typeof="sport:TeamScore">
+								{% if match.team2Player or match.team2Partner %}
+								<span style="display:none;" rel="sport:participant" resource="{% if match.isTeam2Single %}{{ path('profile_athlete', match.team2SingleAthlete.routingParams ) }}{% else %}[_:match-{{ match.id }}_team2]{% endif %}"></span>
+								{% endif %}
+								<span class="score" property="sport:score" datatype="xsd:unsignedShort">{{ game.team2Score }}</span>
+							</span>
+						</span>
+						<span style="display:none;" about="[_:match-{{ match.id }}_game{{ loop.index0 }}]" rel="rdf:rest" resource="[{% if loop.last %}rdf:nil{% else %}_:match-{{ match.id }}_game{{ loop.index }}{% endif %}]"></span>
+					</li>
+				{% endfor %}
+				</ol>
+				{% endif %}
+				{% if match.annulledGames %}
+				<del{% if teammatch.approvedAt %} datetime="{{ teammatch.approvedAt | date('c') }}"{% endif %}{% if teammatch.revaluationWrongdoer %} cite="#revaluation-reason"{% endif %}>
+				<ol class="annulled" title="{% trans %}Ursprüngliches Ergebnis{% endtrans %}">
+				{% for game in match.annulledGames %}
+					<li id="game-{{ game.id }}">
+						<span class="score">{{ game.team1Score }}</span><abbr> : </abbr><span class="score">{{ game.team2Score }}</span>
+					</li>
+				{% endfor %}
+				</ol>
+				</del>
+				{% endif %}
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>

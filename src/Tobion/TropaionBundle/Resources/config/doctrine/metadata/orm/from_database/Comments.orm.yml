@@ -1,0 +1,44 @@
+Comments:
+  type: entity
+  table: comments
+  fields:
+    id:
+      id: true
+      type: integer
+      unsigned: false
+      nullable: false
+      generator:
+        strategy: IDENTITY
+    matchId:
+      type: integer
+      unsigned: false
+      nullable: true
+      column: match_id
+    title:
+      type: string
+      length: 100
+      fixed: false
+      nullable: false
+    message:
+      type: text
+      nullable: false
+  oneToOne:
+    author:
+      targetEntity: Users
+      cascade: {  }
+      mappedBy: null
+      inversedBy: null
+      joinColumns:
+        author_id:
+          referencedColumnName: id
+      orphanRemoval: false
+    teammatch:
+      targetEntity: Teammatches
+      cascade: {  }
+      mappedBy: null
+      inversedBy: null
+      joinColumns:
+        teammatch_id:
+          referencedColumnName: id
+      orphanRemoval: false
+  lifecycleCallbacks: {  }

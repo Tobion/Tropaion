@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html version="XHTML+RDFa 1.0" xml:lang="{% if pageLangCode is defined %}{{ pageLangCode }}{% else %}de{% endif %}"
+	property="dc:language" content="{% if pageLangCode is defined %}{{ pageLangCode }}{% else %}de{% endif %}"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	xmlns:owl="http://www.w3.org/2002/07/owl#"
+	xmlns:dc="http://purl.org/dc/terms/"
+	xmlns:foaf="http://xmlns.com/foaf/0.1/"
+	xmlns:og="http://ogp.me/ns#"
+	xmlns:sport="http://purl.org/sport/ontology/"
+	xmlns:resource="{% block resource_domain %}http://tropaion{% endblock %}/resource/">
+<head{% if pageRdfId is defined %} about="{{ pageRdfId }}"{% endif %}>
+	<meta charset="UTF-8" />
+	<title property="dc:title">{% spaceless %}{% block title %}Tropaion{% endblock %}{% endspaceless %}</title>
+	<link rel="icon" type="image/x-icon" sizes="16x16 32x32" href="{{ asset('favicon.ico') }}" />
+	<link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon.png') }}" />
+	{#
+	<link rel="alternate" type="application/atom+xml" title="Newest team matches" href="" />
+	<link rel="search" type="application/opensearchdescription+xml" title="Tropaion Search" href="" />
+	#}
+	{% block stylesheets %}
+		<link rel="stylesheet" type="text/css" href="{{ asset('bundles/tobiontropaion/css/layout.css') }}" media="all" />
+		<link rel='stylesheet' type='text/css' href='http://fonts.googleapis.com/css?family=Droid+Sans|Droid+Sans+Mono' />
+	{% endblock %}
+	{% block metas %}
+		<meta name="publisher" property="dc:publisher" content="{% if tournament is defined %}{{ tournament.owner }}{% else %}Badminton-Verband Berlin-Brandenburg e.V.{% endif %}" />
+		<meta name="generator" property="dc:creator" content="Tropaion" />
+	{% endblock %}
+
+	{% block head_javascripts %}
+	<!--[if lt IE 9]>
+		<script type="text/javascript" src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE9.js"></script>
+	<![endif]-->
+	{% endblock %}
+</head>
+<body>
+	<header>
+	<h1><img src="{{ asset('bundles/tobiontropaion/images/logos/bvbb_logo.jpg') }}" alt="BVBB Logo" title="Badminton-Verband Berlin-Brandenburg" width="150" height="133" />
+	Badminton-Verband Berlin-Brandenburg <abbr title="eingetragener Verein">e. V.</abbr> <br />Ergebnisdienst</h1>
+	</header>
+	
+	<nav>
+		{% block main_menu %}
+		{% endblock %}
+	</nav>
+	
+	{% if app.session.flash('notice') %}
+		<div class="flash-message">
+			<em>Notice</em>: {{ app.session.flash('notice') }}
+		</div>
+	{% endif %}
+	
+	<section>
+		{% block content %}
+		{% endblock %}
+	</section>
+	
+	<footer>
+	<p>{% trans %}Powered by{% endtrans %} <img src="{{ asset('bundles/tobiontropaion/images/trophy/trophy_32px_24bit.png') }}" alt="{% trans %}Trophäe{% endtrans %}" /> <a href="" title="{% trans %}Tropaion - Der soziale und semantische Sportergebnisdienst{% endtrans %}">Tropaion</a></p>
+	<!--
+	<p class="license" about="http://www.tobion.de/sportservice/software/" xmlns:doap="http://usefulinc.com/ns/doap#" typeof="doap:Project">
+		<span href="http://purl.org/dc/dcmitype/InteractiveResource" property="dc:title" rel="dc:type">Tropaion</span> {% trans %}by{% endtrans %} 
+		<a xmlns:cc="http://creativecommons.org/ns#" href="http://www.tobion.de/" property="cc:attributionName" rel="cc:attributionURL" xml:lang="de">Tobias Schultze</a> {% trans %}is licensed under{% endtrans %} 
+		<a rel="license" href="http://creativecommons.org/licenses/by/3.0/de/">Creative Commons Attribution 3.0 Germany License</a>. 
+		<a href="http://creativecommons.org/licenses/by/3.0/de/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by/3.0/de/80x15.png" /></a>
+	</p>
+	<p class="validation" about="" rel="dc:conformsTo" resource="http://www.w3.org/TR/rdfa-syntax">
+		{% trans %}Semantically annotated using{% endtrans %} <a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml-rdfa-blue" width="88" height="31" alt="Valid XHTML + RDFa" /></a>
+	</p>
+	-->
+	</footer>
+	
+	{% block tail_javascripts %}{% endblock %}
+</body>
+</html>

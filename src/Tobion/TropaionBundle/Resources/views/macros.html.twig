@@ -1,0 +1,9 @@
+{% macro signed(value) %}{% spaceless %}
+	{% if value < 0 %}
+		&#8722;{{ value * -1 }} {# correct minus sign encoding, instead of the traditional "hyphen-minus" character #}
+	{% elseif value == 0 %}
+		&#177;0 {# plus-minus 0 #}
+	{% else %} 
+		+{{ value }}
+	{% endif %}
+{% endspaceless %}{% endmacro %}

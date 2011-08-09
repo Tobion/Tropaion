@@ -1,0 +1,861 @@
+#options:
+#  type: MyISAM
+#  charset: utf8
+# BUG: does not get inherited by tables when they itself have other options specified, e.g. comment
+# BUG: Relation with underscore e.g. Submitted_By must be called with $obj->getSubmitted_By() but BaseClass says "@method User getSubmittedBy()"
+
+User:
+  tableName: users
+  options:
+    type: MyISAM
+    charset: utf8
+  actAs:
+    Timestampable:
+  columns:
+    id:
+      type: integer(4)
+      unsigned: true
+      primary: true
+      autoincrement: true
+    username:
+      type: string(50)
+      notnull: true
+    email:
+      type: string(255)
+      notnull: true
+    athlete_id:
+      type: integer(4)
+      unsigned: true
+      notnull: false
+      comment: Verbindet registrierten Nutzer mit seinem Spielerprofil
+  relations:
+    Athlete:
+      local: athlete_id
+      foreign: id
+      foreignAlias: User
+      type: one
+      foreignType: one      # 1-to-1 relationship
+  indexes:
+    username_index:
+      fields: [username]
+      type: unique
+
+
+Athlete:
+  tableName: athletes
+  options:
+    type: MyISAM
+    charset: utf8
+    comment: Sportler bzw Mitglieder des Verbandes
+  actAs:
+    Timestampable:
+  columns:
+    id:
+      type: integer(4)
+      unsigned: true
+      primary: true
+      autoincrement: true
+    last_name:
+      type: string(20)
+      notnull: true
+    first_name:
+      type: string(20)
+      notnull: true
+    gender:
+      type: enum
+      values: [male, female]
+      # length: 6               # without use_native_enum in databases.yml it would get translated to varchar
+      notnull: true
+    birthday: 
+      type: date
+      notnull: true
+    country:
+      type: string(2)
+      fixed: true
+      notnull: true
+      #country: true			# validator ignores that it can be null
+    club_id:
+      type: integer(4)
+      unsigned: true
+      notnull: true
+    is_active:
+      type: boolean
+      notnull: true
+    zip:
+      type: string(10)
+      notnull: true
+    city:
+      type: string(70)
+      notnull: true
+    street:
+      type: string(70)
+      notnull: true
+    singles_rating:
+      type: integer(2)
+      unsigned: true
+      notnull: false
+    doubles_rating:
+      type: integer(2)
+      unsigned: true
+      notnull: false
+    mixed_rating:
+      type: integer(2)
+      unsigned: true
+      notnull: false
+    singles_matches:
+      type: integer(2)
+      unsigned: true
+      notnull: true
+      default: '0'
+    doubles_matches:
+      type: integer(2)
+      unsigned: true
+      notnull: true
+      default: '0'
+    mixed_matches:
+      type: integer(2)
+      unsigned: true
+      notnull: true
+      default: '0'
+  relations:
+    Club:
+      local: club_id
+      foreign: id
+      foreignAlias: Athletes
+      type: one
+  indexes:
+    gender_index:
+      fields: [gender]
+    is_active_index:
+      fields: [is_active]
+
+
+Location:
+  tableName: locations
+  options:
+    type: MyISAM
+    charset: utf8
+    comment: Sportplaetze und Hallen
+  actAs:
+    Timestampable:
+      created:
+        disabled: true
+    #Sluggable:
+    #  unique: true
+    #  fields: [street, zip, city]
+    #  canUpdate: true
+  columns:
+    id:
+      type: integer(4)
+      unsigned: true
+      primary: true
+      autoincrement: true
+    code:
+      type: string(10)
+      notnull: true
+    zip:
+      type: string(10)
+      notnull: true
+    city:
+      type: string(70)
+      notnull: true
+    street:
+      type: string(70)
+      notnull: true
+    latitude:
+      type: string(10)
+      notnull: true
+    longitude :
+      type: string(10)
+      notnull: true
+    description: clob
+  indexes:
+    location_code_index:
+      fields: [code]
+      type: unique      
+
+
+Club:
+  tableName: clubs
+  options:
+    type: MyISAM
+    charset: utf8
+    comment: Sportvereine und Spielgemeinschaften zusammengesetzt aus mehreren Vereinen
+  actAs:
+    Timestampable:
+      created:
+        disabled: true
+  columns:
+    id:
+      type: integer(4)
+      unsigned: true
+      primary: true
+      autoincrement: true
+    code:
+      type: string(10)
+      notnull: true
+    name:
+      type: string(100)
+      notnull: true
+    contact_person_id:
+      type: integer(4)
+      unsigned: true
+      notnull: true
+    club_syndicate_1:
+      type: integer(4)
+      unsigned: true
+      notnull: false
+    club_syndicate_2:
+      type: integer(4)
+      unsigned: true
+      notnull: false
+    club_syndicate_3:
+      type: integer(4)
+      unsigned: true
+      notnull: false
+    club_syndicate_4:
+      type: integer(4)
+      unsigned: true
+      notnull: false
+    website: string(255)
+    logo: string(100)
+    description: clob
+  relations:
+    Contact_Person:
+      class: Athlete
+      local: contact_person_id
+      foreign: id
+      type: one
+      foreignAlias: InChargeOfClubs
+    Syndicate1:
+      class: Club
+      local: club_syndicate_1
+      foreign: id
+      type: one
+      foreignType: many
+      foreignAlias: ClubSyndicates
+    Syndicate2:
+      class: Club
+      local: club_syndicate_2
+      foreign: id
+      type: one
+      foreignType: many
+      foreignAlias: ClubSyndicates
+    Syndicate3:
+      class: Club
+      local: club_syndicate_3
+      foreign: id
+      type: one
+      foreignType: many
+      foreignAlias: ClubSyndicates
+    Syndicate4:
+      class: Club
+      local: club_syndicate_4
+      foreign: id
+      type: one
+      foreignType: many
+      foreignAlias: ClubSyndicates
+  indexes:
+    club_code_index:
+      fields: [code]
+      type: unique
+
+
+League:
+  tableName: leagues
+  options:
+    type: MyISAM
+    charset: utf8
+    comment: Ligen
+  columns:
+    id:
+      type: integer(4)
+      unsigned: true
+      primary: true
+      autoincrement: true
+    season:
+      type: string(10)
+      notnull: true
+    league_abbr:
+      type: string(10)
+      notnull: true
+    league_name:
+      type: string(50)
+      notnull: true
+    division:
+      type: integer(1)
+      unsigned: true
+      notnull: true 
+      default: '1'
+    level:
+      type: integer(1)
+      unsigned: true
+      notnull: true 
+      default: '1'
+      comment: Einteilung der Liga in eine hierarchische Pyramidenstruktur. Je groesser der Wert, desto schwaecher die sportliche Leistung.
+    promoted_number:
+      type: integer(1)
+      unsigned: true
+      notnull: true
+      default: '1'
+      comment: Die wieviel bestplatzierten qualifizieren sich fuer den Aufstieg
+    relegated_number:
+      type: integer(1)
+      unsigned: true
+      notnull: true
+      default: '1'
+      comment: Die wieviel letztplatzierten qualifizieren sich fuer den Abstieg
+  indexes:
+    league_index:
+      fields: [season, league_abbr, division]
+      type: unique
+
+
+Team:
+  tableName: teams
+  options:
+    type: MyISAM
+    charset: utf8
+    comment: Mannschaften zusammengesetzt aus Verein und Nummer
+  actAs:
+    Timestampable:
+      created:
+        disabled: true
+  columns:
+    id:
+      type: integer(4)
+      unsigned: true
+      primary: true
+      autoincrement: true
+    club_id:
+      type: integer(4)
+      unsigned: true
+      notnull: true
+    team_number:
+      type: integer(1)
+      unsigned: true
+      notnull: true
+      default: '1'
+    league_id:
+      type: integer(4)
+      unsigned: true
+      notnull: true
+    withdrawn: 
+      type: boolean
+      default: false
+      notnull: true
+    description: clob
+  relations:
+    Club:
+      local: club_id
+      foreign: id
+      foreignAlias: Teams
+      type: one
+    League:
+      local: league_id
+      foreign: id
+      foreignAlias: Teams
+      type: one
+  indexes:
+    team_index:
+      fields: [team_number, league_id, club_id]
+      type: unique
+
+
+Teammatch:
+  tableName: teammatches
+  options:
+    type: MyISAM
+    charset: utf8
+    comment: Spiele zwischen zwei Mannschaften, sowohl geplante (ohne Ergebnis) als auch absolvierte, die aus mehreren individual Matches bestehen koennen
+  actAs:
+    Timestampable:
+  columns:
+    id:
+      type: integer(4)
+      unsigned: true
+      primary: true
+      autoincrement: true
+    location_id:
+      type: integer(4)
+      unsigned: true
+      notnull: false        # onDelete set NULL
+    scheduled_at:
+      type: timestamp
+      notnull: true
+      comment: Urspruenglich geplantes Datum des Spiels, wenn abweichend von performed_at
+    performed_at:
+      type: timestamp
+      notnull: true
+      comment: Austragungsdatum des Spiels
+    season_round:
+      type: integer(1)
+      unsigned: true
+      notnull: true
+      comment: Hinrunde = 1, Rueckrunde = 2
+    team1_id:
+      type: integer(4)
+      unsigned: true
+      notnull: true
+      comment: Heimmannschaft bzw erstes Team bei Spielen auf neutralem Grund
+    team2_id:
+      type: integer(4)
+      unsigned: true
+      notnull: true
+      comment: Auswaertsmannschaft bzw zweites Team bei Spielen auf neutralem Grund
+    team1_score: 
+      type: integer(1)
+      unsigned: true
+      notnull: false
+      comment: Gewonnene Spiele oder erzielte Tore und dergleichen von Team1
+    team2_score: 
+      type: integer(1)
+      unsigned: true
+      notnull: false
+      comment: Gewonnene Spiele oder erzielte Tore und dergleichen von Team2
+    team1_games: 
+      type: integer(1)
+      unsigned: true
+      notnull: false
+      comment: Gewonnene Sätze von Team1
+    team2_games: 
+      type: integer(1)
+      unsigned: true
+      notnull: false
+      comment: Gewonnene Sätze von Team2
+    team1_points: 
+      type: integer(2)
+      unsigned: true
+      notnull: false
+      comment: Gewonnene Spielpunkte von Team1
+    team2_points: 
+      type: integer(2)
+      unsigned: true
+      notnull: false
+      comment: Gewonnene Spielpunkte von Team2
+    no_fight: 
+      type: boolean
+      notnull: true
+      default: false
+      comment: Kampflos beendetes Spiel, z.B. nicht angetretene Mannschaft
+    annulled: 
+      type: boolean
+      notnull: true
+      comment: Unbewertetes Ergebnis bzw. gestrichene Ansetzung, z.B. durch zurueckgezogene Mannschaft
+    revised_score: 
+      type: boolean
+      notnull: true
+      default: false
+      comment: Ob Ergebnis revidiert wurde; D.h. hat matches mit revised_score = 1
+    wrongdoer:
+      type: integer(1)
+      unsigned: true
+      notnull: true
+      default: '0'
+      comment: Ob und wer einen (Aufstellungs-)Fehler begangen hat, der zu einer Umwertung fuehrt (Taeter); 0 = false, 1 = Fehler verursacht von Team1, 2 = Team2, 3 = beide schuldig
+    wrongdoing_reason:
+      type: integer(1)
+      unsigned: true
+      notnull: true
+      default: '0'
+      comment: Begruendung des Fehlverhaltens; 0 = false, sonst Fehlernummer
+    incomplete_lineup: 
+      type: boolean
+      notnull: true
+      default: false
+      comment: Unvollstaendige Aufstellung; D.h. hat matches mit player = NULL
+    submitted_by_id:
+      type: integer(4)
+      unsigned: true
+      notnull: false
+      comment: Ergebnis eingegeben von welchem Nutzer
+    submitted_at:
+      type: timestamp
+      notnull: false
+    confirmed_by_id:
+      type: integer(4)
+      unsigned: true
+      notnull: false
+      comment: Ergebnis bestaetigt von welchem Nutzer
+    confirmed_at:
+      type: timestamp
+      notnull: false
+    approved_by_id:
+      type: integer(4)
+      unsigned: true
+      notnull: false
+      comment: Ergebnis genehmigt von welchem Nutzer
+    approved_at:
+      type: timestamp
+      notnull: false
+    description: clob
+  relations:
+    Location:
+      local: location_id
+      foreign: id
+      type: one
+      onDelete: SET NULL
+      onUpdate: CASCADE
+    Team1:
+      class: Team
+      local: team1_id
+      foreign: id
+      type: one
+    Team2:
+      class: Team
+      local: team2_id
+      foreign: id
+      type: one
+    Submitted_By:
+      class: User
+      local: submitted_by_id
+      foreign: id
+      type: one
+    Confirmed_By:
+      class: User
+      local: confirmed_by_id
+      foreign: id
+      type: one
+    Approved_By:
+      class: User
+      local: approved_by_id
+      foreign: id
+      type: one
+  indexes:
+    performed_at_index:
+      fields: [performed_at]
+
+
+Match:
+  tableName: matches
+  options:
+    type: MyISAM
+    charset: utf8
+    comment: Spiele zwischen zwei oder vier Sportlern (Einzel und Doppel), also individual matches
+  actAs:
+    Timestampable:
+      created:
+        disabled: true
+  columns:
+    id:
+      type: integer(4)
+      unsigned: true
+      primary: true
+      autoincrement: true
+    teammatch_id:
+      type: integer(4)
+      unsigned: true
+      notnull: true
+    match_type:
+      type: string(10)
+      notnull: true
+    team1_player_id:
+      type: integer(4)
+      unsigned: true
+      notnull: false
+    team1_partner_id:
+      type: integer(4)
+      unsigned: true
+      notnull: false
+    team2_player_id:
+      type: integer(4)
+      unsigned: true
+      notnull: false
+    team2_partner_id:
+      type: integer(4)
+      unsigned: true
+      notnull: false
+    team1_score: 
+      type: integer(1)
+      unsigned: true
+      notnull: false
+      comment: Gewonnene Saetze von den Spielern von Team1
+    team2_score: 
+      type: integer(1)
+      unsigned: true
+      notnull: false
+      comment: Gewonnene Saetze von den Spielern von Team2
+    team1_points: 
+      type: integer(2)
+      unsigned: true
+      notnull: true
+      default: '0'
+      comment: Insg. gewonnene Spielpunkte von den Spielern von Team1 in allen Games
+    team2_points: 
+      type: integer(2)
+      unsigned: true
+      notnull: true
+      default: '0'
+      comment: Insg. gewonnene Spielpunkte von den Spielern von Team2 in allen Games
+    no_fight: 
+      type: boolean
+      notnull: true
+      default: false
+      comment: Kampflos beendetes Spiel, z.B. kein Gegner oder Aufgabe vor Spielbeginn
+    withdrawn_by:
+      type: integer(1)
+      unsigned: true
+      notnull: true
+      default: '0'
+      comment: Ob und wer das Spiel aufgegeben/zurueckgezogen hat; 0 = false, 1 = Aufgabe von Team1, 2 = Aufgabe von Team2; Spielstand zum Zeitpunkt der Aufgabe nachvollziehbar bei games.annulled = 1
+    revised_score: 
+      type: boolean
+      notnull: true
+      default: false
+      comment: Ob Ergebnis revidiert wurde; Urspruengliches nachvollziehbar bei games.annulled = 1
+    team1_original_score: 
+      type: integer(1)
+      unsigned: true
+      notnull: false
+      comment: Urspruengliches Ergebnis von Team1 (vor der Aenderung oder Aufgabe; siehe games.annulled = 1); NULL = nicht vorhanden
+    team2_original_score: 
+      type: integer(1)
+      unsigned: true
+      notnull: false
+      comment: Urspruengliches Ergebnis von Team1 (vor der Aenderung oder Aufgabe; siehe games.annulled = 1); NULL = nicht vorhanden
+    team1_original_points: 
+      type: integer(2)
+      unsigned: true
+      notnull: false
+      comment: Urspr. insg. gewonnene Spielpunkte von den Spielern von Team1 in allen Games
+    team2_original_points: 
+      type: integer(2)
+      unsigned: true
+      notnull: false
+      comment: Urspr. insg. gewonnene Spielpunkte von den Spielern von Team2 in allen Games
+    avg_orig_smaller_div_bigger_gamescore_permil: 
+      type: integer(2)
+      unsigned: true
+      notnull: false
+      comment: Durchschn. Quotient (in Promille) aus kleineren durch groeßeren Satzpunkten des urspr. (bzw. normalen wenn es nicht vorliegt) Ergebnisses. Maß fuer die Ausgeglichenheit des Spiels
+    std_orig_smaller_div_bigger_gamescore_permil: 
+      type: integer(2)
+      unsigned: true
+      notnull: false
+      comment: Standardabweichung (in Promille) der Quotienten aus kleineren durch groeßeren Satzpunkten des urspr. (bzw. normalen wenn es nicht vorliegt) Ergebnisses. Maß fuer die Ergebnisschwankung
+  relations:
+    Teammatch:
+      local: teammatch_id
+      foreign: id
+      foreignAlias: Matches
+      onDelete: CASCADE
+    Team1_Player:
+      class: Athlete
+      local: team1_player_id
+      foreign: id
+      type: one
+      foreignType: many
+      foreignAlias: Matches
+    Team1_Partner:
+      class: Athlete
+      local: team1_partner_id
+      foreign: id
+      type: one
+      foreignType: many
+      foreignAlias: Matches
+    Team2_Player:
+      class: Athlete
+      local: team2_player_id
+      foreign: id
+      type: one
+      foreignType: many
+      foreignAlias: Matches
+    Team2_Partner:
+      class: Athlete
+      local: team2_partner_id
+      foreign: id
+      type: one
+      foreignType: many
+      foreignAlias: Matches
+    Games:
+      class: Game
+      local: id
+      foreign: match_id
+      type: many
+      orderBy: game_sequence ASC        # automatically order games when calling this relation
+
+
+Game:
+  tableName: games
+  options:
+    type: MyISAM
+    charset: utf8
+    comment: Saetze eines Spiels
+  columns:
+    id:
+      type: integer(4)
+      unsigned: true
+      primary: true
+      autoincrement: true
+    match_id: 
+      type: integer(4)
+      unsigned: true
+      notnull: true
+    game_sequence:
+      type: integer(1)
+      unsigned: true
+      notnull: true
+    team1_score: 
+      type: integer(1)
+      unsigned: true
+      notnull: true
+    team2_score: 
+      type: integer(1)
+      unsigned: true
+      notnull: true
+    annulled: 
+      type: boolean
+      notnull: true
+      default: false
+      comment: Nachtraeglich annulliertes Ergebnis (z.B. durch formale Fehler) oder Spielstand zum Zeitpunkt einer Aufgabe (dessen gewertetes Ergebnis anders ist)
+  relations:
+    Match:
+      local: match_id
+      foreign: id
+      foreignAlias: Games
+      type: one
+      onDelete: CASCADE
+  indexes:
+    game_index:
+      fields: [annulled, game_sequence, match_id]
+      type: unique
+      
+      
+Lineup:
+  tableName: lineups
+  options:
+    type: MyISAM
+    charset: utf8
+    comment: Anfangsaufstellungen der Mannschaften
+  columns:
+    team_id: 
+      type: integer(4)
+      unsigned: true
+      notnull: true
+      primary: true
+    season_round:
+      type: integer(1)
+      unsigned: true
+      notnull: true
+      primary: true
+      comment: Hinrunde = 1, Rueckrunde = 2
+    athlete_id: 
+      type: integer(4)
+      unsigned: true
+      notnull: true
+      primary: true
+    position: 
+      type: integer(1)
+      unsigned: true
+      notnull: true
+  relations:
+    Team:
+      local: team_id
+      foreign: id
+      foreignAlias: Lineups
+      type: one
+    Athlete:
+      local: athlete_id
+      foreign: id
+      foreignAlias: Lineups
+      type: one
+
+      
+Comment:
+  tableName: comments
+  options:
+    type: MyISAM
+    charset: utf8
+    comment: Kommentare zu Spielen
+  columns:
+    id:
+      type: integer(4)
+      unsigned: true
+      primary: true
+      autoincrement: true
+    author_id: 
+      type: integer(4)
+      unsigned: true
+      notnull: true
+    teammatch_id:
+      type: integer(4)
+      unsigned: true
+      notnull: true
+    match_id: 
+      type: integer(4)
+      unsigned: true
+      notnull: false
+    title:
+      type: string(100)
+      notnull: true
+    message:
+      type: clob
+      notnull: true
+  relations:
+    Author:
+      class: User
+      local: author_id
+      foreign: id
+      foreignAlias: Comments
+      type: one
+    Teammatch:
+      local: teammatch_id
+      foreign: id
+      foreignAlias: Comments
+      type: one
+
+
+Ratinghistory:
+  tableName: ratinghistory
+  options:
+    type: MyISAM
+    charset: utf8
+    comment: Rating der Spieler ueber die Zeit
+  actAs:
+    Timestampable:
+      created:
+        name: created_at
+        type: date
+        format: Y-m-d
+      updated:
+        disabled: true
+  columns:
+    id:
+      type: integer(4)
+      unsigned: true
+      primary: true
+      autoincrement: true
+    athlete_id: 
+      type: integer(4)
+      unsigned: true
+      notnull: true
+    discipline:
+      type: enum
+      values: [singles, doubles, mixed]
+      notnull: true
+    rating: 
+      type: integer(2)
+      unsigned: true
+      notnull: false
+    number_matches:
+      type: integer(2)
+      unsigned: true
+      notnull: true
+      comment: Anzahl der Spiele, die in fuer das neue Rating ausgewertet wurden (nicht kampflos)
+  relations:
+    Athlete:
+      local: athlete_id
+      foreign: id
+      foreignAlias: OldRatings
+      type: one
+   # Match:
+     # local: match_id
+     # foreign: id
+     # foreignAlias: Ratings
+     # type: one
+  indexes:
+    created_at_index:
+      fields: [created_at]
+    
+    
+# Teammatch: no_fight = 1 AND teamX_score = 0 -> nicht angetretene Mannschaft X

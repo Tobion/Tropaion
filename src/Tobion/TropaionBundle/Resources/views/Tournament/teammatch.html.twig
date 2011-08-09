@@ -1,0 +1,208 @@
+{% extends "TobionTropaionBundle::layout.html.twig" %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<link rel="stylesheet" type="text/css" href="{{ asset('bundles/tobiontropaion/css/teammatch.css') }}" />
+{% endblock %}
+
+{% set pageRdfId = path('tournament_teammatch', teammatch.routingParams|merge({ '_format': 'html' }) ) ~ '.html' %}
+
+{% set teammatchRdfUri = path('tournament_teammatch', teammatch.routingParams ) %}
+
+{% block title %}
+	{{ teammatch.team1 }} vs  {{ teammatch.team2 }} | {{ teammatch.league.classAbbr }} {{ teammatch.league.division }} - {{ teammatch.league.tournament.shortName }}
+{% endblock %}
+
+{% block metas %}
+	{{ parent() }}
+	<meta name="description" property="dc:description" content="{% 
+		trans with {
+			'%sport%': teammatch.league.tournament.sport,
+			'%team1%': teammatch.team1.club.name ~ ' ' ~ teammatch.team1.teamNumber,
+			'%team2%': teammatch.team2.club.name ~ ' ' ~ teammatch.team2.teamNumber,
+			'%tournament%': teammatch.league.tournament.fullName
+		} 
+	%}Mannschaftsspiel im %sport% zwischen %team1% und %team2% bei der %tournament%{% endtrans %}" />
+	{% if teammatch.submittedBy %}<meta name="author" property="dc:contributor" content="{{ teammatch.submittedBy }}" />{% endif %}
+
+	<link rel="canonical" href="{{ teammatchRdfUri }}" />
+	<link rel="index up up" href="{{ path('tournament', teammatch.league.tournament.routingParams ) }}" />
+	<link rel="up" href="{{ path('tournament_league', teammatch.league.routingParams ) }}" />
+
+	{# chronologically previous team match: #}
+	{% if previousTeammatch %}<link rel="prev" href="{{ path('tournament_teammatch', previousTeammatch.routingParams ) }}" title="{% spaceless %}
+	{% trans %}Zeitlich vorheriges Mannschaftsspiel:{% endtrans %}{% endspaceless %} {% spaceless %} 
+		{% if previousTeammatch.hasResult %} 
+			{% trans with {
+				'%team1%': previousTeammatch.team1.__toString,
+				'%team2%': previousTeammatch.team2.__toString,
+				'%score1%': previousTeammatch.team1Score,
+				'%score2%': previousTeammatch.team2Score
+			} %}%team1% – %team2% = %score1%:%score2%{% endtrans %} 
+		{% else %} 
+			{% trans with {
+				'%team1%': previousTeammatch.team1.__toString,
+				'%team2%': previousTeammatch.team2.__toString,
+				'%date%': previousTeammatch.performedAt | date('d. M Y - H:i')
+			} %}%team1% – %team2% @ %date%{% endtrans %}
+		{% endif %}{% endspaceless %}" />{% endif %}
+
+	{# chronologically next team match: #}
+	{% if nextTeammatch %}<link rel="next" href="{{ path('tournament_teammatch', nextTeammatch.routingParams ) }}" title="{% spaceless %}
+	{% trans %}Zeitlich nächstes Mannschaftsspiel:{% endtrans %}{% endspaceless %} {% spaceless %} 
+		{% if nextTeammatch.hasResult %} 
+			{% trans with {
+				'%team1%': nextTeammatch.team1.__toString,
+				'%team2%': nextTeammatch.team2.__toString,
+				'%score1%': nextTeammatch.team1Score,
+				'%score2%': nextTeammatch.team2Score
+			} %}%team1% – %team2% = %score1%:%score2%{% endtrans %} 
+		{% else %} 
+			{% trans with {
+				'%team1%': nextTeammatch.team1.__toString,
+				'%team2%': nextTeammatch.team2.__toString,
+				'%date%': nextTeammatch.performedAt | date('d. M Y - H:i')
+			} %}%team1% – %team2% @ %date%{% endtrans %}
+		{% endif %}{% endspaceless %}" />{% endif %}
+
+	<meta property="og:type" content="sport" />
+	<meta property="og:url" content="{{ teammatchRdfUri }}" />
+	<meta property="og:street-address" content="{{ teammatch.venue.street }}" />
+	<meta property="og:postal-code" content="{{ teammatch.venue.zip }}" />
+{% endblock %}
+
+{% block content %}
+
+<article id="teammatch-{{ teammatch.id }}" style="display:inline-block; width:auto;">
+
+<header id="meta-teammatch-{{ teammatch.id }}" about="{{ teammatchRdfUri }}" typeof="sport:Match">
+
+<div rel="sport:partOfEvent">
+<h1 about="{{ path('tournament_league', teammatch.league.routingParams ) }}" typeof="sport:League" xml:lang="de">
+	<a rel="sport:partOfEvent" href="{{ path('tournament', teammatch.league.tournament.routingParams ) }}"><span property="dc:title">{{ teammatch.league.tournament.shortName }}</span></a>
+	&gt;
+	<a href="{{ path('tournament_league', teammatch.league.routingParams ) }}">
+		<span property="sport:class">{{ teammatch.league.className }}</span>
+		<span {% if not teammatch.league.division %}style="display:none;" {% endif %}property="sport:division">{{ teammatch.league.division }}</span>
+	</a>
+</h1>
+</div>
+
+<h2>{{ teammatch.team1 }} <abbr title="{% trans %}versus{% endtrans %}">{% trans %}vs{% endtrans %}</abbr>  {{ teammatch.team2 }}</h2>
+
+<dl>
+	<dt>{% trans %}Austragungsdatum{% endtrans %}</dt>
+	<dd><time datetime="{{ teammatch.performedAt | date('c') }}" property="dc:date" datatype="xsd:dateTime" content="{{ teammatch.performedAt | date('c') }}"> 
+		{{ teammatch.performedAt | date('d. F Y') }} um {{ teammatch.performedAt | date('H:i') }}
+	</time></dd>
+	{% if teammatch.movedAt %}
+	<dt>{% trans %}Verlegter Termin{% endtrans %}{# Rearranged date #}</dt>
+	<dd><img src="{{ asset('bundles/tobiontropaion/images/icons/status/rearranged.png') }}" width="16" height="16" alt="" /> {{ teammatch.movedAt | date('d.m.Y - H:i') }}</dd>
+	{% endif %}
+	{% if teammatch.hasDifferentSchedule %}
+	<dt>{% trans %}Angesetzter Termin{% endtrans %}</dt>
+	<dd>{{ teammatch.scheduledAt | date('d.m.Y - H:i') }}</dd>
+	{% endif %}
+	<dt>{% trans %}Halle{% endtrans %}{# Venue #}</dt>
+	<dd rel="sport:place">
+		<a xml:lang="de" href="{{ path('profile_venue', teammatch.venue.routingParams ) }}" typeof="sport:Venue">
+			<span property="dc:identifier">{{ teammatch.venue.code }}</span>: <span property="sport:street">{{ teammatch.venue.street }}</span> 
+		</a>
+	</dd>
+	{% if teammatch.hasResult %}
+	<dt>{% trans %}Sieger{% endtrans %}</dt>
+	<dd>{% if teammatch.isBothTeamsLost %}
+			{% trans %}Beide haben verloren{% endtrans %}
+		{% elseif teammatch.isDraw %}
+			{% trans %}Unentschieden{% endtrans %}
+		{% else %}
+			{{ teammatch.getWinnerTeam }}
+		{% endif %}</dd>
+	{% endif %}
+	{% if teammatch.annulled %}
+	<dt>{% trans %}Annulliert{% endtrans %}</dt>
+	<dd><img src="{{ asset('bundles/tobiontropaion/images/icons/status/annulled.png') }}" width="16" height="16" alt="" /> {% trans %}Das Spiel wurde gestrichen und aus der Wertung genommen.{% endtrans %}</dd>
+	{% endif %}
+	{% if teammatch.revaluationWrongdoer %}
+	<dt>{% trans %}Umwertung{% endtrans %}</dt>
+	<dd id="revaluation-reason">
+		<img src="{{ asset('bundles/tobiontropaion/images/icons/status/revaluation.png') }}" width="16" height="16" alt="" />
+		{# <object type="image/svg+xml" data="{{ asset('bundles/tobiontropaion/images/attention.svg') }}" height="17" width="20"><img src="{{ asset('bundles/tobiontropaion/images/attention.png') }}" height="17" width="20" alt="{% trans %}Achtung Symbol{% endtrans %}" /></object> #}
+		{{ teammatch.description }}
+	</dd>
+	{% endif %}
+	{% if teammatch.noFight %}
+	<dt>{% trans %}Kampflos{% endtrans %}</dt>
+	<dd><img src="{{ asset('bundles/tobiontropaion/images/icons/status/nofight.png') }}" width="16" height="16" alt="" /> {% trans %}Das Ergebnis ist kampflos zustande gekommen, da eine Mannschaft nicht angetreten ist.{% endtrans %}</dd>
+	{% endif %}
+	{% if teammatch.revisedScore %}
+	<dt>{% trans %}Revidiert{% endtrans %}</dt>
+	<dd><img src="{{ asset('bundles/tobiontropaion/images/icons/status/revised.png') }}" width="16" height="16" alt="" /> {% trans %}Das Mannschaftsspiel enthält Individualspiele, deren Ergebnisse geändert wurden.{% endtrans %}</dd>
+	{% endif %}
+	<dt>{% trans %}Saisonabschnitt{% endtrans %}{# Season period: First round | Second round #}</dt> 
+	<dd>{% if teammatch.seasonRound == 1 %}{% trans %}Hinrunde{% endtrans %}{% else %}{% trans %}Rückrunde{% endtrans %}{% endif %}</dd>
+	<dt>{% if teammatch.seasonRound == 1 %}{% trans %}Rückspiel{% endtrans %}{% else %}{% trans %}Hinspiel{% endtrans %}{% endif %}{# Return match | First match: First round | Second round #}</dt>
+	<dd>{% if returnTeammatch.annulled %}<del>{% endif %}
+		<a href="{{ path('tournament_teammatch', returnTeammatch.routingParams ) }}">
+		{% if returnTeammatch.hasResult %}
+			{% trans with {
+				'%team1%': returnTeammatch.team1.__toString,
+				'%team2%': returnTeammatch.team2.__toString,
+				'%score1%': returnTeammatch.team1Score,
+				'%score2%': returnTeammatch.team2Score
+			} %}%team1% – %team2% = %score1%:%score2%{% endtrans %} 
+		{% else %}
+			{% trans with {
+				'%team1%': returnTeammatch.team1.__toString,
+				'%team2%': returnTeammatch.team2.__toString,
+				'%isodate%': returnTeammatch.performedAt | date('c'),
+				'%date%': returnTeammatch.performedAt | date('d. M Y'),
+				'%time%': returnTeammatch.performedAt | date('H:i')
+			} %}%team1% – %team2% am <time datetime="%isodate%">%date% um %time%</time>{% endtrans %}
+		{% endif %}</a>
+		{% if returnTeammatch.annulled %}</del>{% endif %}
+	</dd>
+	{% if teammatch.submittedBy %}
+	<dt property="dc:dateSubmitted" datatype="xsd:dateTime" content="{{ teammatch.submittedAt | date('c') }}">{% trans %}Ergebniseingabe{% endtrans %}</dt>
+	<dd>von {{ teammatch.submittedBy }} am {{ teammatch.submittedAt | date('d.m.Y - H:i') }}</dd>
+	{% endif %}	
+	{% if teammatch.confirmedBy %}
+	<dt property="dc:dateAccepted" datatype="xsd:dateTime" content="{{ teammatch.confirmedAt | date('c') }}">{% trans %}Ergebnis bestätigt{% endtrans %}</dt>
+	<dd><img src="{{ asset('bundles/tobiontropaion/images/icons/status/confirmed.png') }}" width="16" height="16" alt="" /> von {{ teammatch.confirmedBy }} am {{ teammatch.confirmedAt | date('d.m.Y - H:i') }}</dd>
+	{% endif %}
+	{% if teammatch.approvedBy %}
+	<dt>{% trans %}Ergebnis genehmigt{% endtrans %}</dt>
+	<dd><img src="{{ asset('bundles/tobiontropaion/images/icons/status/approved.png') }}" width="16" height="16" alt="" /> von {{ teammatch.approvedBy }} am {{ teammatch.approvedAt | date('d.m.Y - H:i') }}</dd>
+	{% endif %}
+	<dt>{% trans %}Editieren{% endtrans %}</dt> 
+	<dd><a rel="edit" href=""><img src="{{ asset('bundles/tobiontropaion/images/icons/action/submit.png') }}" width="16" height="16" alt="" /> {% trans %}Ergebnis eingeben/bearbeiten{% endtrans %}</a></dd>
+</dl>
+
+</header>
+
+{% if teammatch.hasDetailedResult %}
+	{% include 'TobionTropaionBundle::teammatch-scoresheet.html.twig' with {'teammatch': teammatch} %}
+{% endif %}
+
+<footer about="{{ teammatchRdfUri }}">
+<p>Andere Formate</p>
+<ul>
+	<li><a rel="alternate nofollow foaf:isPrimaryTopicOf" type="text/html" href="{{ path('tournament_teammatch', teammatch.routingParams|merge({ '_format': 'html' }) ) ~ '.html' }}">
+		<span property="dc:coverage" datatype=""><abbr property="dc:format" content="text/html" title="Extensible Hypertext Markup Language 5">(X)HTML5</abbr> mit <abbr title="Resource Description Framework in attributes">RDFa</abbr> im Semantischen Web</span>
+	</a></li>
+	<li><a rel="alternate nofollow foaf:isPrimaryTopicOf" type="application/xhtml+xml" href="{{ path('tournament_teammatch', teammatch.routingParams|merge({ '_format': 'basic' }) ) }}">
+		<span property="dc:coverage" datatype=""><abbr property="dc:format" content="application/xhtml+xml" title="Mobile optimized XHTML">XHTML Basic</abbr> für mobile Geräte</span>
+	</a></li>
+	<li><a rel="alternate nofollow foaf:isPrimaryTopicOf" type="application/json" href="{{ path('tournament_teammatch', teammatch.routingParams|merge({ '_format': 'json' }) ) }}">
+		<span property="dc:coverage" datatype=""><abbr property="dc:format" content="application/json" title="JavaScript Object Notation">JSON</abbr> als Datenaustausch</span>
+	</a></li>
+	<li><a rel="alternate foaf:isPrimaryTopicOf" type="text/calendar" href="{{ path('tournament_teammatch', teammatch.routingParams|merge({ '_format': 'ics' }) ) }}">
+		<span property="dc:coverage" datatype=""><img src="/images/calendar_icon.png" alt="ICS" width="32" height="32" /><abbr property="dc:format" content="text/calendar" title="iCalendar">ICS</abbr> für Terminplaner</span>
+	</a></li>
+</ul>
+</footer>
+
+
+</article>
+
+{% endblock %}

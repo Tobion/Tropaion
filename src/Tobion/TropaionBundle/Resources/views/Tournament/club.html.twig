@@ -1,0 +1,101 @@
+{% extends "TobionTropaionBundle::layout.html.twig" %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<link rel="stylesheet" type="text/css" href="{{ asset('bundles/tobiontropaion/css/teammatch.css') }}" />
+	<link rel="stylesheet" type="text/css" href="{{ asset('bundles/tobiontropaion/css/jquery-ui-1.8.14.custom.css') }}" />
+{% endblock %}
+
+{% block tail_javascripts %}
+    {{ parent() }}
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+	<script type="text/javascript" src="{{ asset('bundles/tobiontropaion/js/Placeholder-jQuery-Plugin/jquery.placeholder.min.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('bundles/tobiontropaion/js/DataTables-1.8.1/media/js/jquery.dataTables.min.js') }}"></script>
+	
+	<script type="text/javascript">
+	//<![CDATA[
+		/* Global variables used to activate filters and access the matrix column in the filtering functions */
+		var filter_date_cellindex      = 0, 	// $("th.date").get(0).cellIndex
+			filter_stage_cellindex     = 2, 
+			filter_homeaway_cellindex  = 3, 
+			filter_self_cellindex      = 4, 
+			filter_opponent_cellindex  = 6;	
+	//]]>
+	</script>
+	
+	<script type="text/javascript" src="{{ asset('bundles/tobiontropaion/js/dataTables-custom-functions.js') }}"></script>
+	
+	<script type="text/javascript">
+	//<![CDATA[
+
+		$(document).ready(function() {
+			var dataTable = $('#teammatches table').dataTable({
+				"bPaginate": false,
+				"bLengthChange": false,
+				"bFilter": true,
+				"bSort": true,
+				"bInfo": false,
+				"bAutoWidth": false,
+				"bJQueryUI": true,
+				"sDom": '',
+				"aoColumns": [
+					{ "sType": "time-element" },
+					null,
+					null,
+					null,
+					{ "sType": "num-html" },
+					{ "sType": "margin-of-victory", "asSorting": [ "desc", "asc" ] },
+					null,
+					{ "bSortable": false },
+					{ "bSortable": false },
+					{ "bSortable": false }
+				],
+				// "aaSorting": [[0,'asc']]
+			});
+
+			var teamsnumbers = dataTable.fnGetColumnData(filter_self_cellindex);
+			teamsnumbers.sort(numsort);
+
+			fnAppendOptions('#self-filter', teamsnumbers);
+
+			/* Add event listeners to filtering inputs */
+			$('#date-filter').change( function() { dataTable.fnDraw(); } );
+			$('#stage-filter').change( function() { dataTable.fnDraw(); } );
+			$('#homeaway-filter').change( function() { dataTable.fnDraw(); } );
+			$('#self-filter').change( function() { dataTable.fnDraw(); } );
+			$('#opponent-filter').keyup( function() { dataTable.fnFilter( $(this).val(), filter_opponent_cellindex ); } );
+		} );
+
+	//]]>
+	</script> 
+{% endblock %}
+
+{% set pageRdfId = path('tournament_club', club.routingParams(tournament)) %}
+
+{% block title %}
+
+{% endblock %}
+
+{% block metas %}
+	{{ parent() }}
+
+	<meta property="og:type" content="sports_team" />
+
+{% endblock %}
+
+{% block content %}
+
+<article id="club-{{ club.id }}">
+
+<h1>{{ club }}</h1>
+
+<section id="teammatches">
+<h2>{% trans with { '%club%': club.code } %}Spiele des Vereins <em>%club%</em>{% endtrans %}</h2>
+
+{% include 'TobionTropaionBundle::teammatches-profile-view.html.twig' with {'teammatches': teammatches, 'profileView': 'club', 'perspective': club.name} %}
+
+</section>
+
+</article>
+
+{% endblock %}

@@ -1,0 +1,120 @@
+Matches:
+  type: entity
+  table: matches
+  fields:
+    id:
+      id: true
+      type: integer
+      unsigned: false
+      nullable: false
+      generator:
+        strategy: IDENTITY
+    matchType:
+      type: string
+      length: 10
+      fixed: false
+      nullable: false
+      column: match_type
+    team1Score:
+      type: boolean
+      nullable: true
+      column: team1_score
+    team2Score:
+      type: boolean
+      nullable: true
+      column: team2_score
+    team1Points:
+      type: smallint
+      nullable: false
+      column: team1_points
+    team2Points:
+      type: smallint
+      nullable: false
+      column: team2_points
+    noFight:
+      type: boolean
+      nullable: false
+      column: no_fight
+    withdrawnBy:
+      type: boolean
+      nullable: false
+      column: withdrawn_by
+    revisedScore:
+      type: boolean
+      nullable: false
+      column: revised_score
+    team1OriginalScore:
+      type: boolean
+      nullable: true
+      column: team1_original_score
+    team2OriginalScore:
+      type: boolean
+      nullable: true
+      column: team2_original_score
+    team1OriginalPoints:
+      type: smallint
+      nullable: true
+      column: team1_original_points
+    team2OriginalPoints:
+      type: smallint
+      nullable: true
+      column: team2_original_points
+    avgOrigSmallerDivBiggerGamescorePermil:
+      type: smallint
+      nullable: true
+      column: avg_orig_smaller_div_bigger_gamescore_permil
+    stdOrigSmallerDivBiggerGamescorePermil:
+      type: smallint
+      nullable: true
+      column: std_orig_smaller_div_bigger_gamescore_permil
+    updatedAt:
+      type: datetime
+      nullable: false
+      column: updated_at
+  oneToOne:
+    team1Partner:
+      targetEntity: Athletes
+      cascade: {  }
+      mappedBy: null
+      inversedBy: null
+      joinColumns:
+        team1_partner_id:
+          referencedColumnName: id
+      orphanRemoval: false
+    team1Player:
+      targetEntity: Athletes
+      cascade: {  }
+      mappedBy: null
+      inversedBy: null
+      joinColumns:
+        team1_player_id:
+          referencedColumnName: id
+      orphanRemoval: false
+    team2Partner:
+      targetEntity: Athletes
+      cascade: {  }
+      mappedBy: null
+      inversedBy: null
+      joinColumns:
+        team2_partner_id:
+          referencedColumnName: id
+      orphanRemoval: false
+    team2Player:
+      targetEntity: Athletes
+      cascade: {  }
+      mappedBy: null
+      inversedBy: null
+      joinColumns:
+        team2_player_id:
+          referencedColumnName: id
+      orphanRemoval: false
+    teammatch:
+      targetEntity: Teammatches
+      cascade: {  }
+      mappedBy: null
+      inversedBy: null
+      joinColumns:
+        teammatch_id:
+          referencedColumnName: id
+      orphanRemoval: false
+  lifecycleCallbacks: {  }

@@ -1,0 +1,37 @@
+Games:
+  type: entity
+  table: games
+  fields:
+    id:
+      id: true
+      type: integer
+      unsigned: false
+      nullable: false
+      generator:
+        strategy: IDENTITY
+    gameSequence:
+      type: boolean
+      nullable: false
+      column: game_sequence
+    team1Score:
+      type: boolean
+      nullable: false
+      column: team1_score
+    team2Score:
+      type: boolean
+      nullable: false
+      column: team2_score
+    annulled:
+      type: boolean
+      nullable: false
+  oneToOne:
+    match:
+      targetEntity: Matches
+      cascade: {  }
+      mappedBy: null
+      inversedBy: null
+      joinColumns:
+        match_id:
+          referencedColumnName: id
+      orphanRemoval: false
+  lifecycleCallbacks: {  }

@@ -1,0 +1,723 @@
+/*
+.hide {
+	/* display: none; 
+	/* recommended styles for visually hiding content that will be read by a screen reader 
+	position: absolute;
+	left: -10000px;
+	top: auto;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+}
+*/
+
+table {
+	border: 0;
+	border-collapse: collapse;
+	border-spacing: 0;
+	white-space: nowrap;
+	text-align: center;
+	font-size: 13px;
+	font-family: "Droid Sans", Arial;
+	clear: both;
+}
+table a {
+	color: black;
+	text-decoration: none;
+}
+table a:hover, table a:hover del {
+	text-decoration: underline;
+}
+table caption a:hover {
+	text-decoration: none;
+}
+table ul, table ol {
+	margin: 0;
+	padding: 0;
+}
+table > thead a {
+	color: white;
+}
+table > caption {
+	text-align: left;
+	padding-bottom: 1em;
+}
+table abbr {
+	border: 0;
+	text-decoration: none;
+}
+table th, table td {
+	/* padding: 3px 12px; */
+	padding: 0.25em 0.9em;
+	font-weight: normal;
+}
+table > tbody th {
+	font-weight: bold;
+	font-size: normal;
+}
+table > thead > tr {
+	background-color: black;
+	color: white;
+}
+table > tbody > tr {
+	border-bottom: 1px dashed gray;
+}
+table > tbody > tr:last-child {
+	border-bottom: 1px solid black;
+}
+table > tfoot > tr {
+	border-top: 3px double gray;
+	border-bottom: 1px solid black;
+}
+table tr > *:first-child {
+	border-left: 1px solid black;
+}
+table tr > *:last-child { /* table tr > th:last-child, table tr > td:last-child */
+	border-right: 1px solid black;
+}
+table > tbody > tr:hover { /* .scoresheet:not(.edit) > tbody > tr:hover */
+	background-color: #FFFF80;
+	border-top: 1px solid black;
+	border-bottom: 1px solid black;
+}
+table:target > caption {
+	text-shadow: 2px 2px 2px #999999;
+	font-weight: bold;
+}
+table:target > caption > details {
+	text-shadow: none;
+	font-weight: normal;
+}
+table tr:target {
+	background-color: #FFFF80; /* see :hover style */
+}
+table .hometeam, table td.partner {
+	text-align: right;
+}
+table .awayteam, table td.opponent {
+	text-align: left;
+}
+table img {
+	vertical-align: text-bottom;
+}
+
+td.score, td.games, td.points {
+	font-family: "Droid Sans Mono", "Arial Monospaced", monospace; /* for alignment of digits and centering ":" between them */
+}
+td.games {
+	min-width: 90px; /* so a single game result does not get wrapped */
+	white-space: normal;
+}
+.games del {
+	text-decoration: none;
+}
+.games ol {
+	list-style-type: none;
+}
+.games ol {
+	clear: left;
+}
+.games ol.annulled {
+	color: red;
+	font-size: 0.79em;
+}
+.games ol > li {
+	float: left;					/* display: inline; */
+	margin-right: 15px;
+	white-space: nowrap;			/* white-space has only effect on text and not between containing block elements */
+}
+.games ol > li:last-child {
+	margin-right: 0;
+}
+.games ol > li * {
+	display: block;
+	float: left;  
+	text-align: right;
+}
+.games ol > li .score {
+	width: 16px;
+}
+.games ol > li abbr {
+	/* padding: 0 3px; */
+	/* font-weight: lighter; */
+	text-align: center;
+	width: 11px;
+}
+/* left-alignment on the right side of the score for both RDFa-markup and non-RDFa results */
+.games ol > li > .score:last-child, .games ol > li > span > span:last-child > .score {
+	text-align: left;
+}
+
+.games ol > li:target {
+	border-top: 1px solid black;
+	border-bottom: 1px solid black;
+	background-color: #FFFF80;
+}
+
+
+.profile-view td.score {
+	text-align: right;
+}
+.profile-view td.score img, .teammatch-list td.score .sameclub {
+	margin-right: 10px;
+}
+.profile-view td.score img.win, .profile-view td.score img.loss {
+	margin-right: 14px; /* 10px (see above) + 7px (number of pixels the win/loss img are narrower than the default 16px) / 2 */	
+}
+.profile-view th {
+	position: relative;
+}
+
+.profile-view .revised {
+	color: violet;
+}
+.profile-view .matchtype > a:hover {
+	text-decoration: none;
+}
+
+fieldset.filter {
+	padding: 8px;
+}
+.filter label > span {
+	display: none;
+}
+
+input#teams-filter, input#opponent-filter  {
+	width: 8em;
+}
+
+.filter option[value=""] {
+	color: #aaa;
+}
+/* JQuery Placeholder Plugin Fallback Styling */
+.placeholder { color: #aaa; }
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * DataTables sorting (without JQueryUI)
+ */
+.sorting_asc {
+	padding-right: 20px; /* make space for the img */
+	background: url('../images/icons/status/sort_asc.png') no-repeat center right;
+	cursor: pointer; /* sortable cursor */
+}
+
+.sorting_desc {
+	padding-right: 20px; /* make space for the img */
+	background: url('../images/icons/status/sort_desc.png') no-repeat center right;
+	cursor: pointer;  /* sortable cursor */
+}
+
+.sorting {
+	padding-right: 20px; /* make space for the img */
+	background: url('../images/icons/status/sort_both.png') no-repeat center right;
+	cursor: pointer;  /* sortable cursor */
+}
+
+.sorting_asc_disabled {
+	background: url('../images/icons/status/sort_asc_disabled.png') no-repeat center right;
+}
+
+.sorting_desc_disabled {
+	background: url('../images/icons/status/sort_desc_disabled.png') no-repeat center right;
+}
+
+
+
+
+/*
+ * Sort arrow icon positioning for JQueryUI markup
+ */
+th div.DataTables_sort_wrapper span {
+	position: absolute;
+	top: 50%;
+	margin-top: -8px;
+	right: 0;
+}
+.teammatch-list th.date, 
+.teammatch-list th.venue, 
+.teammatch-list th.stage, 
+.teammatch-list th.homeaway,
+.teammatch-list th.self, 
+.teammatch-list th.score, 
+.teammatch-list th.opponent {
+	padding-right: 20px; /* 0 */
+	cursor: pointer;
+}
+/*
+.teammatch-list th.date .DataTables_sort_wrapper, 
+.teammatch-list th.venue .DataTables_sort_wrapper, 
+.teammatch-list th.stage .DataTables_sort_wrapper, 
+.teammatch-list th.homeaway .DataTables_sort_wrapper, 
+.teammatch-list th.score .DataTables_sort_wrapper, 
+.teammatch-list th.opponent .DataTables_sort_wrapper {
+	padding-right: 20px;
+}
+*/
+
+.teammatch-list .venue a, .teammatch-list .score a {
+	color: #00E;
+}
+
+
+.match-list th.date, 
+.match-list th.league, 
+.match-list th.stage, 
+.match-list th.homeaway,
+.match-list th.matchtype, 
+.match-list th.self, 
+.match-list th.score, 
+.match-list th.team.opponent {
+	padding-right: 20px; /* 0 */
+	cursor: pointer;
+}
+
+.match-list .league a, .match-list .score a, .match-list .matchtype > a:first-child {
+	color: #00E;
+}
+.match-list td.team.self {
+	text-align: right;
+}
+.match-list td.teammatch.score {
+	text-align: center;
+}
+
+
+
+
+
+
+/* CSS3 selector to make it independent from the prefix */
+.scoresheet span[property$="familyName"], .scoresheet span.familyName {
+	text-transform: uppercase;
+	/* Font Droid Sans hat keine grossen Umlaute */
+}
+.scoresheet span[property$="teamNumber"] {
+	font-family: "Droid Sans", Verdana, serif;	/* serif font for roman numerals */
+}
+.scoresheet span[property$="name"] {
+	font-family: "Droid Sans", Arial;		/* revert above style for name */
+}
+
+
+.scoresheet mark {
+	background-color: transparent;
+}
+.scoresheet th, .scoresheet td {
+	/* padding: 3px 12px; */
+	padding: 0.25em 0.9em;
+}
+.scoresheet > thead th {
+	font-size: 1.14em;
+	padding-left: 0.8em;
+	padding-right: 0.8em;
+}
+.scoresheet > thead > tr {
+	border-top: 0.25em solid black;
+	border-bottom: 0.25em solid black;
+}
+.scoresheet > thead th, .scoresheet > thead td {
+	padding-top: 0; /* 3px border minus 3px normales padding */
+	padding-bottom: 0;
+}
+.scoresheet > thead td.score {
+	background-color: black;
+	padding: 0;
+}
+.scoresheet > thead td.score > div {
+	background-color: white;
+	color: red;
+	border-radius: 15px;
+	-moz-border-radius: 15px;
+	-webkit-border-radius: 15px;
+}
+.scoresheet > thead .team > .winner a { /* team winner (strong)*/
+	background: transparent;
+	color: yellow;
+	font-weight: normal;
+}
+.scoresheet .teammatch-result {
+	color: red;
+	font-size: 1.25em;
+}
+.scoresheet > thead .matchtype { /* invisible cells cannot have a background in WebKit, so make foreground = background */
+	/* visibility: hidden; */
+	color: black;
+	cursor: default;
+}
+.scoresheet th.team {
+	white-space: normal;
+}
+.scoresheet .matchtype a:hover {
+	text-decoration: none;
+}
+
+
+.scoresheet .substitute {
+	color: gray;
+}
+.scoresheet > tbody > tr:hover .winner a, .scoresheet > tbody > tr:hover .winner a.substitute { /* athlete  winner (em) */
+	color: #AF1619;
+}
+.scoresheet .noresult .matchtype {
+	text-decoration: line-through;
+}
+.scoresheet .nofight .matchtype a {
+	color: red;
+}
+.scoresheet .revised .match-result {
+	color: violet;
+}
+.scoresheet .givenup .match-result {
+	background-color: silver;
+}
+
+/* :target pseudo-class when referenced within website with anchor # */
+
+.scoresheet tr:target .matchtype {
+	text-decoration: underline;
+}
+
+
+.scoresheet:target .teammatch-result {
+	font-weight: bold;
+}
+
+
+/*
+	Edit styles 
+*/
+.scoresheet.edit .hometeam  {
+	text-align: left;
+}
+.scoresheet > thead .status {
+	font-weight: normal;
+	font-size: 0.86em;
+	margin-top: 4px;
+}
+.scoresheet > tbody .status {
+	margin-bottom: 5px;
+}
+.scoresheet.edit .match-result {
+	font-weight: bold;
+}
+.scoresheet .result_incident {
+	margin-top: 3px;
+}
+.scoresheet fieldset {
+	margin: 0;
+	padding: 0 6px 4px 6px; /* padding-top is not the padding after the legend but before it in IE only; but padding-bottom on the legend works for all */
+	border: 1px solid #bbbbbb;
+	border-bottom: 0;
+}
+.scoresheet fieldset > legend {
+	color: black;
+	margin: 0;
+	padding-bottom: 4px;
+}
+
+.scoresheet fieldset + fieldset {
+	margin-top: 2px;
+}
+.scoresheet .result_incident fieldset {
+	color: gray;
+}
+.scoresheet input {
+	margin: 0;
+}
+.scoresheet input[type=text]:focus, .scoresheet input[type=number]:focus {
+	outline: 1px solid orange;
+}
+
+.scoresheet .matchtype .noresult {
+	margin-top: 10px;
+}
+.scoresheet .matchtype label {
+	white-space: normal;
+	font-weight: normal;
+	display: block;
+	padding-bottom: 3px;
+}
+
+/* how to do this in opera? */
+.scoresheet input[type=number]::-webkit-inner-spin-button, .scoresheet input[type=number]::-webkit-outer-spin-button {
+	/* -webkit-appearance: none; */
+	display: none;
+}
+.scoresheet .team input + input { 	
+	margin-top: 3px; 
+}
+
+/* see .scoresheet .teammatch-result */
+.scoresheet .teammatch-result input {
+	width: 1.5em;
+	font-size: 1.15em;
+	color: red;
+	text-align: right;
+	/*
+	border-radius: 15px;
+	-moz-border-radius: 15px;
+	-webkit-border-radius: 15px;
+	*/
+}
+.scoresheet .team input.athlete {
+	display: block;
+	width: 100%;
+	min-width: 140px;
+	text-align: left;
+}
+/* abgedeckt durch .scoresheet .games ol > li .score
+.scoresheet .games ol > li input.score {
+	width: 20px;
+}
+*/
+.scoresheet.edit > tbody .games {
+	font-family: Arial;
+}
+.scoresheet .games .annulled input.score {
+	color: red;
+	font-size: 1em; /* wichtig, da input das nicht inherited ! */
+}
+/* so it is in the middle of the higher input box; vertical-align does not work because parent li is display:block */
+.scoresheet.edit .games ol > li abbr {
+	line-height: 1.7em;
+}
+
+.yui3-aclist {
+	width: auto !important;
+	text-align: left;
+}
+.yui3-aclist-item .searchable {
+	font-size: 115%;
+}
+.yui3-aclist-item .activity, .yui3-aclist-item .lineup {
+	color: #707070;
+	/* text-align: right; */
+	padding-left: 20px;
+}
+.yui3-aclist-item-active .activity, .yui3-aclist-item-active .lineup {
+	color: silver;
+}
+
+.scoresheet .error {
+	/* outline and not border because it does not take up extra space and thus will not displace elements */
+	outline: 2px solid red;
+}
+.scoresheet fieldset.error {
+	outline: none;
+}
+.scoresheet fieldset.error > legend {
+	color: red;
+}
+
+
+details { 
+	margin: 0; 
+	padding: 0.5em 0 0 1em; 
+	white-space: normal; 
+}
+details > summary { 
+	display: block; 
+	cursor: pointer;
+	margin: 0; 
+	padding: 0; 
+}
+details > summary::before { 
+	float: left; 
+	width: 20px; 
+	content: '► '; 
+}
+details[open] > summary::before { 
+	content: '▼ '; 
+}
+
+/*
+#revaluation-reason {
+	background-image: url(/images/attention-16.png);
+	background-repeat: no-repeat;
+	background-position: left center;
+	padding-left: 25px;
+}
+*/
+
+
+
+/*
+	Standings
+*/
+
+.standings  a {
+	color: #00E;
+}
+.standings .place a, .standings caption a {
+	color: black;
+}
+.standings .place a:hover {
+	text-decoration: none;
+}
+.standings th, .standings td {
+	padding: 0.1em 0.4em;
+	border-left: 1px dashed black;
+	border-right: 1px dashed black;
+	font-weight: normal;
+}
+.standings > tbody > tr {
+	border-top: 1px solid black;
+	border-bottom: 1px solid black;
+}
+.standings > tbody > tr:hover {
+	background-color: transparent;
+}
+.standings > tbody > tr:hover .team, 
+.standings > tbody > tr:hover .place, 
+.standings > tbody > tr.crossover-opponent .team,
+.standings > tbody > tr.crossover-opponent .place {
+	background-color: #FFFF80;
+}
+.standings .team {
+	text-align: left;
+}
+.standings > tbody .place {
+	font-weight: bold;
+}
+.standings td.crossover {
+	font-size: 0.84em;
+}
+.standings .withdrawn {
+	color: gray;
+}
+.standings .withdrawn .place, .standings .place a {
+	color: black;
+}
+.standings .crossover > a {
+	display: block;
+}
+.standings .crossover time {
+	color: gray;
+}
+.standings .incomplete, .standings .incomplete a {
+	color: orange;
+}
+.standings .revised, .standings .revised a {
+	color: violet;
+}
+.standings .nofight, .standings .nofight a {
+	color: red;
+}
+
+.standings > tbody .place {
+	border: 0;
+	padding: 0.3em 0.3em;
+}
+.standings > tbody .team {
+	border-left: 0;
+}
+.standings > tbody .place > div {
+	background-color: white;
+	padding: 0.2em;
+	margin: auto;
+	min-width: 1em;
+	max-width: 3em;
+	text-align: center;
+	border: 1px solid black;
+	border-radius: 15px;
+	-moz-border-radius: 15px;
+	-webkit-border-radius: 15px;
+}
+.standings .promoted .place > div {
+	background-color: #B6FF97;
+}
+.standings .relegated .place > div {
+	background-color: #FFCDCD;
+}
+
+/* based on http://www.alistapart.com/d/accessibledata/example-barchart.html */
+.standings td.points {
+	padding: 0;
+}
+.standings td.points > div {
+	display: block;
+	position: relative;
+	padding: 0.561em 0.4em; /* 0.514em 0.4em; */
+	width: 10em;
+}
+.standings td.points meter {
+	display: block;
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%; /* 186% */
+	background: #D7F0FF; /* #B8E4F5 */
+	text-indent: -9999px;
+	overflow: hidden;
+	line-height: 2.2em;
+}
+.standings td.points span {
+	position: relative;
+	z-index: 1;
+}
+
+.standings tr:target {
+	background-color: transparent;
+}
+.standings tr:target .team {
+	font-weight: bold;
+}
+
+.standings.home-table .away, 
+.standings.away-table .home,
+.standings.first-half-table .second-half, 
+.standings.second-half-table .first-half {
+	visibility: hidden;
+}
+
+
+
+
+/* Chrome 6 beta introduces native meter style; override it */ 
+.standings meter {
+	-webkit-appearance: none;
+	vertical-align: inherit;
+}
+.standings meter::-webkit-meter-horizontal-bar,
+.standings meter::-webkit-meter-horizontal-optimum-value,
+.standings meter::-webkit-meter-horizontal-suboptimal-value,
+.standings meter::-webkit-meter-horizontal-even-less-good-value,
+.standings meter::-webkit-meter-vertical-bar,
+.standings meter::-webkit-meter-vertical-optimum-value,
+.standings meter::-webkit-meter-vertical-suboptimal-value,
+.standings meter::-webkit-meter-vertical-even-less-good-value,
+.standings meter::-webkit-meter-bar,
+.standings meter::-webkit-meter-optimum-value,
+.standings meter::-webkit-meter-value,
+.standings meter::-webkit-progress-value {
+	background: #D7F0FF;
+}
+/* for some reason this value is ignored as sub-element of .standings.
+   but this general selector works. strange bug in webkit */
+meter::-webkit-meter-optimum-value {
+    background: #D7F0FF;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@media only screen and (max-width: 480px) { /* max-device-width: 480px */
+	body {
+		margin: 0;
+		padding: 0;
+	}
+	.scoresheet {
+		font-size: 11px;
+	}
+}
