@@ -11,6 +11,7 @@
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
 	<script type="text/javascript" src="{{ asset('bundles/tobiontropaion/js/Placeholder-jQuery-Plugin/jquery.placeholder.min.js') }}"></script>
 	<script type="text/javascript" src="{{ asset('bundles/tobiontropaion/js/DataTables-1.8.1/media/js/jquery.dataTables.min.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('bundles/tobiontropaion/js/Sparkline-JQuery-Plugin/jquery.sparkline.min.js') }}"></script>
 	
 	<script type="text/javascript">
 	//<![CDATA[
@@ -19,7 +20,7 @@
 			filter_homeaway_cellindex   = 3, 
 			filter_matchtype_cellindex  = 4, 
 			filter_players_cellindex    = [4, 6],
-			filter_teams_cellindex    	= [8, 10];
+			filter_teams_cellindex    	= [9, 11];
 	//]]>
 	</script>
 	
@@ -29,15 +30,16 @@
 	//<![CDATA[
 	
 		$(document).ready(function() {
-			var dataTable = $('#matches table').dataTable({
-				"bPaginate": false,
+			var dataTable = $('#matches').dataTable({
+				"bAutoWidth": false,
 				"bLengthChange": false,
+				"bPaginate": false,
+				"bInfo": false,
+				"sDom": '',
+				"asStripClasses": [],
+				"bJQueryUI": true,
 				"bFilter": true,
 				"bSort": true,
-				"bInfo": false,
-				"bAutoWidth": false,
-				"bJQueryUI": true,
-				"sDom": '',
 				"aoColumns": [
 					{ "sType": "time-element" },
 					{ "sType": "league-level-division" },
@@ -47,28 +49,128 @@
 					{ "sType": "margin-of-victory", "asSorting": [ "desc", "asc" ] },
 					{ "bSortable": false },
 					{ "bSortable": false },
+					{ "sType": "num-signed" },
 					null,
 					{ "sType": "margin-of-victory", "asSorting": [ "desc", "asc" ] },
 					null,
 					{ "bSortable": false }
 				],
-				// "aaSorting": [[0,'asc']]
+				// "aaSorting": [[0,'asc']],
+				"fnDrawCallback": function() {
+				
+					$('#entries-displayed').text(this.fnSettings().fnRecordsDisplay());
+					$('#entries-total').text(this.fnSettings().fnRecordsTotal());
+					$('#entries-total').parent().toggle(this.fnSettings().fnRecordsDisplay() != this.fnSettings().fnRecordsTotal());
+				
+					var wins = $('#matches .win').length,
+						draws = $('#matches .draw').length,
+					    losses = $('#matches .loss').length,
+						nofights = $('#matches .nofight').length;
+						
+					$('#wins').text(wins);
+					$('#draws').text(draws);
+					$('#losses').text(losses);
+					$('#wins-percent').text(Math.round(wins / (wins + draws + losses) * 1000) / 10 || 0);
+					$('#draws-percent').text(Math.round(draws / (wins + draws + losses) * 1000) / 10 || 0);
+					$('#losses-percent').text(Math.round(losses / (wins + draws + losses) * 1000) / 10 || 0);
+					$('#no-fights').text(nofights);
+					
+					$('#draws').parent().toggle(draws != 0);
+					$('#no-fights').parent().toggle(nofights != 0);
+					
+					$('#win-loss-chart').sparkline([wins, draws, losses], {type: 'pie', sliceColors: ['green', 'yellow', 'red'], offset: -90, width: '45px', height: '45px'} );
+					
+					var nbTeammatches = this.fnGetColumnData(10, true, true, true, false, /href="(.*?)"/).length,
+					    nbMyTeams = this.fnGetColumnData(filter_teams_cellindex[0], true, true, true, true).length,
+					    nbPartners = this.fnGetColumnData(4, true, true, true, false, /about="(.*?)"/).length;
+
+					$('#nb-teammatches').text(nbTeammatches);
+					$('#nb-myteams').text(nbMyTeams);
+					$('#nb-partners').text(nbPartners);
+					
+					var myScoreSum = 0, opponentScoreSum = 0, myPointsSum = 0, opponentPointsSum = 0;
+					$('#matches ol.effective').each(function(index) {
+						myScoreSum += parseInt($(this).attr('data-my-score')) || 0;
+						opponentScoreSum += parseInt($(this).attr('data-opponent-score')) || 0;
+						myPointsSum += parseInt($(this).attr('data-my-points')) || 0;
+						opponentPointsSum += parseInt($(this).attr('data-opponent-points')) || 0;
+					});	
+					
+					$('#my-games').text(myScoreSum);
+					$('#opponent-games').text(opponentScoreSum);
+					$('#my-points').text(myPointsSum);
+					$('#opponent-points').text(opponentPointsSum);
+
+					/*
+					Trend unabhängig von der Nutzersortierung zu machen (immer aufsteigende Zeitachse).
+					Funktionierte nicht einwandfrei, da bei Spielen zur gleichen Zeit das Trenddiagramm entweder sich doch verändert (abhängig von Zweitsortierung der Tabelle)
+					oder das Diagramm nicht konsistent mit der Tabellenreihenfolge ist.
+					
+					var ratings = [];
+					$('#matches tbody tr').each(function(index) {
+						var oRating = {};
+						oRating.ratingChange = signedStringToNumber($(this).find('td.rating').text(), NaN);
+						if (!isNaN(oRating.ratingChange)) {
+							oRating.date = Date.parse($(this).find('time').attr('datetime'));
+							// secondary sorting criteria 'match' needed to make it unambiguous when having matches at the same date
+							// otherwise the trend graph would change slightly depending on sorting direction
+							oRating.match = $(this).find('td.matchtype a').attr('href');
+							
+							ratings.push(oRating);
+						}
+					});	
+
+					ratings.sort( function (a,b) { 
+						return ((a.date < b.date) ? -1 : ((a.date > b.date) ?  1 : 
+							((a.match < b.match) ? -1 : ((a.match > b.match) ?  1 : 0))
+						));
+					});
+
+					var sum = 0, trendValues = [0], colorMap = ['white'];
+					for (var i=0; i<ratings.length; i++) {
+						sum = sum + ratings[i].ratingChange;
+						trendValues.push(sum);
+						colorMap.push(sum < 0 ? 'red' : (sum > 0 ? 'green' : 'gray'));
+					}
+					*/
+					
+					var sum = 0, trendValues = [0], colorMap = ['white'];
+					$('#matches tbody tr').each(function(index) {
+						var ratingChange = signedStringToNumber($(this).find('td.rating').text(), NaN);
+						if (!isNaN(ratingChange)) {
+							sum = sum + ratingChange;
+							trendValues.push(sum);
+							colorMap.push(sum < 0 ? 'red' : (sum > 0 ? 'green' : 'gray'));
+						}
+					});	
+					
+					if (trendValues.length == 1) {
+						trendValues = [];
+						colorMap = [];
+					}
+									
+					$('#trend').sparkline(trendValues, {type: 'bar', barColor: 'green', negBarColor: 'red', zeroColor: 'white', colorMap: colorMap, width: 'auto', height: '40px'} );
+				}
 			});
-		
-
-			
-			
-			var matchtypes = dataTable.fnGetColumnData(4, true, true, true, false, /data-matchtype-name="(.*?)"/);
+					
+			var matchtypes = dataTable.fnGetColumnData(filter_matchtype_cellindex, true, true, true, false, /data-matchtype-name="(.*?)"/);
 			matchtypes.sort();
-
 			fnAppendOptions('#discrete-matchtypes', matchtypes);
+			
+			var myteams = dataTable.fnGetColumnData(filter_teams_cellindex[0]);
+			myteams.sort();
+			fnAppendOptions('#my-teams', myteams);
+			
+			var opponentteams = dataTable.fnGetColumnData(filter_teams_cellindex[1]);
+			opponentteams.sort();
+			fnAppendOptions('#opponent-teams', opponentteams);
 
 			/* Add event listeners to filtering inputs */
 			$('#stage-filter').change( function() { dataTable.fnDraw(); } );
 			$('#homeaway-filter').change( function() { dataTable.fnDraw(); } );
 			$('#matchtype-filter').change( function() { dataTable.fnDraw(); } );
 			$('#players-filter').keyup( function() { dataTable.fnFilter( $(this).val(), filter_players_cellindex[1] ); } );
-			$('#teams-filter').keyup( function() { dataTable.fnDraw(); } );
+			$('#teams-filter').change( function() { dataTable.fnDraw(); } );
 		} );
 
 	//]]>
@@ -91,13 +193,26 @@
 
 <h1>{% trans with { '%givenName%': athlete.firstName, '%familyName%': athlete.lastName } %}%givenName% %familyName%{% endtrans %}</h1>
 
-<section id="matches">
-<h2>{% trans with { '%givenName%': athlete.firstName, '%familyName%': athlete.lastName } %}Spiele von <em>%givenName% %familyName%</em>{% endtrans %}</h2>
+<section id="my-results">
+<h2>{% trans with { '%givenName%': athlete.firstName, '%familyName%': athlete.lastName } %}Spiele &amp; Statistiken von <em>%givenName% %familyName%</em>{% endtrans %}</h2>
 
-<p>Todo Stats: Spiele/Sätze/Punkte: Anz., S / U / N, percent, kampflose, (Kroton: pro Mannschaft -> Mannschaftseinsätze ablesbar); Mannschaftsspiele: Einsätze, in welcher Mannschaft</p>
-<p>Partner Search not working yet!</p>
+<details style="margin-bottom: 1em">
+	<summary>{% trans %}Hilfe{% endtrans %}</summary>
+	{% trans %}<p>Alle Spiele werden in der Tabelle in chronologischer Reihenfolge angezeigt. Durch Klicken auf die Spaltenüberschriften kann man die Spiele 
+		umsortieren. Hält man dabei die Shift-Taste gedrückt, können auch mehrere Sortierkriterien angewendet werden. 
+		Die Pfeile in den Überschriften geben Auskunft über die Sortierbarkeit und die aktive Sortierrichtung (aufsteigend bzw. absteigend).</p>
+		<p>Zusätzlich können die Spiele nach verschiedenen, kombinierbaren Kriterien gefiltert und durchsucht werden. Auch werden Statistiken berechnet, die sich auf
+		die angezeigten, möglicherweise gefilterten Spiele beziehen. Dadurch kann man sich flexibel seine eigenen Auswertungen generieren und 
+		ist nicht auf die vordefinierten Statistiken beschränkt. 
+		Beispielsweise findet man durch das Auswählen einer Mannschaft heraus, wieviele Einsätze man für bzw. gegen diese Mannschaft bestritten hat und 
+		wie viele Individualspiele man dabei gewonnen und verloren hat. Die Sieg/Niederlage-Rate wird hierbei zur Anschaulichkeit als Kreisdiagramm visualisiert.</p>
+		<p>Bei den Auswertungen kommen die ursprünglichen, tatsächlich gespielten Ergebnisse zum Tragen, 
+		und nicht die formellen, am grünen Tisch entschiedenen.</p>{% endtrans %}
+</details>
 
 {% include 'TobionTropaionBundle::matches-profile-view.html.twig' with {'matches': matches, 'athlete': athlete} %}
+
+<p>ToDo: Partner Search not working yet!</p>
 
 </section>
 

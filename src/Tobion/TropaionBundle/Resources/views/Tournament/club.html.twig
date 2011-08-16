@@ -29,7 +29,7 @@
 	//<![CDATA[
 
 		$(document).ready(function() {
-			var dataTable = $('#teammatches table').dataTable({
+			var dataTable = $('#teammatches').dataTable({
 				"bPaginate": false,
 				"bLengthChange": false,
 				"bFilter": true,
@@ -89,7 +89,7 @@
 
 <h1>{{ club }}</h1>
 
-<section id="teammatches">
+<section id="my-results">
 <h2>{% trans with { '%club%': club.code } %}Spiele des Vereins <em>%club%</em>{% endtrans %}</h2>
 
 {% include 'TobionTropaionBundle::teammatches-profile-view.html.twig' with {'teammatches': teammatches, 'profileView': 'club', 'perspective': club.name} %}

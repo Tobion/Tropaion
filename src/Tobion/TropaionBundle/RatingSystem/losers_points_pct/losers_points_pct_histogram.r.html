@@ -1,0 +1,132 @@
+<html>
+<head>
+<style type="text/css">
+.number{
+	color: rgb(21,20,181) ;
+}
+
+.functioncall{
+	color: red ;
+}
+
+.string{
+	color: rgb(153,153,255) ;
+}
+
+.keyword{
+	font-weight: bolder ;
+	color: black;
+}
+
+.argument{
+	color: rgb( 177,63,5) ;
+}
+
+.comment{
+	color: rgb( 204,204,204) ;
+}
+
+.roxygencomment{
+	color: rgb(0,151,255);
+}
+
+.formalargs{
+	color: rgb(18,182,18);
+}
+
+.eqformalargs{
+	color: rgb(18,182,18);
+}
+
+.assignement{
+	font-weight: bolder;
+	color: rgb(55,55,98);
+}
+
+.package{
+	color: rgb(150,182,37);
+}
+
+.slot{
+	font-style:italic;
+}
+
+.symbol{
+	color: black ;
+}
+
+.prompt{
+	color: black ;
+}
+
+</style>
+</head>
+<body>
+<pre>
+<span class="functioncall">setwd</span><span class="keyword">(</span><span class="string">"C:/Dokumente und Einstellungen/Tubo/Eigene Dateien/Studium/FHTW B.Sc. Angew. Inf/Bachelorarbeit/BVBB/Statistiken/losers_points_pct/"</span><span class="keyword">)</span>
+<span class="symbol">data</span> <span class="assignement"><-</span> <span class="functioncall">read.csv</span><span class="keyword">(</span><span class="argument">file</span><span class="argument">=</span><span class="string">"losers_points_pct.csv"</span><span class="keyword">,</span><span class="argument">sep</span><span class="argument">=</span><span class="string">";"</span><span class="keyword">,</span><span class="argument">head</span><span class="argument">=</span><span class="number">TRUE</span><span class="keyword">)</span>
+<span class="functioncall">library</span><span class="keyword">(</span><span class="symbol">ggplot2</span><span class="keyword">)</span>
+
+<span class="functioncall">mean</span><span class="keyword">(</span><span class="symbol">data</span><span class="keyword">$</span><span class="symbol">losers_original_points_pct</span><span class="keyword">)</span>
+<span class="functioncall">sd</span><span class="keyword">(</span><span class="symbol">data</span><span class="keyword">$</span><span class="symbol">losers_original_points_pct</span><span class="keyword">)</span>
+
+<span class="functioncall">hist</span><span class="keyword">(</span><span class="symbol">data</span><span class="keyword">$</span><span class="symbol">losers_original_points_pct</span><span class="keyword">,</span> <span class="argument">breaks</span><span class="argument">=</span><span class="number">30</span><span class="keyword">,</span> <span class="argument">cex.main</span><span class="argument">=</span><span class="number">0.95</span><span class="keyword">,</span> <span class="argument">main</span><span class="argument">=</span><span class="string">'Histogramm zum Verhältnis der Punkte des Verlierers zu denen des Gewinners'</span><span class="keyword">,</span> <span class="argument">xlab</span><span class="argument">=</span><span class="string">'Quotient aus Verliererpunkte durch Gewinnerpunkte in Prozent'</span><span class="keyword">,</span> <span class="argument">ylab</span><span class="argument">=</span><span class="string">'Häufigkeit'</span><span class="keyword">)</span>
+
+<span class="comment"># Other charts</span>
+<span class="functioncall">qqnorm</span><span class="keyword">(</span><span class="symbol">data</span><span class="keyword">$</span><span class="symbol">losers_original_points_pct</span><span class="keyword">)</span>
+<span class="functioncall">plot</span><span class="keyword">(</span><span class="symbol">data</span><span class="keyword">$</span><span class="symbol">losers_original_points_pct</span><span class="keyword">,</span><span class="symbol">data</span><span class="keyword">$</span><span class="symbol">std_orig_smaller_div_bigger_gamescore_permil</span><span class="keyword">)</span>
+<span class="functioncall">boxplot</span><span class="keyword">(</span><span class="symbol">data</span><span class="keyword">$</span><span class="symbol">losers_original_points_pct</span><span class="keyword">,</span><span class="argument">horizontal</span><span class="argument">=</span><span class="number">TRUE</span><span class="keyword">)</span>
+<span class="functioncall">stripchart</span><span class="keyword">(</span><span class="symbol">data</span><span class="keyword">$</span><span class="symbol">losers_original_points_pct</span><span class="keyword">)</span>
+
+
+<span class="comment"># http://had.co.nz/ggplot2/geom_histogram.html</span>
+<span class="functioncall">install.packages</span><span class="keyword">(</span><span class="string">"ggplot2"</span><span class="keyword">)</span>
+<span class="functioncall">library</span><span class="keyword">(</span><span class="symbol">ggplot2</span><span class="keyword">)</span>
+
+<span class="comment"># Basic</span>
+<span class="functioncall">qplot</span><span class="keyword">(</span><span class="symbol">losers_original_points_pct</span><span class="keyword">,</span> <span class="argument">data</span><span class="argument">=</span><span class="symbol">data</span><span class="keyword">,</span> <span class="argument">xlab</span><span class="argument">=</span><span class="string">'Quotient aus Verliererpunkte durch Gewinnerpunkte in Prozent'</span><span class="keyword">,</span> <span class="argument">ylab</span><span class="argument">=</span><span class="string">'Häufigkeit'</span><span class="keyword">,</span> <span class="argument">main</span><span class="argument">=</span><span class="string">'Histogramm zum Verhältnis der Punkte des Verlierers zu denen des Gewinners'</span><span class="keyword">,</span> <span class="argument">binwidth</span><span class="argument">=</span><span class="number">5</span><span class="keyword">)</span>
+
+<span class="comment"># Fill</span>
+<span class="functioncall">ggplot</span><span class="keyword">(</span><span class="symbol">data</span><span class="keyword">,</span> <span class="functioncall">aes</span><span class="keyword">(</span><span class="argument">x</span><span class="argument">=</span><span class="symbol">losers_original_points_pct</span><span class="keyword">)</span><span class="keyword">)</span> <span class="keyword">+</span> <span class="functioncall">geom_histogram</span><span class="keyword">(</span><span class="argument">binwidth</span><span class="argument">=</span><span class="number">5</span><span class="keyword">,</span> <span class="argument">colour</span><span class="argument">=</span><span class="string">"black"</span><span class="keyword">,</span> <span class="functioncall">aes</span><span class="keyword">(</span><span class="argument">fill</span> <span class="argument">=</span> <span class="symbol">..count..</span><span class="keyword">)</span><span class="keyword">)</span> <span class="keyword">+</span>
+<span class="functioncall">scale_fill_gradient</span><span class="keyword">(</span><span class="string">"Häufigkeit"</span><span class="keyword">)</span> <span class="keyword">+</span>
+<span class="functioncall">xlab</span><span class="keyword">(</span><span class="string">"Quotient aus Verliererpunkte durch Gewinnerpunkte in Prozent"</span><span class="keyword">)</span> <span class="keyword">+</span>
+<span class="functioncall">ylab</span><span class="keyword">(</span><span class="string">"Häufigkeit"</span><span class="keyword">)</span>
+
+<span class="comment"># Density</span>
+<span class="functioncall">ggplot</span><span class="keyword">(</span><span class="symbol">data</span><span class="keyword">,</span> <span class="functioncall">aes</span><span class="keyword">(</span><span class="argument">x</span><span class="argument">=</span><span class="symbol">losers_original_points_pct</span><span class="keyword">)</span><span class="keyword">)</span> <span class="keyword">+</span> <span class="functioncall">geom_histogram</span><span class="keyword">(</span><span class="argument">binwidth</span><span class="argument">=</span><span class="number">5</span><span class="keyword">,</span> <span class="functioncall">aes</span><span class="keyword">(</span><span class="argument">y</span> <span class="argument">=</span> <span class="symbol">..density..</span><span class="keyword">)</span><span class="keyword">)</span> <span class="keyword">+</span> <span class="functioncall">geom_density</span><span class="keyword">(</span><span class="keyword">)</span>
+
+<span class="comment"># Facet</span>
+<span class="functioncall">ggplot</span><span class="keyword">(</span><span class="symbol">data</span><span class="keyword">,</span> <span class="functioncall">aes</span><span class="keyword">(</span><span class="argument">x</span><span class="argument">=</span><span class="symbol">losers_original_points_pct</span><span class="keyword">)</span><span class="keyword">)</span> <span class="keyword">+</span> <span class="functioncall">geom_histogram</span><span class="keyword">(</span><span class="argument">binwidth</span><span class="argument">=</span><span class="number">5</span><span class="keyword">)</span> <span class="keyword">+</span> <span class="functioncall">facet_grid</span><span class="keyword">(</span><span class="keyword">~</span> <span class="symbol">match_type</span><span class="keyword">)</span>
+<span class="functioncall">ggplot</span><span class="keyword">(</span><span class="symbol">data</span><span class="keyword">,</span> <span class="functioncall">aes</span><span class="keyword">(</span><span class="argument">x</span><span class="argument">=</span><span class="symbol">losers_original_points_pct</span><span class="keyword">)</span><span class="keyword">)</span> <span class="keyword">+</span> <span class="functioncall">geom_histogram</span><span class="keyword">(</span><span class="argument">binwidth</span><span class="argument">=</span><span class="number">5</span><span class="keyword">)</span> <span class="keyword">+</span> <span class="functioncall">facet_grid</span><span class="keyword">(</span><span class="keyword">~</span> <span class="symbol">games</span><span class="keyword">)</span>
+
+<span class="comment"># Stacked histogramm</span>
+<span class="functioncall">ggplot</span><span class="keyword">(</span><span class="symbol">data</span><span class="keyword">,</span> <span class="functioncall">aes</span><span class="keyword">(</span><span class="argument">x</span><span class="argument">=</span><span class="symbol">losers_original_points_pct</span><span class="keyword">,</span> <span class="argument">fill</span><span class="argument">=</span><span class="functioncall">factor</span><span class="keyword">(</span><span class="symbol">games</span><span class="keyword">)</span><span class="keyword">)</span><span class="keyword">)</span> <span class="keyword">+</span>
+<span class="functioncall">geom_bar</span><span class="keyword">(</span><span class="argument">binwidth</span><span class="argument">=</span><span class="number">5</span><span class="keyword">,</span> <span class="argument">colour</span><span class="argument">=</span><span class="string">"black"</span><span class="keyword">)</span> <span class="keyword">+</span> <span class="comment"># dodge version: position="dodge", aes(y = ..density..)</span>
+<span class="functioncall">scale_fill_hue</span><span class="keyword">(</span><span class="string">"Sätze"</span><span class="keyword">,</span> <span class="argument">breaks</span> <span class="argument">=</span> <span class="functioncall">c</span><span class="keyword">(</span><span class="string">"2"</span><span class="keyword">,</span> <span class="string">"3"</span><span class="keyword">)</span><span class="keyword">,</span> <span class="argument">labels</span> <span class="argument">=</span> <span class="functioncall">c</span><span class="keyword">(</span><span class="string">"2-Satz-Spiel"</span><span class="keyword">,</span> <span class="string">"3-Satz-Spiel"</span><span class="keyword">)</span><span class="keyword">)</span> <span class="keyword">+</span>
+<span class="functioncall">stat_function</span><span class="keyword">(</span>
+                <span class="argument">fun</span> <span class="argument">=</span> <span class="keyword">function</span><span class="keyword">(</span><span class="formalargs">x</span><span class="keyword">,</span> <span class="formalargs">mean</span><span class="keyword">,</span> <span class="formalargs">sd</span><span class="keyword">,</span> <span class="formalargs">n</span><span class="keyword">)</span><span class="keyword">{</span>
+                        <span class="number">4250</span> <span class="keyword">*</span> <span class="symbol">sd</span> <span class="keyword">*</span> <span class="functioncall">sqrt</span><span class="keyword">(</span><span class="number">2</span> <span class="keyword">*</span> <span class="symbol">pi</span><span class="keyword">)</span> <span class="keyword">*</span> <span class="functioncall">dnorm</span><span class="keyword">(</span><span class="argument">x</span> <span class="argument">=</span> <span class="symbol">x</span><span class="keyword">,</span> <span class="argument">mean</span> <span class="argument">=</span> <span class="symbol">mean</span><span class="keyword">,</span> <span class="argument">sd</span> <span class="argument">=</span> <span class="symbol">sd</span><span class="keyword">)</span>
+                <span class="keyword">}</span><span class="keyword">,</span>
+                <span class="argument">args</span> <span class="argument">=</span> <span class="functioncall">with</span><span class="keyword">(</span><span class="symbol">data</span><span class="keyword">,</span> <span class="functioncall">c</span><span class="keyword">(</span><span class="argument">mean</span><span class="argument">=</span><span class="functioncall">mean</span><span class="keyword">(</span><span class="symbol">losers_original_points_pct</span><span class="keyword">)</span><span class="keyword">,</span> <span class="argument">sd</span><span class="argument">=</span><span class="functioncall">sd</span><span class="keyword">(</span><span class="symbol">losers_original_points_pct</span><span class="keyword">)</span><span class="keyword">,</span> <span class="argument">n</span><span class="argument">=</span><span class="functioncall">length</span><span class="keyword">(</span><span class="symbol">losers_original_points_pct</span><span class="keyword">)</span><span class="keyword">)</span><span class="keyword">)</span><span class="keyword">,</span>
+                <span class="argument">lwd</span><span class="argument">=</span><span class="number">1.2</span><span class="keyword">,</span> <span class="comment"># col="darkblue",</span>
+                <span class="functioncall">aes</span><span class="keyword">(</span><span class="argument">colour</span><span class="argument">=</span><span class="string">"µ = 63.9\nσ = 23.2"</span><span class="keyword">)</span>
+<span class="keyword">)</span> <span class="keyword">+</span>
+<span class="functioncall">scale_colour_manual</span><span class="keyword">(</span><span class="string">"Normalverteilung"</span><span class="keyword">,</span> <span class="argument">values</span> <span class="argument">=</span> <span class="functioncall">c</span><span class="keyword">(</span><span class="string">"darkblue"</span><span class="keyword">)</span><span class="keyword">)</span> <span class="keyword">+</span>
+<span class="functioncall">opts</span><span class="keyword">(</span><span class="argument">legend.position</span> <span class="argument">=</span> <span class="functioncall">c</span><span class="keyword">(</span><span class="number">0.85</span><span class="keyword">,</span><span class="number">0.7</span><span class="keyword">)</span><span class="keyword">,</span> <span class="argument">legend.background</span> <span class="argument">=</span> <span class="functioncall">theme_rect</span><span class="keyword">(</span><span class="argument">col</span> <span class="argument">=</span> <span class="number">0</span><span class="keyword">)</span><span class="keyword">)</span> <span class="keyword">+</span>
+<span class="functioncall">xlab</span><span class="keyword">(</span><span class="string">"Quotient aus Verliererpunkte durch Gewinnerpunkte in Prozent"</span><span class="keyword">)</span> <span class="keyword">+</span>
+<span class="functioncall">ylab</span><span class="keyword">(</span><span class="string">"Häufigkeit"</span><span class="keyword">)</span> <span class="comment"># + opts(title = "Stacked Histogram with Normal Curve")</span>
+
+<span class="comment">#legend("bottomright", "µ = 63.9\nσ = 23.2", inset = -0.04, border="", bty="n", box.lwd=0, lwd=2.5, cex=0.9, col="darkblue", title="Normalverteilung")</span>
+
+<span class="comment"># Dodge histogramm</span>
+<span class="functioncall">ggplot</span><span class="keyword">(</span><span class="symbol">data</span><span class="keyword">,</span> <span class="functioncall">aes</span><span class="keyword">(</span><span class="argument">x</span><span class="argument">=</span><span class="symbol">losers_original_points_pct</span><span class="keyword">,</span> <span class="argument">fill</span><span class="argument">=</span><span class="functioncall">factor</span><span class="keyword">(</span><span class="symbol">games</span><span class="keyword">)</span><span class="keyword">)</span><span class="keyword">)</span> <span class="keyword">+</span>
+<span class="functioncall">geom_bar</span><span class="keyword">(</span><span class="argument">binwidth</span><span class="argument">=</span><span class="number">5</span><span class="keyword">,</span> <span class="argument">colour</span><span class="argument">=</span><span class="string">"black"</span><span class="keyword">,</span><span class="argument">position</span><span class="argument">=</span><span class="string">"dodge"</span><span class="keyword">)</span> <span class="keyword">+</span>
+<span class="functioncall">scale_fill_hue</span><span class="keyword">(</span><span class="string">"Sätze"</span><span class="keyword">,</span> <span class="argument">breaks</span> <span class="argument">=</span> <span class="functioncall">c</span><span class="keyword">(</span><span class="string">"2"</span><span class="keyword">,</span> <span class="string">"3"</span><span class="keyword">)</span><span class="keyword">,</span> <span class="argument">labels</span> <span class="argument">=</span> <span class="functioncall">c</span><span class="keyword">(</span><span class="string">"2-Satz-Spiel"</span><span class="keyword">,</span> <span class="string">"3-Satz-Spiel"</span><span class="keyword">)</span><span class="keyword">)</span> <span class="keyword">+</span>
+<span class="functioncall">opts</span><span class="keyword">(</span><span class="argument">legend.position</span> <span class="argument">=</span> <span class="functioncall">c</span><span class="keyword">(</span><span class="number">0.85</span><span class="keyword">,</span><span class="number">0.7</span><span class="keyword">)</span><span class="keyword">,</span> <span class="argument">legend.background</span> <span class="argument">=</span> <span class="functioncall">theme_rect</span><span class="keyword">(</span><span class="argument">col</span> <span class="argument">=</span> <span class="number">0</span><span class="keyword">)</span><span class="keyword">)</span> <span class="keyword">+</span>
+<span class="functioncall">xlab</span><span class="keyword">(</span><span class="string">"Quotient aus Verliererpunkte durch Gewinnerpunkte in Prozent"</span><span class="keyword">)</span> <span class="keyword">+</span>
+<span class="functioncall">ylab</span><span class="keyword">(</span><span class="string">"Häufigkeit"</span><span class="keyword">)</span>
+
+<span class="functioncall">title</span><span class="keyword">(</span><span class="argument">main</span><span class="argument">=</span><span class="string">"Histogramm zum Verhältnis der Punkte des Verlierers zu denen des Gewinners"</span><span class="keyword">,</span> <span class="argument">cex.main</span> <span class="argument">=</span> <span class="number">1</span><span class="keyword">)</span>
+</pre>
+</body>
+</html>

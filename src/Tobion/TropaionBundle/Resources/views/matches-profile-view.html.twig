@@ -1,12 +1,10 @@
 {% import "TobionTropaionBundle::macros.html.twig" as macros %}
 
-<table class="match-list profile-view" about="{{ path('profile_athlete', athlete.routingParams ) }}" typeof="sport:Athlete" xmlns:rel="http://purl.org/vocab/relationship/">
+<table id="matches" class="match-list profile-view" about="{{ path('profile_athlete', athlete.routingParams ) }}" typeof="sport:Athlete" xmlns:rel="http://purl.org/vocab/relationship/">
 <caption>
-{#<details class="filter">:
-	<summary>{% trans %}Filter{% endtrans %}</summary>#}
-<fieldset class="filter">
+<fieldset id="filters">
     <legend>{% trans %}Filter{% endtrans %}</legend>
-<div id="match-filters">
+	<div>
 	<label><span>{% trans %}Runde{% endtrans %}:</span>
 		<select id="stage-filter">
 			<option selected="selected" value="">{% trans %}-- Runde --{% endtrans %}</option>
@@ -36,11 +34,55 @@
 		<input id="players-filter" type="text" placeholder="{% trans %}-- Partner / Gegner --{% endtrans %}" />
 	</label>
 	<label><span>{% trans %}Mannschaft{% endtrans %}:</span>
-		<input id="teams-filter" type="text" placeholder="{% trans %}-- Mannschaft --{% endtrans %}" />
+		<select id="teams-filter">
+			<option selected="selected" value="">{% trans %}-- Mannschaft --{% endtrans %}</option>
+			<optgroup id="my-teams" label="{% trans %}Für Teams{% endtrans %}">
+			</optgroup>
+			<optgroup id="opponent-teams" label="{% trans %}Gegn. Teams{% endtrans %}">
+			</optgroup>
+		</select>
 	</label>
-</div>
+	</div>
 </fieldset>
-{#</details>#}
+<fieldset id="statistics">
+    <legend>{% trans with { '%nbMatches%': matches | length } %}Statistiken: <span id="entries-displayed">%nbMatches%</span> Spiele<span style="display:none"> (gefiltert von insgesamt <span id="entries-total">%nbMatches%</span>){% endtrans %}</legend>
+	<div>
+		<div style="float: left; width: 200px;">
+			<p>{% trans %}<span id="wins">%wins%</span> Siege: <span id="wins-percent">%winsPercent%</span>%%{% endtrans %}</p>
+			<p{% if draws == 0 %} style="display: none;"{% endif %}>{% trans %}<span id="draws">%draws%</span> Unentschieden: <span id="draws-percent">%drawsPercent%</span>%%{% endtrans %}</p>
+			<p>{% trans %}<span id="losses">%losses%</span> Niederlagen: <span id="losses-percent">%lossesPercent%</span>%%{% endtrans %}</p>
+			<p{% if noFights == 0 %} style="display: none;"{% endif %}>{% trans %}<span id="no-fights">%noFights%</span> kampflose Spiele{% endtrans %}</p>
+		</div>
+		<div style="float: left; width: 100px;">
+			<p id="win-loss-chart" title="{% trans %}Anteil der Siege (grün) und Niederlagen (rot) als Kreisdiagramm{% endtrans %}">
+				{% trans %}JavaScript notwendig{% endtrans %}
+			</p>
+		</div>
+		<div style="float: left; width: 150px;">
+			<p>{% trans %}<span id="my-games">%myGames%</span> : <span id="opponent-games">%opponentGames%</span> Sätze{% endtrans %}</p>
+			<p>{% trans %}<span id="my-points">%myPoints%</span> : <span id="opponent-points">%opponentPoints%</span> Punkte{% endtrans %}</p>
+		</div>
+		<div style="float: left; width: 300px;">
+			<p>{% transchoice nbTeammatches %}
+					{1} <span id="nb-teammatches">%nbTeammatches%</span> Mannschaftsspiel
+					|[0,Inf] <span id="nb-teammatches">%nbTeammatches%</span> Mannschaftsspiele
+				{% endtranschoice %} 
+				{% transchoice nbMyTeams %}
+					{1} für <span id="nb-myteams">%nbMyTeams%</span> Team
+					|[0,Inf] für <span id="nb-myteams">%nbMyTeams%</span> Teams
+				{% endtranschoice %}</p>
+			<p>{% transchoice nbPartners %}
+					{0,1} <span id="nb-partners">%nbPartners%</span> Doppelpartner 
+					|[2,Inf] <span id="nb-partners">%nbPartners%</span> verschiedene Doppelpartner
+				{% endtranschoice %}</p>
+		</div>
+		<div style="float: left;">
+			<p title="{% trans %}Leistungstrend als aufsummierte Ratingveränderung nach der aktuellen Sortierung (sinnvoll bei aufsteigender Zeit). Grün = Gesamtleistung zu diesem Zeitpunkt besser als erwartet | Rot = schlechter als erwartet{% endtrans %}">{% trans %}Leistungstrend gemäß Sortierung:{% endtrans %} <br />
+				<span id="trend">{% trans %}JavaScript notwendig{% endtrans %}</span>
+			</p>
+		</div>
+	</div>
+</fieldset>
 </caption>
 <thead>
 	<tr>
@@ -52,6 +94,7 @@
 		<th scope="col" class="match score" title="{% trans with { '%perspective%': athlete.firstName ~ ' ' ~ athlete.lastName } %}Resultat aus Sicht von %perspective% | Sortierbar nach der Höhe des Sieges{% endtrans %}">{% trans %}Ergebnis{% endtrans %}</th>
 		<th scope="col" class="players opponent">{% trans %}Gegner{% endtrans %}</th>
 		<th scope="col" class="games">{% trans %}Sätze{% endtrans %}</th>
+		<th scope="col" class="rating" title="{% trans %}Rating-Veränderung | Je größer bzw. kleiner, desto überraschender der Sieg bzw. die Niederlage{% endtrans %}">{% trans %}&#916; Rating{% endtrans %}</th>
 		<th scope="col" class="team self">{% trans %}<abbr title="Gespielt für Mannschaft">Für Team</abbr>{% endtrans %}{# Für / Unterstütztes / Begünstigtes Team , Gespielt für #}</th>
 		<th scope="col" class="teammatch score" title="{% trans %}Mannschaftsergebnis{% endtrans %}">{% trans %}Erg.{% endtrans %}</th>
 		<th scope="col" class="team opponent">{% trans %}<abbr title="Gegnerische Mannschaft">Gegn. Team</abbr>{% endtrans %}</th>
@@ -61,14 +104,19 @@
 <tbody>
 {% for match in matches %}
 	{% set teammatch = match.teammatch %}
-	<tr id="match-{{ match.id }}">
+	<tr id="match-{{ match.id }}" {{ {
+				'noresult': not match.hasResult, 
+				'nofight': match.noFight,
+				'revised': match.revisedScore,
+				'givenup': match.givenUpBy
+			} | class_attribute }}>
 		<td class="date">
 			{% if teammatch.annulled %}<del>{% endif %}
 			<time datetime="{{ teammatch.performedAt | date('c') }}">{{ teammatch.performedAt | date('d.m.Y H:i') }}</time>
 			{% if teammatch.annulled %}</del>{% endif %}
 		</td>
 		<td class="league"><a href="{{ path('tournament_league', teammatch.league.routingParams ) }}" data-level="{{ teammatch.league.classLevel }}" data-division="{{ teammatch.league.division }}">{{ teammatch.league.shortName }}</a></td>
-		<td class="stage"><span {% if teammatch.seasonRound == 1 %}data-stage="first-half">{% trans %}Hin{% endtrans %}</span>{% else %}data-stage="second-half">{% trans %}Rück{% endtrans %}{% endif %}</span></td>
+		<td class="stage"><span {% if teammatch.seasonRound == 1 %}data-stage="first-half">{% trans %}Hin{% endtrans %}{% else %}data-stage="second-half">{% trans %}Rück{% endtrans %}{% endif %}</span></td>
 		<td class="homeaway"><span data-homeaway="{{ teammatch.transformedViewHomeAway }}">{% if teammatch.transformedViewHomeAway == 'home' %}{% trans %}Heim{% endtrans %}{% else %}{% trans %}Ausw.{% endtrans %}{% endif %}</span></td>
 		<td class="matchtype partner">
 			{% spaceless %}
@@ -102,12 +150,12 @@
 			{% if match.hasOriginalResult and ( 
 				match.team1Score != match.team1OriginalFallbackEffectiveScore or match.team1Score is none or 
 				match.team2Score != match.team2OriginalFallbackEffectiveScore or match.team2Score is none )	%}
-				<div class="revised">{{ match.team1Score is none ? '‒' : match.team1Score }}:{{ match.team2Score is none ? '‒' : match.team2Score }}</div>
+				<div class="formal-result" title="{% trans %}Formell anderes Ergebnis{% endtrans %}">{{ match.team1Score is none ? '‒' : match.team1Score }}:{{ match.team2Score is none ? '‒' : match.team2Score }}</div>
 			{% endif %}
 		</td>
 		<td class="players opponent" rel="rel:antagonistOf">
 			{% if not match.team2Player and not match.team2Partner %}
-				<small>&lt;&lt;&lt; {% trans %}kein Spieler{% endtrans %} &gt;&gt;&gt;</small>
+				<small>{% trans %}&lt;&lt;&lt; kein Spieler &gt;&gt;&gt;{% endtrans %}</small>
 			{% endif %}
 			{% spaceless %}
 			{% if match.team2Player %}
@@ -121,7 +169,11 @@
 		</td>
 		<td class="games">
 			{% if match.annulledGames %}
-				<ol class="annulled" title="{% trans %}Ursprüngliches Ergebnis{% endtrans %}">
+				<ol data-my-score="{{ match.team1OriginalScore }}" data-opponent-score="{{ match.team2OriginalScore }}" 
+					data-my-points="{{ match.team1OriginalPoints }}" data-opponent-points="{{ match.team2OriginalPoints }}" 
+					class="effective annulled" title="{% trans %}Ursprüngliches Ergebnis{% endtrans %} - {% 
+					trans with { '%team1Points%': match.team1OriginalPoints, '%team2Points%': match.team2OriginalPoints  } 
+					%}%team1Points%:%team2Points% Punkte{% endtrans %}">
 				{% for game in match.annulledGames %}
 					<li id="game-{{ game.id }}">
 						<span class="score">{{ game.team1Score }}</span><abbr> : </abbr><span class="score">{{ game.team2Score }}</span>
@@ -131,15 +183,34 @@
 				</del>
 			{% endif %}
 			{% if match.effectiveGames %}
-				<ol {% if match.hasOriginalResult %}class="formal" title="{% trans %}Formell umgewertetes Ergebnis{% endtrans %}"{% else %}class="effective"{% endif %}>
+				<ol data-my-score="{{ match.team1Score }}" data-opponent-score="{{ match.team2Score }}" 
+					data-my-points="{{ match.team1Points }}" data-opponent-points="{{ match.team2Points }}" 
+					{% if match.hasOriginalResult %}class="formal" title="{% trans %}Formell umgewertetes Ergebnis{% endtrans %} -  {% 
+						trans with { '%team1Points%': match.team1Points, '%team2Points%': match.team2Points  } 
+						%}%team1Points%:%team2Points% Punkte{% endtrans %}"{% 
+					else %}class="effective" title="{% trans with { '%team1Points%': match.team1Points, '%team2Points%': match.team2Points  } 
+						%}%team1Points%:%team2Points% Punkte{% endtrans %}"{% endif %}>
 				{% for game in match.effectiveGames %}
 					<li id="game-{{ game.id }}">
 						<span class="score">{{ game.team1Score }}</span><abbr> : </abbr><span class="score">{{ game.team2Score }}</span>
 					</li>
 				{% endfor %}
 				</ol>
-				{% endif %}
+			{% endif %}
 		</td>
+		{% set rating = match.athleteRatinghistory(athlete) %}
+		{% if rating %}
+			{% if rating.discipline == 'mixed' %}
+				{% set ratingDiscipline = "Mixed-Rating"|trans %}
+			{% elseif rating.discipline == 'doubles' %}
+				{% set ratingDiscipline = "Doppel-Rating"|trans %}
+			{% else %}
+				{% set ratingDiscipline = "Einzel-Rating"|trans %}
+			{% endif %}
+			<td class="rating" title="{% trans with { '%ratingDiscipline%': ratingDiscipline, '%preRating%': rating.preRating, '%postRating%': rating.postRating  } %}%ratingDiscipline%: Vorher: %preRating% → Nachher: %postRating%{% endtrans %}">{{ macros.signed(rating.postRating - rating.preRating) }}</td>
+		{% else %}
+			<td class="rating" title="{% trans %}Das Spiel ist nicht in die Ratingberechnung eingeflossen.{% endtrans %}">{% trans %}k.A.{% endtrans %}</td>
+		{% endif %}
 		<td class="team self"><a href="{{ path('tournament_team', teammatch.team1.routingParams ) }}">{{ teammatch.team1.club.code }} {{ teammatch.team1.teamNumber }}</a></td>
 		<td class="teammatch score">
 			<a href="{{ path('tournament_teammatch', teammatch.routingParams ) }}" data-mov="{{ teammatch.marginOfVictorySortableString(teammatch.team1) }}" title="{% trans %}Zum Mannschaftsspiel{% endtrans %}">

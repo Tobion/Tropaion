@@ -10,7 +10,7 @@
 	xmlns:foaf="http://xmlns.com/foaf/0.1/"
 	xmlns:og="http://ogp.me/ns#"
 	xmlns:sport="http://purl.org/sport/ontology/"
-	xmlns:resource="{% block resource_domain %}http://tropaion{% endblock %}/resource/">
+	class="no-js">
 <head{% if pageRdfId is defined %} about="{{ pageRdfId }}"{% endif %}>
 	<meta charset="UTF-8" />
 	<title property="dc:title">{% spaceless %}{% block title %}Tropaion{% endblock %}{% endspaceless %}</title>
@@ -33,6 +33,7 @@
 	<!--[if lt IE 9]>
 		<script type="text/javascript" src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE9.js"></script>
 	<![endif]-->
+	<script type="text/javascript" src="{{ asset('bundles/tobiontropaion/js/Modernizr/modernizr-latest.js') }}"></script>
 	{% endblock %}
 </head>
 <body>

@@ -217,6 +217,14 @@ class Match
      * @ORM\OrderBy({"game_sequence" = "ASC"})
      */
     private $Games;
+	
+    /**
+     * @var Ratinghistory
+     *
+     * @ORM\OneToMany(targetEntity="Ratinghistory", mappedBy="Match")
+     * @ORM\JoinColumn(name="id", referencedColumnName="match_id")
+     */
+    private $Ratinghistory;
 
 
     public function __construct()
@@ -782,6 +790,16 @@ class Match
     {
         return $this->Games;
     }
+	
+    /**
+     * Get Ratinghistory
+     *
+     * @return Doctrine\Common\Collections\Collection $ratinghistory
+     */
+    public function getRatinghistory()
+    {
+        return $this->Ratinghistory;
+    }
 
 	
 	/**
@@ -1323,6 +1341,7 @@ class Match
 		}
 	}
 	
+	
 	/**
 	 * Swap athletes of a particular team
 	 * @param integer $team 0 = athletes of both teams; 1 = athletes of team1; 2 = athletes of team2
@@ -1347,6 +1366,22 @@ class Match
 			$this->Team2_Player = $this->Team2_Partner;
 			$this->Team2_Partner = $tmp;
 		}
+	}
+	
+	/**
+	 * @return Ratinghistory
+	 */
+	public function getAthleteRatinghistory(\Tobion\TropaionBundle\Entity\Athlete $athlete)
+	{
+
+		foreach ($this->getRatinghistory() as $ratinghistory) {
+			if ($ratinghistory->getAthleteId() == $athlete->getId())
+			{
+					return $ratinghistory;
+			}
+		}
+		
+		return null;		
 	}
 
 	function __toString()

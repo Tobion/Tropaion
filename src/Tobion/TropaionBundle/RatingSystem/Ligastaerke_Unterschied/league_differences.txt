@@ -1,0 +1,83 @@
+number_matches (nicht kampflos, mit ergebnis)
+43229
+
+
+Gesamt (höhere Liga gegen niedrigere Liga)
+3346 / 5055 (home: 2652)    0.6619
+
+
+Ligaunterschied = 0.5
+1151 / 1918 (home: 989)     0.6         0.5156
+
+Ligaunterschied = 1
+1457 / 2222 (home: 1180)    0.6557      0.5311      111 ELO
+
+Ligaunterschied = 1.5
+165 / 206 (home: 110)       0.801       0.534
+
+Ligaunterschied = 2
+437 / 561 (home: 293)       0.779       0.5223      218 ELO
+
+Ligaunterschied = 2.5
+16 / 16 (home: 6)           1.0         0.375
+
+Ligaunterschied = 3
+92 / 102 (home: 53)         0.902       0.5196      385 ELO
+
+Ligaunterschied = 3.5
+4 / 4 (home: 4)             1.0         1.0
+
+Ligaunterschied = 4
+17 / 18 (home: 14)          0.9444      0.7778
+
+Ligaunterschied = 4.5
+NULL
+
+Ligaunterschied = 5
+7 / 8 (home: 3)             0.875       0.375
+
+
+5 vs 6
+155 / 253 (home: 143)       0.6126      0.5652
+
+6 vs 7
+285 / 438 (home: 219)       0.6507      0.5
+
+7 vs 8
+377 / 561 (home: 301)       0.6720      0.5365
+
+8 vs 9
+426 / 647 (home: 337)       0.6584      0.5209
+
+9 vs 10
+194 / 299 (home: 163)       0.6488      0.5451
+
+5 vs 7
+100 / 117 (home: 57)       0.8547      0.4872
+
+6 vs 8
+101 / 138 (home: 72)       0.7332      0.5217
+
+7 vs 9
+108 / 133 (home: 79)       0.8120      0.594    254 ELO
+
+8 vs 10
+126 / 170 (home: 83)       0.7412      0.4882
+
+5 vs 8
+14 / 14 (home: 5)          1      0.3571
+
+6 vs 9
+32 / 38 (home: 18)          0.8421      0.4737
+
+7 vs 10
+46 / 50 (home: 30)          0.92      0.6
+
+5 vs 9
+6 / 7 (home: 7)          0.8571      1
+
+6 vs 10
+11 / 11 (home: 7)          1      0.6363
+
+5 vs 10
+7 / 8 (home: 3)             0.875       0.375

@@ -27,7 +27,7 @@
 	<script type="text/javascript">
 	//<![CDATA[
 		$(document).ready(function() {
-			var dataTable = $('#teammatches table').dataTable({
+			var dataTable = $('#teammatches').dataTable({
 				"bPaginate": false,
 				"bLengthChange": false,
 				"bFilter": true,
@@ -148,14 +148,14 @@
 	<dd><a href="{{ path('tournament_club', team.club.routingParams(tournament) ) }}">{{ team.club.name }}</a></dd>
 </dl>
 
-<section id="teammatches">
+<section id="my-results">
 <h2>{% trans with { '%team%': team.__toString } %}Spiele der Mannschaft <em>%team%</em>{% endtrans %}</h2>
 
-{% include 'TobionTropaionBundle::teammatches-profile-view.html.twig' with {'teammatches': teammatches, 'profileView' : 'team', 'perspective': team.__toString} %}
+{% include 'TobionTropaionBundle::teammatches-profile-view.html.twig' with {'teammatches': teammatches, 'profileView': 'team', 'perspective': team.__toString} %}
 
 </section>
 
-<p>Zusätzl. Filter / Suche: Status: Ausstehende Ergebniseingabe, Fehlende Ergebnisbestätigung</p>
+<p>Zusätzl. Filter / Suche: <del>Status</del> <ins>Ergebnis</ins>: Sieg, Unentschieden, Niederlage (nur bei profil-view möglich; interessant in Kombination mit Statistiken wie Anteil der 3-Satz-Spiele, aber Sieg/Niederlage Statistik dann sinnlos), 2-Satz-Spiele, 3-Satz-Spiele, Ausstehende Ergebniseingabe, Fehlende Ergebnisbestätigung</p>
 
 <p>Mögl. Erweiterungen: Tabelle, Spielerstatistiken für diese Mannschaft + welche Spieler wären zum aktuellen Zeitpunkt in der Mannschaft einsatzberechtigt?</p>
 

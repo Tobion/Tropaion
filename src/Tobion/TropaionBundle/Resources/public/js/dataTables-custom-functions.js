@@ -9,7 +9,10 @@
  *           bool:bUnique - optional - if set to false duplicated values are not filtered out
  *           bool:bFiltered - optional - if set to false all the table data is used (not only the filtered)
  *           bool:bIgnoreEmpty - optional - if set to false empty values are not filtered from the result array
+ *           bool:bStripHtml - optional - if set to false HTML remains otherwise it is removed
+ *           object:oRegExExtractor - optional - RegEx object to extract the values from the string
  * Author:   Benedikt Forchhammer <b.forchhammer /AT\ mind2.de>
+ *           Enhanced by Tobias Schultze (Added options bStripHtml, oRegExExtractor)
  */
 $.fn.dataTableExt.oApi.fnGetColumnData = function ( oSettings, iColumn, bUnique, bFiltered, bIgnoreEmpty, bStripHtml, oRegExExtractor ) {
 	// check that we have a column id
@@ -45,7 +48,7 @@ $.fn.dataTableExt.oApi.fnGetColumnData = function ( oSettings, iColumn, bUnique,
 		
 		if (!(typeof oRegExExtractor == "undefined" || oRegExExtractor === null)) {
 			var aHits= oRegExExtractor.exec(sValue);
-			sValue = aHits[1];
+			sValue = aHits !== null ? aHits[1] : '';
 		}
 		
 		if (bStripHtml == true) sValue = sValue.replace( /<.*?>/g, "" );
@@ -107,19 +110,30 @@ jQuery.fn.dataTableExt.oSort['margin-of-victory-desc'] = function(a,b) {
 };
 		
 jQuery.fn.dataTableExt.oSort['num-html-asc']  = function(a,b) {
-	var x = a.replace( /<.*?>/g, "" );
-	var y = b.replace( /<.*?>/g, "" );
-	x = parseFloat( x );
-	y = parseFloat( y );
-	return ((x < y) ? -1 : ((x > y) ?  1 : 0));
+	var x = parseFloat(a.replace( /<.*?>/g, "" ));
+	var y = parseFloat(b.replace( /<.*?>/g, "" ));
+	return x - y;
 };
 
 jQuery.fn.dataTableExt.oSort['num-html-desc'] = function(a,b) {
-	var x = a.replace( /<.*?>/g, "" );
-	var y = b.replace( /<.*?>/g, "" );
-	x = parseFloat( x );
-	y = parseFloat( y );
-	return ((x < y) ?  1 : ((x > y) ? -1 : 0));
+	var x = parseFloat(a.replace( /<.*?>/g, "" ));
+	var y = parseFloat(b.replace( /<.*?>/g, "" ));
+	return y - x;
+};
+
+function signedStringToNumber(str, defaultValue) {
+	// unicode minus sign = \u2212 (JS hex encoding) == &#8722; (HTML decimal encoding)
+	// unicode plus-minus sign = \uxb1 (JS hex encoding) == &#177; (HTML decimal encoding)
+	var isNegative = str.indexOf('\u2212') > -1 || str.indexOf('-') > -1; 
+	return ( parseFloat(str.replace( /\u2212/, "" ).replace( /-/, "" ).replace( /\+/, "" ).replace( /\uxb1/, "" )) * ((isNegative) ? -1 : 1) ) || defaultValue;
+};
+
+jQuery.fn.dataTableExt.oSort['num-signed-asc']  = function(a,b) {
+	return signedStringToNumber(a, 0) - signedStringToNumber(b, 0);
+};
+
+jQuery.fn.dataTableExt.oSort['num-signed-desc'] = function(a,b) {
+	return signedStringToNumber(b, 0) - signedStringToNumber(a, 0);
 };
 
 
@@ -233,9 +247,9 @@ if (filter_teams_cellindex !== null) {
 		function( oSettings, aData, iDataIndex ) {
 			var team1 = aData[filter_teams_cellindex[0]].replace( /<.*?>/g, "" ).toLowerCase(),
 			    team2 = aData[filter_teams_cellindex[1]].replace( /<.*?>/g, "" ).toLowerCase(),
-			    teamsSearch = document.getElementById('teams-filter').value.toLowerCase();
-			/* Do not filter on the placeholder text */
-			return $('#teams-filter').hasClass('placeholder') || teamsSearch == "" || team1.indexOf(teamsSearch) > -1 || team2.indexOf(teamsSearch) > -1;
+			    teamsSearch = document.getElementById('teams-filter').value.replace(/^\s+|\s+$/g, '').toLowerCase(); // trim and lower case for case insensitivity
+			/* Do not filter on the placeholder text: $('#teams-filter').hasClass('placeholder') */
+			return  teamsSearch == "" || team1 === teamsSearch || team2 === teamsSearch;
 		}
 	);
 }
@@ -268,7 +282,7 @@ $(document).ready(function() {
 		document.getElementById('players-filter').value = "";
 	}
 	if (filter_teams_cellindex !== null) {
-		document.getElementById('teams-filter').value = "";
+		document.getElementById('teams-filter').selectedIndex = 0;
 	}
 	
 	/* active placeholder fallback solution for older browser, e.g. IE6-IE9 */

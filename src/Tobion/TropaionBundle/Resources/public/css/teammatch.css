@@ -11,6 +11,9 @@
 }
 */
 
+/**
+ * Base table design for scoresheets, standings, match-lists
+ */
 table {
 	border: 0;
 	border-collapse: collapse;
@@ -41,6 +44,7 @@ table > thead a {
 table > caption {
 	text-align: left;
 	padding-bottom: 1em;
+	white-space: normal;
 }
 table abbr {
 	border: 0;
@@ -80,6 +84,9 @@ table > tbody > tr:hover { /* .scoresheet:not(.edit) > tbody > tr:hover */
 	border-top: 1px solid black;
 	border-bottom: 1px solid black;
 }
+/** 
+ * :target pseudo-class when referenced within website with anchor # 
+ */
 table:target > caption {
 	text-shadow: 2px 2px 2px #999999;
 	font-weight: bold;
@@ -101,11 +108,19 @@ table img {
 	vertical-align: text-bottom;
 }
 
+/**
+ * Monospaced font for numeric columns
+ * For alignment of digits and centering ":" between them
+ */
 td.score, td.games, td.points {
-	font-family: "Droid Sans Mono", "Arial Monospaced", monospace; /* for alignment of digits and centering ":" between them */
+	font-family: "Droid Sans Mono", "Arial Monospaced", monospace; /*  */
 }
+/**
+ * Ordered list of games
+ * Styling each score value with equal width so they are correctly aligned (also for varying font-size)
+ */
 td.games {
-	min-width: 90px; /* so a single game result does not get wrapped */
+	min-width: 65px; /* so a single game result does not get wrapped */
 	white-space: normal;
 }
 .games del {
@@ -155,6 +170,109 @@ td.games {
 }
 
 
+/**
+ * Match filters and statistics
+ */
+fieldset {
+	padding: 8px;
+}
+legend{
+	font-weight: bold;
+}
+.no-js #filters {
+	display: none; /* hide filters when Javascript is disabled because it cannot be used anyway */
+}
+#statistics {
+	padding-top: 0;
+	padding-bottom: 0;
+	margin-top: 1em;
+	font-size: 110%;
+}
+#filters label > span {
+	display: none; /* hide label and instead use default option or placeholder text to convey the information */
+}
+
+input#teams-filter, input#opponent-filter  {
+	width: 8em;
+}
+
+#filters option[value=""] {
+	color: #aaa;
+}
+/* JQuery Placeholder Plugin Fallback Styling */
+.placeholder { 
+	color: #aaa; 
+}
+
+
+/**
+ * Table of matches or teammatches
+ */
+.match-list .venue a, .match-list .league a, .match-list .score a, .match-list .matchtype > a:first-child {
+	color: #00E;
+}
+.match-list td.rating, .match-list td.team.self {
+	text-align: right;
+}
+.match-list td.teammatch.score {
+	text-align: center;
+}
+.match-list  .formal-result {
+	color: violet;
+}
+.match-list .matchtype > a:hover {
+	text-decoration: none;
+}
+
+/*
+ * Sort arrow icon positioning for JQueryUI markup
+ */
+th div.DataTables_sort_wrapper {
+	position: relative;
+}
+/* Firefox has serious problems when appling relative positioning directly to table cells
+   So the DataTables_sort_wrapper is really necessary
+.profile-view th {
+	position: relative;
+}
+*/
+th div.DataTables_sort_wrapper span {
+	position: absolute;
+	top: 50%;
+	margin-top: -8px;
+	right: 0;
+}
+
+.js .match-list th.date, 
+.js .match-list th.venue, 
+.js .match-list th.league, 
+.js .match-list th.stage, 
+.js .match-list th.homeaway,
+.js .match-list th.matchtype, 
+.js .match-list th.self, 
+.js .match-list th.score, 
+.js .match-list th.rating, 
+.js .match-list th.team.opponent {
+	padding-right: 0;
+	cursor: pointer;
+}
+
+.match-list th.date .DataTables_sort_wrapper, 
+.match-list th.venue .DataTables_sort_wrapper,
+.match-list th.league .DataTables_sort_wrapper,
+.match-list th.stage .DataTables_sort_wrapper, 
+.match-list th.homeaway .DataTables_sort_wrapper, 
+.match-list th.matchtype .DataTables_sort_wrapper,
+.match-list th.self .DataTables_sort_wrapper, 
+.match-list th.score .DataTables_sort_wrapper, 
+.match-list th.rating .DataTables_sort_wrapper, 
+.match-list th.team.opponent .DataTables_sort_wrapper {
+	padding-right: 20px;
+}
+
+/*
+ * Profile view
+ */
 .profile-view td.score {
 	text-align: right;
 }
@@ -164,142 +282,11 @@ td.games {
 .profile-view td.score img.win, .profile-view td.score img.loss {
 	margin-right: 14px; /* 10px (see above) + 7px (number of pixels the win/loss img are narrower than the default 16px) / 2 */	
 }
-.profile-view th {
-	position: relative;
-}
-
-.profile-view .revised {
-	color: violet;
-}
-.profile-view .matchtype > a:hover {
-	text-decoration: none;
-}
-
-fieldset.filter {
-	padding: 8px;
-}
-.filter label > span {
-	display: none;
-}
-
-input#teams-filter, input#opponent-filter  {
-	width: 8em;
-}
-
-.filter option[value=""] {
-	color: #aaa;
-}
-/* JQuery Placeholder Plugin Fallback Styling */
-.placeholder { color: #aaa; }
-
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * DataTables sorting (without JQueryUI)
- */
-.sorting_asc {
-	padding-right: 20px; /* make space for the img */
-	background: url('../images/icons/status/sort_asc.png') no-repeat center right;
-	cursor: pointer; /* sortable cursor */
-}
-
-.sorting_desc {
-	padding-right: 20px; /* make space for the img */
-	background: url('../images/icons/status/sort_desc.png') no-repeat center right;
-	cursor: pointer;  /* sortable cursor */
-}
-
-.sorting {
-	padding-right: 20px; /* make space for the img */
-	background: url('../images/icons/status/sort_both.png') no-repeat center right;
-	cursor: pointer;  /* sortable cursor */
-}
-
-.sorting_asc_disabled {
-	background: url('../images/icons/status/sort_asc_disabled.png') no-repeat center right;
-}
-
-.sorting_desc_disabled {
-	background: url('../images/icons/status/sort_desc_disabled.png') no-repeat center right;
-}
-
-
 
 
 /*
- * Sort arrow icon positioning for JQueryUI markup
+ * Scoresheet
  */
-th div.DataTables_sort_wrapper span {
-	position: absolute;
-	top: 50%;
-	margin-top: -8px;
-	right: 0;
-}
-.teammatch-list th.date, 
-.teammatch-list th.venue, 
-.teammatch-list th.stage, 
-.teammatch-list th.homeaway,
-.teammatch-list th.self, 
-.teammatch-list th.score, 
-.teammatch-list th.opponent {
-	padding-right: 20px; /* 0 */
-	cursor: pointer;
-}
-/*
-.teammatch-list th.date .DataTables_sort_wrapper, 
-.teammatch-list th.venue .DataTables_sort_wrapper, 
-.teammatch-list th.stage .DataTables_sort_wrapper, 
-.teammatch-list th.homeaway .DataTables_sort_wrapper, 
-.teammatch-list th.score .DataTables_sort_wrapper, 
-.teammatch-list th.opponent .DataTables_sort_wrapper {
-	padding-right: 20px;
-}
-*/
-
-.teammatch-list .venue a, .teammatch-list .score a {
-	color: #00E;
-}
-
-
-.match-list th.date, 
-.match-list th.league, 
-.match-list th.stage, 
-.match-list th.homeaway,
-.match-list th.matchtype, 
-.match-list th.self, 
-.match-list th.score, 
-.match-list th.team.opponent {
-	padding-right: 20px; /* 0 */
-	cursor: pointer;
-}
-
-.match-list .league a, .match-list .score a, .match-list .matchtype > a:first-child {
-	color: #00E;
-}
-.match-list td.team.self {
-	text-align: right;
-}
-.match-list td.teammatch.score {
-	text-align: center;
-}
-
-
-
-
-
-
-/* CSS3 selector to make it independent from the prefix */
-.scoresheet span[property$="familyName"], .scoresheet span.familyName {
-	text-transform: uppercase;
-	/* Font Droid Sans hat keine grossen Umlaute */
-}
-.scoresheet span[property$="teamNumber"] {
-	font-family: "Droid Sans", Verdana, serif;	/* serif font for roman numerals */
-}
-.scoresheet span[property$="name"] {
-	font-family: "Droid Sans", Arial;		/* revert above style for name */
-}
-
-
 .scoresheet mark {
 	background-color: transparent;
 }
@@ -352,7 +339,6 @@ th div.DataTables_sort_wrapper span {
 	text-decoration: none;
 }
 
-
 .scoresheet .substitute {
 	color: gray;
 }
@@ -372,20 +358,28 @@ th div.DataTables_sort_wrapper span {
 	background-color: silver;
 }
 
-/* :target pseudo-class when referenced within website with anchor # */
-
 .scoresheet tr:target .matchtype {
 	text-decoration: underline;
 }
-
-
 .scoresheet:target .teammatch-result {
 	font-weight: bold;
 }
 
+/* CSS3 selector to make it independent from the prefix */
+.scoresheet span[property$="familyName"], .scoresheet span.familyName {
+	text-transform: uppercase;
+	/* Font Droid Sans hat keine grossen Umlaute */
+}
+.scoresheet span[property$="teamNumber"] {
+	font-family: "Droid Sans", Verdana, serif;	/* serif font for roman numerals */
+}
+.scoresheet span[property$="name"] {
+	font-family: "Droid Sans", Arial;		/* revert above style for name */
+}
+
 
 /*
-	Edit styles 
+	Scoresheet edit styles 
 */
 .scoresheet.edit .hometeam  {
 	text-align: left;
@@ -511,25 +505,54 @@ th div.DataTables_sort_wrapper span {
 }
 
 
+/** 
+ * HTML5 <details> element
+ */
 details { 
 	margin: 0; 
 	padding: 0.5em 0 0 1em; 
 	white-space: normal; 
 }
 details > summary { 
-	display: block; 
 	cursor: pointer;
 	margin: 0; 
-	padding: 0; 
+	padding: 0;
+	width: 10em;
 }
-details > summary::before { 
-	float: left; 
-	width: 20px; 
-	content: '► '; 
-}
-details[open] > summary::before { 
-	content: '▼ '; 
-}
+
+/** 
+ * Javascript <details> fallback for non supporting browsers
+ * http://mathiasbynens.be/demo/html5-details-jquery 
+ */
+/* Add focus styles (for keyboard accessibility) */
+.no-details summary:hover, .no-details summary:focus { background: #ddd; }
+/* The following styles are not really needed, since the jQuery script takes care of hiding/displaying the elements. */
+/* However, we’re still gonna use CSS as well to prevent FOUC in browsers that understand these selectors. */
+/* Remember: by default (and probably most of the time), the contents of the <details> element are hidden. */
+ 
+/* Hide all direct descendants of every <details> element */
+/* Note that IE6 doesn’t support the child selector; we’ll work around that using jQuery later */
+.no-details details > * { display: none; }
+/* This doesn’t work very well in Firefox 3.6.x */
+/* .no-details details[open] > * { display: block; } */
+/* The following doesn’t toggle correctly in Webkit:
+   .no-details details summary:before { content: '► '; }
+   .no-details details[open] summary:before { content: '▼ '; }
+*/
+/* And yes, it should really be ::before, but that doesn’t work in IE8 */
+.no-details details summary:before { float: left; width: 20px; content: '► '; }
+.no-details details.open summary:before { content: '▼ '; }
+/* For IE6 and IE7, who don’t support generated content, you could use padding-left + a background image instead */
+/* I really couldn’t be bothered though. */
+/*
+   .no-details details summary { padding-left: 20px; background: url(img/arrow-sprite.png) no-repeat 0 0; }
+   .no-details details.open summary { background-position: 0 -20px; }
+*/
+/* Make sure summary remains visible, and apply a pointer cursor upon hover to indicate it’s a clickable element */
+.no-details details summary { display: block; }
+
+
+
 
 /*
 #revaluation-reason {
@@ -542,10 +565,9 @@ details[open] > summary::before {
 
 
 
-/*
-	Standings
-*/
-
+/**
+ * Standings
+ */
 .standings  a {
 	color: #00E;
 }

@@ -32,7 +32,7 @@ class TropaionExtension extends \Twig_Extension
 	 *     'promoted': loop.index <= league.promotedNumber, 
 	 *     'relegated': loop.revindex <= league.relegatedNumber,
 	 *     'withdrawn': teamStanding.withdrawn
-	 * } | classAttributeFilter }}
+	 * } | class_attribute }}
 	 * Instead of the traditional version which is verbose and problematic because of whitespace (either hard to read expression sequences or 'spaceless' tag) 
 	 * and empty class attribute (invalid html):
 	 * class="{% 

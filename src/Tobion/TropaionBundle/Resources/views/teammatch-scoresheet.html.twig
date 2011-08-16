@@ -74,11 +74,12 @@
 	</tfoot>
 	<tbody xml:lang="de" rel="sport:subEvent">
 		{% for match in teammatch.matches %}
-		<tr class="match{% 
-					if not match.hasResult %} noresult{% endif %}{% 
-					if match.noFight %} nofight{% endif %}{% 
-					if match.revisedScore %} revised{% endif %}{% 
-					if match.givenUpBy %} givenup{% endif %}" id="match-{{ match.id }}" about="{{ teammatchRdfUri }}#match-{{ match.id }}" typeof="sport:Match">
+		<tr {{ {
+				'noresult': not match.hasResult, 
+				'nofight': match.noFight,
+				'revised': match.revisedScore,
+				'givenup': match.givenUpBy
+			} | class_attribute }} id="match-{{ match.id }}" about="{{ teammatchRdfUri }}#match-{{ match.id }}" typeof="sport:Match">
 			<th scope="row" class="matchtype" property="sport:characteristic" datatype="xsd:string"><a href="#match-{{ match.id }}">{{ match.matchType }}</a></th>
 			<td class="team hometeam" rel="sport:outcome">
 				{% if match.isTeam1Winner %}<em class="winner"{% else %}<span{% endif %} typeof="sport:TeamScore" property="sport:score" datatype="xsd:unsignedShort" content="{{ match.team1Score }}" rel="sport:participant">

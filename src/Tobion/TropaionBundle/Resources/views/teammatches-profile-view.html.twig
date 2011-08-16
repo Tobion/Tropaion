@@ -1,12 +1,10 @@
 {% import "TobionTropaionBundle::macros.html.twig" as macros %}
 
-<table class="teammatch-list profile-view">
+<table id="teammatches" class="match-list profile-view">
 <caption>
-{#<details class="filter">
-	<summary>{% trans %}Filter{% endtrans %}</summary>#}
-<fieldset class="filter">
+<fieldset id="filters">
     <legend>{% trans %}Filter{% endtrans %}</legend>
-<div id="teammatch-filters">
+	<div>
 	<label><span>{% trans %}Termin{% endtrans %}:</span>
 		<select id="date-filter">
 			<option selected="selected" value="">{% trans %}-- Termin --{% endtrans %}</option>
@@ -40,9 +38,8 @@
 	<label><span>{% trans %}Gegner{% endtrans %}:</span>
 		<input id="opponent-filter" type="text" placeholder="{% trans %}-- Gegner --{% endtrans %}" />
 	</label>
-</div>
+	</div>
 </fieldset>
-{#</details>#}
 </caption>
 <thead>
 	<tr>

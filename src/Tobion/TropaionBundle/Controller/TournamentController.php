@@ -451,7 +451,7 @@ class TournamentController extends Controller
 			Usually this is not necessary, for example in clubAction(). Doctrine should recognize that the same league is already loaded.
 		*/
 		$qb = $em->createQueryBuilder();
-		$qb->select(array('m','tm','t1','t2','c1','c2','l','l2','v','y','g','t1p1','t1p2','t2p1','t2p2'))
+		$qb->select(array('m','tm','t1','t2','c1','c2','l','l2','v','y','g','t1p1','t1p2','t2p1','t2p2','rh'))
 			->from('TobionTropaionBundle:Match', 'm')
 			->innerJoin('m.Teammatch', 'tm')
 			->innerJoin('tm.Team1', 't1')
@@ -461,12 +461,13 @@ class TournamentController extends Controller
 			->innerJoin('t1.League', 'l')
 			->innerJoin('t2.League', 'l2')
 			->innerJoin('tm.Venue', 'v')
-			->leftJoin('m.MatchType', 'y')
+			->innerJoin('m.MatchType', 'y')
 	    	->leftJoin('m.Games', 'g')
 	    	->leftJoin('m.Team1_Player', 't1p1')
 	    	->leftJoin('m.Team1_Partner', 't1p2')
 	    	->leftJoin('m.Team2_Player', 't2p1')
 	    	->leftJoin('m.Team2_Partner', 't2p2')
+			->leftJoin('m.Ratinghistory', 'rh', 'WITH', $qb->expr()->eq('rh.athlete_id', ':athlete_id')) // \Doctrine\ORM\Expr\Join::WITH
 			->where('m.team1_player_id = :athlete_id OR m.team1_partner_id = :athlete_id OR ' .
 			        'm.team2_player_id = :athlete_id OR m.team2_partner_id = :athlete_id')
 			->andWhere($qb->expr()->eq('l.tournament_id', ':tournament_id'))
@@ -476,16 +477,59 @@ class TournamentController extends Controller
 			->setParameter('athlete_id', $athlete->getId())
 			->setParameter('tournament_id', $tournament->getId());
 		
+
 		$matches = $qb->getQuery()->getResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
+		
+		$wins = $draws = $losses = $winsPercent = $drawsPercent = $lossesPercent = $noFights = $myGames = $opponentGames = $myPoints = $opponentPoints = 0;
+		$nbPartners = $nbTeammatches = $nbMyTeams = array();
+		
 		
 		foreach ($matches as $match) {
 			$match->transformToAthleteView($athlete);
+			
+			$wins += $match->isTeam1OriginalFallbackEffectiveWinner() ? 1 : 0;
+			$draws += $match->isOriginalFallbackEffectiveDraw() ? 1 : 0;
+			$losses += $match->isTeam2OriginalFallbackEffectiveWinner() ? 1 : 0;
+			$noFights += $match->getNoFight() ? 1 : 0;
+			$myGames += $match->getTeam1OriginalFallbackEffectiveScore() ?: 0;
+			$opponentGames += $match->getTeam2OriginalFallbackEffectiveScore() ?: 0;
+			$myPoints += $match->getTeam1OriginalFallbackEffectivePoints() ?: 0;
+			$opponentPoints += $match->getTeam2OriginalFallbackEffectivePoints() ?: 0;
+			if ($match->getTeam1PartnerId()) {
+				$nbPartners[$match->getTeam1PartnerId()] = true;
+			}
+			$nbTeammatches[$match->getTeammatchId()] = true;
+			$nbMyTeams[$match->getTeammatch()->getTeam1Id()] = true;
 		}
-
+		
+		if (($sum = $wins + $draws + $losses) > 0) {
+			$winsPercent = round($wins / $sum * 100, 1);
+			$drawsPercent = round($draws / $sum * 100, 1);
+			$lossesPercent = round($losses / $sum * 100, 1);
+		}
+		
+		$nbPartners = count($nbPartners);
+		$nbTeammatches = count($nbTeammatches);
+		$nbMyTeams = count($nbMyTeams);
+		
 		return array(
 			'tournament' => $tournament,
 			'athlete' => $athlete,
-			'matches' => $matches
+			'matches' => $matches,
+			'wins' => $wins,
+			'draws' => $draws,
+			'losses' => $losses,
+			'winsPercent' => $winsPercent,
+			'drawsPercent' => $drawsPercent,
+			'lossesPercent' => $lossesPercent,
+			'noFights' => $noFights,
+			'myGames' => $myGames,
+			'opponentGames' => $opponentGames,
+			'myPoints' => $myPoints,
+			'opponentPoints' => $opponentPoints,
+			'nbPartners' => $nbPartners,
+			'nbTeammatches' => $nbTeammatches,
+			'nbMyTeams' => $nbMyTeams
 		);
 		
 	}

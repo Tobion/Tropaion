@@ -27,6 +27,13 @@ class Ratinghistory
      * @ORM\Column(type="integer")
      */
     private $athlete_id;
+	
+	/**
+     * @var integer $match_id
+     *
+     * @ORM\Column(type="integer")
+     */
+    private $match_id;
 
     /**
      * @var string $discipline
@@ -36,18 +43,18 @@ class Ratinghistory
     private $discipline;
 
     /**
-     * @var integer $rating
+     * @var integer $pre_rating
      *
      * @ORM\Column(type="smallint", nullable=true)
      */
-    private $rating;
-
-    /**
-     * @var integer $number_matches
+    private $pre_rating;
+	
+	/**
+     * @var integer $post_rating
      *
-     * @ORM\Column(type="smallint")
+     * @ORM\Column(type="smallint", nullable=true)
      */
-    private $number_matches;
+    private $post_rating;
 
 	/**
      * @ORM\Column(type="date")
@@ -61,6 +68,14 @@ class Ratinghistory
      * @ORM\JoinColumn(name="athlete_id", referencedColumnName="id")
      */
     private $Athlete;
+	
+	/**
+     * @var Athlete
+     *
+     * @ORM\ManyToOne(targetEntity="Match", inversedBy="Ratinghistory")
+     * @ORM\JoinColumn(name="match_id", referencedColumnName="id")
+     */
+    private $Match;
 
 
 	public function __construct()
@@ -98,6 +113,26 @@ class Ratinghistory
     {
         return $this->athlete_id;
     }
+	
+    /**
+     * Set match_id
+     *
+     * @param integer $matchId
+     */
+    public function setMatchId($matchId)
+    {
+        $this->match_id = $matchId;
+    }
+
+    /**
+     * Get match_id
+     *
+     * @return integer $matchId
+     */
+    public function getMatchId()
+    {
+        return $this->match_id;
+    }
 
     /**
      * Set discipline
@@ -120,33 +155,43 @@ class Ratinghistory
     }
 
     /**
-     * Set rating
+     * Set pre_rating
      *
-     * @param smallint $rating
+     * @param smallint $pre_rating
      */
-    public function setRating($rating)
+    public function setPreRating($rating)
     {
-        $this->rating = $rating;
+        $this->pre_rating = $rating;
     }
 
     /**
-     * Get rating
+     * Get pre_rating
      *
-     * @return smallint $rating
+     * @return smallint $pre_rating
      */
-    public function getRating()
+    public function getPreRating()
     {
-        return $this->rating;
+        return $this->pre_rating;
+    }
+	
+    /**
+     * Set post_rating
+     *
+     * @param smallint $post_rating
+     */
+    public function setPostRating($rating)
+    {
+        $this->post_rating = $rating;
     }
 
     /**
-     * Set number_matches
+     * Get post_rating
      *
-     * @param smallint $numberMatches
+     * @return smallint $post_rating
      */
-    public function setNumberMatches($numberMatches)
+    public function getPostRating()
     {
-        $this->number_matches = $numberMatches;
+        return $this->post_rating;
     }
 
     /**
@@ -170,16 +215,6 @@ class Ratinghistory
     }
 
     /**
-     * Get number_matches
-     *
-     * @return smallint $numberMatches
-     */
-    public function getNumberMatches()
-    {
-        return $this->number_matches;
-    }
-
-    /**
      * Set Athlete
      *
      * @param Tobion\TropaionBundle\Entity\Athlete $athlete
@@ -199,4 +234,23 @@ class Ratinghistory
         return $this->Athlete;
     }
 
+    /**
+     * Set Match
+     *
+     * @param Tobion\TropaionBundle\Entity\Match $match
+     */
+    public function setMatch(\Tobion\TropaionBundle\Entity\Match $match)
+    {
+        $this->Match = $match;
+    }
+
+    /**
+     * Get Match
+     *
+     * @return Tobion\TropaionBundle\Entity\Match $match
+     */
+    public function getMatch()
+    {
+        return $this->Match;
+    }
 }
