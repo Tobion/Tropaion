@@ -183,4 +183,10 @@ class Lineup
     {
         return $this->Athlete;
     }
+
+	
+	public function isSubstitute()
+	{
+		return $this->getTeam()->getLeague()->getClassLevel() == 255;
+	}
 }

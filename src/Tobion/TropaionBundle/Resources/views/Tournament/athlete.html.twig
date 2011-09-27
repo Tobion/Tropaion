@@ -193,6 +193,36 @@
 
 <h1>{% trans with { '%givenName%': athlete.firstName, '%familyName%': athlete.lastName } %}%givenName% %familyName%{% endtrans %}</h1>
 
+<section id="my-lineup">
+<h2>{% trans %}Stamm-Mannschaft{% endtrans %}</h2>
+
+{% macro lineup_team(lineup, tournament) %}
+	{% if lineup.isSubstitute %}
+		{% set clubLink %}
+			<a href="{{ path('tournament_club', lineup.team.club.routingParams(tournament) ) }} ">{{ lineup.team.club.name }}</a>
+		{% endset %}
+		{% trans with { '%club%': clubLink } %}Ersatzspieler für %club%{% endtrans %}
+	{% else %}
+		{% set teamLink %}
+			<a href="{{ path('tournament_team', lineup.team.routingParams ) }} ">{{ lineup.team.club.code }} {{ lineup.team.teamNumber }}</a>
+		{% endset %}
+		{% trans with { '%team%': teamLink, '%position%' : lineup.position } %}%team% an Position <strong>%position%</strong>{% endtrans %}
+	{% endif %}
+{% endmacro %}
+
+{% if lineupSecondRound and lineupChanged %}
+	<dl>
+		<dt>{% trans %}Hinrunde{% endtrans %}</dt>
+		<dd>{{ _self.lineup_team(lineupFirstRound, tournament) }}</dd>
+		<dt>{% trans %}Rückrunde{% endtrans %}</dt>
+		<dd>{{ _self.lineup_team(lineupSecondRound, tournament) }}</dd>
+	</dl>
+{% else %}
+	<p>{{ _self.lineup_team(lineupFirstRound, tournament) }}</p>
+{% endif %}
+
+</section>
+
 <section id="my-results">
 <h2>{% trans with { '%givenName%': athlete.firstName, '%familyName%': athlete.lastName } %}Spiele &amp; Statistiken von <em>%givenName% %familyName%</em>{% endtrans %}</h2>
 

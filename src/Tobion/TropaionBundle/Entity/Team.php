@@ -381,6 +381,7 @@ class Team
 		}
 		return false;
 	}
+	
 
     function __toString()
     {

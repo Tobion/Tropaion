@@ -512,10 +512,37 @@ class TournamentController extends Controller
 		$nbTeammatches = count($nbTeammatches);
 		$nbMyTeams = count($nbMyTeams);
 		
+		
+		$qb = $em->createQueryBuilder();
+		$qb->select(array('lu', 't'))
+			->from('TobionTropaionBundle:Lineup', 'lu')
+			->innerJoin('lu.Team', 't')
+			->innerJoin('t.League', 'l')
+			->where($qb->expr()->eq('lu.athlete_id', ':athlete_id'))
+			->andWhere($qb->expr()->eq('l.tournament_id', ':tournament_id'))
+			->andWhere($qb->expr()->eq('lu.season_round', ':season_round'))
+			->setParameter('athlete_id', $athlete->getId())
+			->setParameter('tournament_id', $tournament->getId());
+		
+		$qb->setParameter('season_round', 1);
+		$lineupFirstRound = $qb->getQuery()->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
+		
+		$qb->setParameter('season_round', 2);
+		$lineupSecondRound = $qb->getQuery()->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
+
+		$lineupChanged = $lineupSecondRound && 
+			(
+				$lineupFirstRound->getTeamId() != $lineupSecondRound->getTeamId() ||
+				$lineupFirstRound->getPosition() != $lineupSecondRound->getPosition()
+			);
+		
 		return array(
 			'tournament' => $tournament,
 			'athlete' => $athlete,
 			'matches' => $matches,
+			'lineupFirstRound' => $lineupFirstRound,
+			'lineupSecondRound' => $lineupSecondRound,
+			'lineupChanged' => $lineupChanged,
 			'wins' => $wins,
 			'draws' => $draws,
 			'losses' => $losses,
