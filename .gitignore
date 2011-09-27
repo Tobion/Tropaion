@@ -8,3 +8,4 @@
 /vendor/*
 *.php~
 /src/Acme
+/nbproject/private/
