@@ -388,16 +388,27 @@ th div.DataTables_sort_wrapper span {
 	font-weight: normal;
 	font-size: 0.86em;
 	margin-top: 4px;
+	list-style-type: none;
 }
-.scoresheet > tbody .status {
+.scoresheet .noplayer {
 	margin-bottom: 5px;
 }
 .scoresheet.edit .match-result {
 	font-weight: bold;
 }
-.scoresheet .result_incident {
+.scoresheet .result-incident {
+	margin-top: 5px;
+}
+.scoresheet .revaluation {
 	margin-top: 3px;
 }
+.scoresheet .score select {
+	font-size: 0.85em;
+}
+.scoresheet .score select option[value=""] {
+	color: gray;
+}
+
 .scoresheet fieldset {
 	margin: 0;
 	padding: 0 6px 4px 6px; /* padding-top is not the padding after the legend but before it in IE only; but padding-bottom on the legend works for all */
@@ -408,15 +419,18 @@ th div.DataTables_sort_wrapper span {
 	color: black;
 	margin: 0;
 	padding-bottom: 4px;
+	font-weight: normal;
+	text-align: left;
+	font-size: 0.85em;
 }
 
 .scoresheet fieldset + fieldset {
 	margin-top: 2px;
 }
-.scoresheet .result_incident fieldset {
+.scoresheet .result-incident fieldset {
 	color: gray;
 }
-.scoresheet input {
+.scoresheet input, .scoresheet select {
 	margin: 0;
 }
 .scoresheet input[type=text]:focus, .scoresheet input[type=number]:focus {
@@ -722,8 +736,16 @@ meter::-webkit-meter-optimum-value {
 }
 
 
+select.default-value {
+	color: gray;
+}
+select.notice-value {
+	color: red;
+}
 
-
+select.default-value option, select.notice-value option {
+	color: black;
+}
 
 
 

@@ -382,6 +382,20 @@ class Team
 		return false;
 	}
 	
+	public function getShortName($toRoman = true, $html = false)
+    {
+        return $this->getClub()->getCode() . 
+			($html ? '&#160;' /* '&nbsp;' */ : ' ') . 
+			($toRoman ? self::toRoman($this->getTeamNumber()) : $this->getTeamNumber());
+    }
+	
+	public function getFullName($toRoman = true, $html = false)
+    {
+        return $this->getClub()->getName() . 
+			($html ? '&#160;' /* '&nbsp;' */ : ' ') . 
+			($toRoman ? self::toRoman($this->getTeamNumber()) : $this->getTeamNumber());
+    }
+	
 
     function __toString()
     {

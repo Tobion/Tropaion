@@ -204,9 +204,12 @@
 		{% trans with { '%club%': clubLink } %}Ersatzspieler für %club%{% endtrans %}
 	{% else %}
 		{% set teamLink %}
-			<a href="{{ path('tournament_team', lineup.team.routingParams ) }} ">{{ lineup.team.club.code }} {{ lineup.team.teamNumber }}</a>
+			<a href="{{ path('tournament_team', lineup.team.routingParams ) }} ">{{ lineup.team.shortName }}</a>
 		{% endset %}
-		{% trans with { '%team%': teamLink, '%position%' : lineup.position } %}%team% an Position <strong>%position%</strong>{% endtrans %}
+		{% set leagueLink %}
+			<a href="{{ path('tournament_league', lineup.team.league.routingParams ) }} ">{{ lineup.team.league.fullName }}</a>
+		{% endset %}
+		{% trans with { '%team%': teamLink, '%position%' : lineup.position, '%league%' : leagueLink } %}%team% an Position <strong>%position%</strong> in %league%{% endtrans %}
 	{% endif %}
 {% endmacro %}
 

@@ -805,7 +805,7 @@ class Match
 	/**
 	* Team1 nicht angetreten
 	*/
-	public function hasTeam1NoPlayer()
+	public function isTeam1NoPlayer()
 	{
 		return is_null($this->getTeam1PlayerId()) && is_null($this->getTeam1PartnerId());
 	}
@@ -813,7 +813,7 @@ class Match
 	/**
 	* Team2 nicht angetreten
 	*/
-	public function hasTeam2NoPlayer()
+	public function isTeam2NoPlayer()
 	{
 		return is_null($this->getTeam2PlayerId()) && is_null($this->getTeam2PartnerId());
 	}
@@ -869,6 +869,29 @@ class Match
 	public function hasResult()
 	{
         return !is_null($this->getTeam1Score()) && !is_null($this->getTeam2Score());
+	}
+	
+	public function isNoResult()
+	{
+        return !$this->hasResult();
+	}
+	
+	
+	public function getResultIncident()
+	{
+        if ($this->hasTeam1WonByDefault()) {
+			return 'team1_wonbydefault';
+		}
+		if ($this->hasTeam1GivenUp()) {
+			return 'team1_givenup';
+		}
+		if ($this->hasTeam2WonByDefault()) {
+			return 'team2_wonbydefault';
+		}
+		if ($this->hasTeam2GivenUp()) {
+			return 'team2_givenup';
+		}
+		return '';
 	}
 	
 	public function isDraw()
@@ -950,12 +973,27 @@ class Match
 
 	public function isTeam1RevaluatedAgainst()
 	{
-		return $this->getRevisedScore() && $this->isTeam2Winner();
+		return $this->getRevisedScore() && ($this->isTeam2Winner() || $this->isBothTeamsLost());
 	}
 	
 	public function isTeam2RevaluatedAgainst()
 	{
-		return $this->getRevisedScore() && $this->isTeam1Winner();
+		return $this->getRevisedScore() && ($this->isTeam1Winner() || $this->isBothTeamsLost());
+	}
+	
+	public function getRevaluationAgainst()
+	{
+		if ($this->getRevisedScore() && $this->isTeam2Winner()) {
+			return 'team1';
+		}
+		if ($this->getRevisedScore() && $this->isTeam1Winner()) {
+			return 'team2';
+		}
+		if ($this->getRevisedScore() && $this->isBothTeamsLost()) {
+			return 'both';
+		}
+		
+		return '';
 	}
 	
 	/**
@@ -1383,6 +1421,47 @@ class Match
 		
 		return null;		
 	}
+	
+	
+	/**
+     * Returns a human-readable identifier for team1_player
+     *
+     * @return string
+     */
+    public function getTeam1PlayerReadableId()
+    {
+		return $this->Team1_Player ? $this->Team1_Player->getReadableId() :	'';
+    }
+	
+	/**
+     * Returns a human-readable identifier for team1_partner
+     *
+     * @return string
+     */
+    public function getTeam1PartnerReadableId()
+    {
+        return $this->Team1_Partner ? $this->Team1_Partner->getReadableId() : '';
+    }
+	
+	/**
+     * Returns a human-readable identifier for team2_player
+     *
+     * @return string
+     */
+    public function getTeam2PlayerReadableId()
+    {
+        return $this->Team2_Player ? $this->Team2_Player->getReadableId() : '';
+    }
+	
+	/**
+     * Returns a human-readable identifier for team2_partner
+     *
+     * @return string
+     */
+    public function getTeam2PartnerReadableId()
+    {
+        return $this->Team2_Partner ? $this->Team2_Partner->getReadableId() : '';
+    }
 
 	function __toString()
     {

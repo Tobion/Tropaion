@@ -1423,6 +1423,33 @@ class Teammatch
         return $this->getTeam1()->getClubId() === $this->getTeam2()->getClubId();
 	}
 	
+	/**
+	* Team1 nicht angetreten
+	*/
+	public function isTeam1NoFight()
+	{
+		return $this->getNoFight() && ($this->isTeam2Winner() || $this->isBothTeamsLost());
+	}
+	
+	/**
+	* Team2 nicht angetreten
+	*/
+	public function isTeam2NoFight()
+	{
+		return $this->getNoFight() && ($this->isTeam1Winner() || $this->isBothTeamsLost());
+	}
+	
+		
+	public function isTeam1RevaluatedAgainst()
+	{
+		return $this->getRevaluationWrongdoer() == 1 || $this->getRevaluationWrongdoer() == 3;
+	}
+	
+	public function isTeam2RevaluatedAgainst()
+	{
+		return $this->getRevaluationWrongdoer() == 2 || $this->getRevaluationWrongdoer() == 3;
+	}
+	
 
 	function __toString()
     {
@@ -1433,8 +1460,7 @@ class Teammatch
 			);
 		} elseif ($this->getSubmittedById()) {
 			return sprintf('%s – %s = ‒:‒',
-				$this->getTeam1(), $this->getTeam2(), 
-				$this->getTeam1Score(), $this->getTeam2Score()
+				$this->getTeam1(), $this->getTeam2()
 			);
 		} else {
 			return sprintf('%s – %s @ %s',

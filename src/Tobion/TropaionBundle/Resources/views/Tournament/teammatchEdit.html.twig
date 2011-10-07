@@ -1,0 +1,253 @@
+{% extends "TobionTropaionBundle::layout.html.twig" %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<link rel="stylesheet" type="text/css" href="{{ asset('bundles/tobiontropaion/css/teammatch.css') }}" />
+{% endblock %}
+
+{% block tail_javascripts %}
+    {{ parent() }}
+
+	<script type="text/javascript">
+	//<![CDATA[
+		var club1_athletes = {{ club1_athletes | json_encode | raw }};
+		var club2_athletes = {{ club2_athletes | json_encode | raw }};
+	//]]>
+	</script> 
+	
+	<script type="text/javascript" src="http://yui.yahooapis.com/3.3.0/build/yui/yui-min.js"></script>
+	<script type="text/javascript" src="{{ asset('bundles/tobiontropaion/js/teammatch-edit.js') }}"></script>
+{% endblock %}
+	
+{% block content %}
+
+<article>
+	
+<form action="{{ path('tournament_teammatch_edit', teammatch.routingParams) }}" method="post" {{ form_enctype(form) }}>
+    {# form_widget(form) #}
+	{{ form_errors(form) }}
+
+	{{ form_widget(form._token) }}
+<dl>
+	<dt>{{ form_label(form.venue, 'Halle') }}</dt>
+	<dd>
+		{{ form_errors(form.venue) }}
+		{{ form_widget(form.venue) }}
+	</dd>
+	<dt>{{ form_label(form.performed_at, 'Austragungsdatum') }}</dt>
+	<dd>
+		{{ form_errors(form.performed_at) }}
+		{{ form_widget(form.performed_at) }}
+	</dd>
+	<dt>{{ form_label(form.description, 'Beschreibung') }}</dt>
+	<dd>
+		{{ form_errors(form.description) }}
+		{{ form_widget(form.description) }}
+	</dd>
+	<dt>{{ form_label(form.annulled, 'Annulliert') }}</dt>
+	<dd>
+		{{ form_errors(form.annulled) }}
+		{{ form_widget(form.annulled) }}
+	</dd>
+</dl>
+
+{#
+	tabindex="-1": exclude the element from sequential focus navigation 
+	(otherwise IE makes LI and TR focusable)
+#}
+		
+<table class="scoresheet edit" id="scoresheet-teammatch-{{ teammatch.id }}">
+	<caption><a href="#scoresheet-teammatch-{{ teammatch.id }}">{% trans %}Spielbericht{% endtrans %}</a>
+		<details>
+		<summary>{% trans %}Hilfe{% endtrans %}</summary>
+		<p>{% trans %}Spielbericht des Mannschaftsspiels mit allen seinen Individualspielen und deren Sätzen.
+			Eingesetzte Ersatzspieler sind in grauer Schrift geschrieben. 
+			Ergebnislose und ungewerte Spiele sind durchgestrichen.
+			Kampflose Diszplinen sind rot.
+			Wurde ein Ergebnis aus formalen Gründen geändert ist das Spielergebnis violett. Liegen dabei die ursprüngliche Satzergebnisse vor werden diese rot angezeigt.
+			Bei vorzeitiger Aufgabe eines Spielers (z.B. durch Verletzung) ist das Spielergebnis silber hinterlegt.
+			Wenn man ein bestimmtes Spiel referenzieren will, kann man durch Klicken auf die Diszplin einen Anker darauf setzen.{% endtrans %}</p>
+		</details>
+	</caption>
+	<thead>
+		<tr tabindex="-1">
+			<th scope="col" class="matchtype">{% trans %}Disziplin{% endtrans %}</th>
+			<th scope="col" class="team hometeam" title="{% trans %}Heimmannschaft{% endtrans %}">
+				{{ teammatch.team1.fullName }}
+				
+				<ul class="status">
+					<li class="nofight">
+						{{ form_widget(form.team1_nofight) }}
+						{{ form_label(form.team1_nofight, 'Nicht angetreten') }}
+					</li>
+					<li class="revaluation">
+						{{ form_widget(form.team1_revaluated_against) }}
+						{{ form_label(form.team1_revaluated_against, 'Umgewertet gegen') }}
+					</li>
+				</ul>
+			</th>
+			<td class="score"><div><mark class="teammatch-result">
+				{% spaceless %}
+					{{ form_widget(form.team1_score) }}
+					<abbr>:</abbr>
+					{{ form_widget(form.team2_score) }}
+				{% endspaceless %}
+			</mark></div></td>
+			<th scope="col" class="team awayteam" title="{% trans %}Auswärtsmannschaft{% endtrans %}">
+				{{ teammatch.team2.fullName }}
+				
+				<ul class="status">
+					<li class="nofight">
+						{{ form_widget(form.team2_nofight) }}
+						{{ form_label(form.team2_nofight, 'Nicht angetreten') }}
+					</li>
+					<li class="revaluation">
+						{{ form_widget(form.team2_revaluated_against) }}
+						{{ form_label(form.team2_revaluated_against, 'Umgewertet gegen') }}
+					</li>
+				</ul>
+			</th>	
+			<th scope="col" class="games">{% trans %}Sätze{% endtrans %}</th>
+		</tr>
+	</thead>
+	<tfoot>
+		<tr class="sum" tabindex="-1">
+			<th scope="row">{% trans %}Summe{% endtrans %}</th>
+			<td></td>
+			<td class="score" title="{% trans %}Satzergebnis{% endtrans %}"><output>{{ teammatch.team1Games }}:{{ teammatch.team2Games }}</output></td>
+			<td></td>
+			<td class="games" title="{% trans %}Punktergebnis{% endtrans %}"><output>{{ teammatch.team1Points }}:{{ teammatch.team2Points }}</output></td>
+		</tr>
+		<tr tabindex="-1">
+			<td colspan="5">
+				<a href="{{ path('tournament_teammatch', teammatch.routingParams ) }}">{% trans %}Abbrechen{% endtrans %}</a>
+		        <input type="submit" />
+			</td>
+      	</tr>
+	</tfoot>
+	<tbody>
+		{% for matchForm in form.matches %}
+		{% set match = teammatch.matches.get(loop.index0) %}
+		<tr class="match" tabindex="-1">
+			<th scope="row" class="matchtype">
+				{{ form_widget(matchForm.match_type_id) }}
+				{{ match.matchType }}
+				<div class="noresult">
+					{{ form_label(matchForm.noresult, 'Kein Ergebnis') }}
+					{{ form_widget(matchForm.noresult) }}
+				</div>
+			</th>
+			<td class="team hometeam">
+				<div class="noplayer">
+					{{ form_widget(matchForm.team1_noplayer) }}
+					{{ form_label(matchForm.team1_noplayer, 'Nicht angetreten') }}
+				</div>
+
+				{{ form_errors(matchForm.team1_player_readable_id) }}
+				{{ form_widget(matchForm.team1_player_readable_id, { 
+					'attr': {
+						'data-gender': match.matchType.gender == 0 ? 'both' : 
+							(match.matchType.gender == 2 ? 'female' : 'male'), 
+						'data-discipline': match.matchType.discipline
+					} 
+				}) }}
+
+				{% if match.matchType.xOnx != 1 %}
+	    			{{ form_errors(matchForm.team1_partner_readable_id) }}
+					{{ form_widget(matchForm.team1_partner_readable_id, { 
+						'attr': {
+							'data-gender': match.matchType.gender == 0 ? 'both' : 
+								(match.matchType.gender == 1 ? 'male' : 'female'), 
+							'data-discipline': match.matchType.discipline
+						} 
+					}) }}
+				{% endif %}
+			</td>
+			<td class="score" >
+				<output class="match-result" title="{% trans %}Spielergebnis{% endtrans %}">
+					{{ match.team1Score is none ? '‒' : match.team1Score }}:{{ match.team2Score is none ? '‒' : match.team2Score }}
+				</output>
+				<div class="result-incident" title="Bei Umwertung bezogen auf das ursprüngliche Ergebnis">
+					{{ form_errors(matchForm.result_incident) }}
+					{{ form_widget(matchForm.result_incident) }}
+				</div>
+				<div class="revaluation">
+					{{ form_errors(matchForm.revaluation_against) }}
+					{{ form_widget(matchForm.revaluation_against) }}
+				</div>
+			</td>
+			<td class="team awayteam">
+				<div class="noplayer">
+					{{ form_widget(matchForm.team2_noplayer) }}
+					{{ form_label(matchForm.team2_noplayer, 'Nicht angetreten') }}
+				</div>
+				
+				{{ form_errors(matchForm.team2_player_readable_id) }}
+				{{ form_widget(matchForm.team2_player_readable_id, { 
+					'attr': {
+						'data-gender': match.matchType.gender == 0 ? 'both' : 
+							(match.matchType.gender == 2 ? 'female' : 'male'), 
+						'data-discipline': match.matchType.discipline
+					} 
+				}) }}
+				
+				{% if match.matchType.xOnx != 1 %}
+	    			{{ form_errors(matchForm.team2_partner_readable_id) }}
+					{{ form_widget(matchForm.team2_partner_readable_id, { 
+						'attr': {
+							'data-gender': match.matchType.gender == 0 ? 'both' : 
+								(match.matchType.gender == 1 ? 'male' : 'female'), 
+							'data-discipline': match.matchType.discipline
+						} 
+					}) }}
+				{% endif %}
+			</td>
+			<td class="games">
+				<fieldset class="effective-fieldset">
+					<legend>{% trans %}Gewertetes Ergebnis{% endtrans %}</legend>
+	    	 		<ol class="effective">
+						{% for gameForm in matchForm.games %}
+						{% if not gameForm.annulled.get('value') %}
+	    				<li tabindex="-1">
+							{# form_widget(gameForm.annulled) #}
+								
+							{{ form_errors(gameForm.team1_score) }}
+								
+							{{ form_widget(gameForm.team1_score) }}
+							<abbr> : </abbr>
+							{{ form_widget(gameForm.team2_score) }}
+	    				</li>
+						{% endif %}
+						{% endfor %}
+	    	 		</ol>
+				</fieldset>
+				<fieldset class="annulled-fieldset">
+					<legend>{% trans %}Usprüngliches Ergebnis{% endtrans %}</legend>
+					<ol class="annulled">
+	    			{% for gameForm in matchForm.games %}
+						{% if gameForm.annulled.get('value') %}
+	    				<li tabindex="-1">
+							{{ form_widget(gameForm.annulled) }}
+								
+							{{ form_errors(gameForm.team1_score) }}
+								
+							{{ form_widget(gameForm.team1_score) }}
+							<abbr> : </abbr>
+							{{ form_widget(gameForm.team2_score) }}
+	    				</li>
+						{% endif %}
+						{% endfor %}
+	    	 		</ol>
+				</fieldset>
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+	{# form_rest(form) #}
+</form>
+
+</article>
+
+{% endblock %}

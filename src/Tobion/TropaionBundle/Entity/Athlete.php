@@ -573,13 +573,18 @@ class Athlete
 		}
         
     }
-
-	function __toString()
+	
+	function getReadableId()
     {
     	return sprintf('%s %s [%s]', 
         	$this->getFirstName(), $this->getLastName(),
         	$this->getId()
         );
+    }
+
+	function __toString()
+    {
+    	return $this->getReadableId();
     }
 
 }

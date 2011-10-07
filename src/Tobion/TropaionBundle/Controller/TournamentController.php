@@ -11,6 +11,7 @@
 namespace Tobion\TropaionBundle\Controller;
 
 use Tobion\TropaionBundle\Entity;
+use Tobion\TropaionBundle\Form\BadmintonTeammatchType;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -561,5 +562,142 @@ class TournamentController extends Controller
 		
 	}
 	
+	
+    /**
+     * @Route("/{league}/{team1Club}-{team1Number}_{team2Club}-{team2Number}/edit", 
+     *     name="tournament_teammatch_edit",
+	 *     requirements={"team1Club" = ".+", "team1Number" = "\d+", "team2Number" = "\d+", "team2Club" = ".+"}
+     * )  
+     * @Template()
+     */
+    public function teammatchEditAction()
+    {
+		$tournament = $this->getTournament();
+
+		$em = $this->getDoctrine()->getEntityManager();
+		$rep = $this->getDoctrine()->getRepository('TobionTropaionBundle:Teammatch');
+	
+		$leagueParts = \Tobion\TropaionBundle\Entity\League::parseSlug($this->getRequest()->get('league'));	
+
+		$teammatch = $rep->findByParamsJoinedAll(
+			$this->getRequest()->get('owner'),
+			$this->getRequest()->get('tournament'),
+			$leagueParts['classAbbr'],
+			$leagueParts['division'],
+			$this->getRequest()->get('team1Club'),
+			$this->getRequest()->get('team1Number'),
+			$this->getRequest()->get('team2Club'),
+			$this->getRequest()->get('team2Number'),
+			\Doctrine\ORM\Query::HYDRATE_OBJECT
+		);
+		
+		/* TODO
+		 
+		if (!$this->object->hasDetailedResult())
+		{
+			$badmintonMatches = array('1.HD', 'DD', '2.HD', 'DE', 'Mix', '1.HE', '2.HE', '3.HE');
+
+			foreach ($badmintonMatches as $badmintonMatchType) {
+				$match = new Match();
+				$match['match_type'] = $badmintonMatchType;
+				$this->object['Matches'][] = $match;
+			}
+		}
+	
+		*/
+		
+		foreach ($teammatch->getMatches() as $match) { 	
+			for ($count = count($match->getEffectiveGames()); $count < 3; $count++)
+			{
+				$g = new Entity\Game();
+				$g->setMatch($match);
+				$match->addGames($g);
+			}
+			for ($count = count($match->getAnnulledGames()); $count < 3; $count++)
+			{
+				$g = new Entity\Game();
+				$g->setAnnulled(1);
+				$g->setMatch($match);
+				$match->addGames($g);
+			}
+		}
+
+		$form = $this->createForm(new BadmintonTeammatchType(), $teammatch);
+		
+		/*
+			Alle möglichen einsetzbaren Spieler in einer Mannschaft ermitteln
+			Das sind alle gemeldeten Spieler in Mannschaften des gleichen Vereins in der entsprechenden Saison und Hin- bzw. Rückrunde
+			Diese Sortieren nach ihrer Einsatzwahrscheinlichkeit, um bei der Auswahl die wahrscheinlich korrekten Spieler weit oben anzuzeigen
+		*/
+	
+		$query = 'SELECT lu.athlete_id, a. first_name, a.last_name, a.gender, t.team_number, lu.position, l.class_level, l.class_abbr, l.division, IFNULL(at.number_teammatches_for_this_team, 0) AS num_team_activity, (lu.team_id = :TEAM_ID) AS is_team_starter
+			FROM lineups lu
+			INNER JOIN athletes a ON a.id = lu.athlete_id
+			INNER JOIN teams t ON t.id = lu.team_id
+			INNER JOIN leagues l ON l.id = t.league_id
+			INNER JOIN tournaments r ON r.id = l.tournament_id
+			LEFT JOIN (
+				SELECT athlete_id, COUNT(DISTINCT(teammatch_id)) AS number_teammatches_for_this_team
+				FROM (
+					(
+						SELECT DISTINCT m.team1_player_id AS athlete_id, m.teammatch_id
+						FROM matches m
+						INNER JOIN teammatches tm ON tm.id = m.teammatch_id
+						WHERE tm.team1_id = :TEAM_ID AND m.team1_player_id IS NOT NULL
+					) UNION DISTINCT (
+						SELECT DISTINCT m.team1_partner_id AS athlete_id, m.teammatch_id
+						FROM matches m
+						INNER JOIN teammatches tm ON tm.id = m.teammatch_id
+						WHERE tm.team1_id = :TEAM_ID AND m.team1_partner_id IS NOT NULL
+					) UNION DISTINCT (
+						SELECT DISTINCT m.team2_player_id AS athlete_id, m.teammatch_id
+						FROM matches m
+						INNER JOIN teammatches tm ON tm.id = m.teammatch_id
+						WHERE tm.team2_id = :TEAM_ID AND m.team2_player_id IS NOT NULL
+					) UNION DISTINCT (
+						SELECT DISTINCT m.team2_partner_id AS athlete_id, m.teammatch_id
+						FROM matches m
+						INNER JOIN teammatches tm ON tm.id = m.teammatch_id
+						WHERE tm.team2_id = :TEAM_ID AND m.team2_partner_id IS NOT NULL
+					)
+				) AS athlete_teammatches
+				GROUP BY athlete_id
+				) AS at ON lu.athlete_id = at.athlete_id
+			WHERE  t.club_id = :CLUB_ID AND lu.season_round = :SEASON_ROUND AND r.season = :SEASON
+			ORDER BY num_team_activity DESC, is_team_starter DESC, (t.team_number < :TEAM_NUMBER) ASC, t.team_number ASC, lu.position ASC';
+
+		// Zuerst nach Anzahl der Einsätze in dieser Mannschaft sortieren, da die aktivsten Spieler am wahrscheinlichsten auch beim neu-einzutragenden Mannschaftsspiel beteiligt waren
+		// Danach kommen die Stammspieler dieser Mannschaft
+		// Stammspieler vorderer Mannschaften werden nach hinten sortiert, da sie eigentlich eh nicht in unteren Mannschaften aufgestellt werden dürfen
+		// Dann nach aufsteigender Teamnummer sortieren, da ein Spieler der 3. Mannschaft eher in der 2. Mannschaft aushilft, als ein Spieler der 5. Mannschaft
+		// Auch nach Position sotieren, um Stammspieler der selben Mannschaft entsprechend zu priotisieren, da Spieler an Pos. 1 eher die ersten Spiele machen (z.B. 1.HD, 1.HE)
+
+		$conn = $this->getDoctrine()->getEntityManager()->getConnection();
+
+		$sqlParams = array();
+		$sqlParams['TEAM_ID'] = $teammatch->getTeam1Id();
+		$sqlParams['TEAM_NUMBER'] = $teammatch->getTeam1()->getTeamNumber();
+		$sqlParams['CLUB_ID'] = $teammatch->getTeam1()->getClubId();
+		$sqlParams['SEASON_ROUND'] = $teammatch->getSeasonRound();
+		$sqlParams['SEASON'] = $tournament->getSeason();
+
+		$club1_athletes = $conn->fetchAll($query, $sqlParams);
+
+		$sqlParams = array();
+		$sqlParams['TEAM_ID'] = $teammatch->getTeam2Id();
+		$sqlParams['TEAM_NUMBER'] = $teammatch->getTeam2()->getTeamNumber();
+		$sqlParams['CLUB_ID'] = $teammatch->getTeam2()->getClubId();
+		$sqlParams['SEASON_ROUND'] = $teammatch->getSeasonRound();
+		$sqlParams['SEASON'] = $tournament->getSeason();
+
+		$club2_athletes = $conn->fetchAll($query, $sqlParams);
+
+        return array(
+			'teammatch' => $teammatch,
+            'form' => $form->createView(),
+			'club1_athletes' => $club1_athletes,
+            'club2_athletes' => $club2_athletes,
+        );
+    }
 
 }

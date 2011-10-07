@@ -114,6 +114,21 @@ class MatchType
     {
         return $this->gender;
     }
+	
+	
+	/**
+	 * @return string (singles || doubles || mixed)
+	 */
+	public function getDiscipline()
+	{
+		if ($this->getGender() == 3) {
+			return 'mixed';
+		}
+		if ($this->getXOnX() == 2) {
+			return 'doubles';
+		}
+		return 'singles';
+	}
 
 	
 	function __toString()
