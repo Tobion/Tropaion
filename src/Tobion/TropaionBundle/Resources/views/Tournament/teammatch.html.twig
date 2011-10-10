@@ -175,7 +175,7 @@
 	<dd><img src="{{ asset('bundles/tobiontropaion/images/icons/status/approved.png') }}" width="16" height="16" alt="" /> von {{ teammatch.approvedBy }} am {{ teammatch.approvedAt | date('d.m.Y - H:i') }}</dd>
 	{% endif %}
 	<dt>{% trans %}Editieren{% endtrans %}</dt> 
-	<dd><a rel="edit" href=""><img src="{{ asset('bundles/tobiontropaion/images/icons/action/submit.png') }}" width="16" height="16" alt="" /> {% trans %}Ergebnis eingeben/bearbeiten{% endtrans %}</a></dd>
+	<dd><a rel="edit" href="{{ path('tournament_teammatch_edit', teammatch.routingParams) }}"><img src="{{ asset('bundles/tobiontropaion/images/icons/action/submit.png') }}" width="16" height="16" alt="" /> {% trans %}Ergebnis eingeben/bearbeiten{% endtrans %}</a></dd>
 </dl>
 
 </header>

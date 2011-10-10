@@ -1,72 +1,97 @@
-YUI().use('autocomplete', 'array-extras', 'highlight-base', 'text-wordbreak', function (Y) { // 'autocomplete-filters', 'autocomplete-highlighters'
+/*
+TODO
+- Remove validation erros when hiding/showing match results
+- Umwertung und kampfl. Sieg -> Ergebnis setzen
+- Umwertung gegen -> Vorhandenes, gewertetes Ergebnis in Ursprungsergebnis setzen
+- Badminton Validate Result (done)
+	- Ursprüngliches Ergebnis nicht validieren, wenn aufgegeben
+- Teammatch nicht angetreten -> alle Spieler nicht angetreten
+- Status der ursprünglichen Ergebnisse (done)
+- Badminton Match Validator eingeführt werden, um z.B. ein 3:0 Satzergebnis zu alamieren (done)
+*/
 
-	Y.one('body').addClass('yui3-skin-sam');
+YUI().use('autocomplete', 'array-extras', 'highlight-base', 'text-wordbreak', function (Y) { 
 
-var athleteTemplate =
-	'<div class="athlete-suggest">' +
-		'{highlighted}' +
-		// ' <span class="id">[{athlete_id}]</span>' + // hightlighted includes ID (see resultTextLocator)
-		'{activity}' +
-		'<div class="lineup">{lineup}</div>' +
-	'</div>';
 
- 
-// Custom formatter for athletes
+/**
+ * Custom formatter for athletes
+ */
 function athleteFormatter(query, results) {
+	var athleteTemplate =
+		'<div class="athlete-suggest">' +
+			'{highlighted}' +
+			'{activity}' +
+			'<div class="lineup">{lineup}</div>' +
+		'</div>';
+
 	// Iterate over the array of athlete result objects and return an array of HTML strings
 	return Y.Array.map(results, function (result) {
 		var athlete = result.raw;
 	 
 		// Use string substitution to fill out the athlete template and return an HTML string for this result
-		/*
-		YUI 3.3 Autocomplete bug: See my filed bug report at http://yuilibrary.com/projects/yui3/ticket/2529945
-		So use plain text result when query is empty.
-		Seit custom Hightlighter nicht mehr nötig.
-		*/
-		
+		// result.hightlighted contains markup for the name and ID (see queryHighlighter)
 		return Y.Lang.sub(athleteTemplate, {
-			highlighted   : result.highlighted, // query == '' ? result.text : result.highlighted,
+			highlighted   : result.highlighted, 
 			activity      : athlete.num_team_activity > 0 ? 
 				'<div class="activity"><em>' + athlete.num_team_activity + '</em> Einsätze</div>' : 
 				'',
-			lineup        : athlete.level == 255 ? 
+			lineup        : athlete.class_level == 255 ? 
 				'<em>Ersatz</em>spieler' : 
 				athlete.is_team_starter == 1 ? 
 					'<em title="Pos. ' + athlete.position + '">Stamm</em>spieler' : 
 					'<em title="Pos. ' + athlete.position + '">' + athlete.team_number + '.</em> Mannschaft (' + 
-						athlete.league_abbr + (athlete.division == 0 ? '' : '-' + athlete.division) + ')'
+						athlete.class_abbr + (athlete.division == 0 ? '' : '-' + athlete.division) + ')'
 		});
 	});
 }
 
 
-/*
-Mögliche Verbesserung: individueller flexibler "partialWordMatch" Filter und Highlighter (Kombination aus phraseMatch und wordMatch,
-um auch andere Eingabeformen, wie "Zuname, Vorname" zu erlauben, statt der vorgeschriebenen (Vorname Zuname). 
-Dies ist besonders wichtig, wenn man Namen anderer Kulturen eingeben möchte, wie chinesiche Namen, deren Reihenfolge umgedreht ist. Dies sorgt bei Nutzern oft zu Verunsicherung.
-Praktische Beispiele, die möglich sein sollten:
-Sophie-Anne statt Anne-Sophie (Verwechslung)
-Schulz, Basti statt Sebastian Schulze (Spitzname)
-T. Schultze (Abkürzung)
-Schultze, Tobias (Getauscht)
-Max Müller, Dr. statt Dr. Müller
-Noch nicht möglich sind Initialien, wie TS, aber T S oder T.S. würde schon funktionieren auch wenn nicht Beschränkt auf den Anfang des Textes
-Der Highlighter könnte dann den Markup liefern, der den Namen und die ID voneinander unterscheidet.
-Inspiration siehe https://github.com/yui/yui3/blob/master/src/autocomplete/js/autocomplete-filters.js und https://github.com/yui/yui3/blob/master/src/autocomplete/js/autocomplete-highlighters.js
-*/
-// Potentiell nicht ganz eindeutige Filterung einer bestehenden Auswahl, wenn Name und Id in einem einem anderen result enthalten ist. Bsp: Tobi Schultz [80] und Tobias Schultze [480]
-// -> erledigt durch IdSearch
+/**
+ * Ein individueller Filter, der die Spieler nach Namen und ID anhand des Querys filtert.
+ * Es erlaubt die Namenseingabe unabhängig von der Namensreihenfolge.
+ * Dies ist besonders wichtig, wenn man Namen anderer Kulturen eingeben möchte, 
+ * wie chinesiche Namen, deren Reihenfolge umgedreht ist. Dies sorgt bei Nutzern 
+ * oft zu Verunsicherung.
+ * Praktische Beispiele, die möglich sein sollten:
+ * - Sophie-Anne statt Anne-Sophie (Verwechslung)
+ * - Schulz, Basti statt Sebastian Schulze (Spitzname)
+ * - T. Schultze (Abkürzung)
+ * - Schultze, Tobias (Getauscht)
+ * - Max Müller, Dr. statt Dr. Müller
+ * 
+ * Noch nicht möglich sind Initialien, wie TS. Die Versionen T S und T.S. würden aber schon 
+ * funktionieren, wenn auch nicht Beschränkt auf den Anfang des Textes.
+ *
+ * Eine Zahl in Klammern wird als numerische ID interpretiert, die dann übereinstimmen muss.
+ * Dadurch ist eine eindeutige Filterung möglich, auch wenn der Name und die ID
+ * in einem einem anderen result enthalten ist. Bsp: Tobi Schultz [80] und Tobias Schultze [480]
+ * 
+ * Dieser Filter und der entsprechende Highlighter (queryHighlighter) funktionieren ähnlich dem
+ * allgemeinem subWordMatch Filter, den ich YUI bereitgestellt habe und der in YUI 3.4.0 aufgenommen wurde.
+ * Siehe http://yuilibrary.com/projects/yui3/ticket/2529952
+ * 
+ * Inspiration siehe 
+ * https://github.com/yui/yui3/blob/master/src/autocomplete/js/autocomplete-filters.js und 
+ * https://github.com/yui/yui3/blob/master/src/autocomplete/js/autocomplete-highlighters.js
+ * 
+ * @param {String} query Query to match
+ * @param {Array} results Results to filter
+ * @return {Array} Filtered results
+ */
 function queryFilter(query, results) {
-	if (query == '') return results; // performance optimization because the following calls will not have any effect in this case anyway
+	// performance optimization because the following calls will not have any effect in this case anyway
+	if (query == '') return results; 
 	query = query.toLowerCase();
-	var queryWords = Y.Text.WordBreak.getUniqueWords(query), // mögliches problem: trennt wörter mit bindestruch, siehe http://yuilibrary.com/projects/yui3/ticket/2529948
+
+	// beachte: trennt wörter mit bindestruch, siehe http://yuilibrary.com/projects/yui3/ticket/2529948
+	var queryWords = Y.Text.WordBreak.getUniqueWords(query), 
 		IdSearchRegEx = /[\[\(](\d+)[\]\)]/, // '[' or '(' + Number + ']' or ')'
-		IdSearchResult = IdSearchRegEx.exec(query); 
+		IdSearchResult = IdSearchRegEx.exec(query);
+
 	if (IdSearchResult) {
 		IdSearchResult = parseInt(IdSearchResult[1], 10);
 	}
-	// Y.log(queryWords);
-	// Y.log(IdSearchResult);
+
 	return Y.Array.filter(results, function (result) {
 		return queryWords.every(function (word) {
 			return result.raw.first_name.toLowerCase().indexOf(word) !== -1 || 
@@ -77,97 +102,10 @@ function queryFilter(query, results) {
 	});
 }
 
-
- /**
-     * Returns an array of results where all the words of the query are partially found in any word of the result. 
-     * Non-word characters like whitespace and certain punctuation are ignored. Case-insensitive.
-     * This is basically a combination of <code>wordMatch()</code> by ignoring whitespace and word order and <code>phraseMatch()</code> by allowing partial matching instead of whole words.
-     * Example use case: Trying to find personal names independently of name order (Western or Eastern order)  and supporting immediate feedback by allowing partial occurences. So "J. Doe" and "Deo, John" and "J. D." would all find "John Doe".
-     *
-     * @method partialWordMatch
-     * @param {String} query Query to match
-     * @param {Array} results Results to filter
-     * @return {Array} Filtered results
-     * @static
-     */
-var YArray     = Y.Array,
-    YObject    = Y.Object,
-    WordBreak  = Y.Text.WordBreak,
-	Highlight = Y.Highlight;
-	
-function partialWordMatch(query, results, caseSensitive) {
-    // The caseSensitive parameter is only intended for use by
-    // partialWordMatchCase(). It's intentionally undocumented.
-	
-	if (query == '') return results; // performance optimization because the following calls will not have any effect in this case anyway
-	
-	var queryWords = WordBreak.getUniqueWords(query, {ignoreCase: !caseSensitive});
-
-    return YArray.filter(results, function (result) {
-		var resultText = caseSensitive ? result.text : result.text.toLowerCase();
-		return queryWords.every(function (queryWord) {
-			return resultText.indexOf(queryWord) !== -1;
-		});
-		
-		/*
-		var resultWords = WordBreak.getUniqueWords(caseSensitive ? result.text : result.text.toLowerCase());
-		
-		return queryWords.every(function (queryWord) {
-			return resultWords.some(function (resultWord) {
-				return resultWord.indexOf(queryWord) !== -1;
-			});
-		});
-		*/
-    });
-}
-
-function partialWordMatchCase(query, results) {
-    return partialWordMatch(query, results, true);
-}
-
-
-function partialWordMatchHighlighter(query, results, caseSensitive) {
-    // The caseSensitive parameter is only intended for use by
-    // partialWordMatchCase(). It's intentionally undocumented.
-	
-	var queryWords = WordBreak.getUniqueWords(query, {
-        ignoreCase: !caseSensitive
-    });
-	
-	return YArray.map(results, function (result) {
-		return Highlight.all(result.text, queryWords, {
-            caseSensitive: caseSensitive
-        });
-		/*words = WordBreak.getWords(result.text, {
-            includePunctuation: true,
-            includeWhitespace : true
-        });
-	
-		return YArray.map(words, function (word) {
-            return Highlight.all(word, queryWords, { caseSensitive: caseSensitive });
-        }).join('');
-		*/
-		
-		/*
-		// we do not pass query as needles because it will not be used (and could not due to casting to hash inside Highlight.words)
-		// this is also more performant since we only apply WordBreak once (see above) and reuse the result
-		return Highlight.words(result.text, [], { 
-            caseSensitive: caseSensitive,
-			mapper: function (word, needles) {
-		        return Highlight.all(word, queryWords, { caseSensitive: caseSensitive });
-		    }
-        });
-		*/
-		
-	});
-}
-
-
-function partialWordMatchCaseHighlighter(query, results, caseSensitive) {
-    return partialWordMatchHighlighter(query, results, true);
-}
-
-
+/**
+ * Highlights query strings within the athlete results.
+ * It returns HTML markup as string that distinguishes the name from the ID.
+ */
 function queryHighlighter(query, results) {
 	var queryWords = Y.Text.WordBreak.getUniqueWords(query, {ignoreCase: true}),
 		highlightTemplate =
@@ -193,18 +131,30 @@ function queryHighlighter(query, results) {
 	});
 }
 
-
+/**
+ * Returns an array of results which have the same gender as the node's
+ * data-gender attribute
+ *
+ * @param {String} query Query to match
+ * @param {Array} results Results to filter
+ * @param {Node} acNode Current autocomplete node triggering this filter
+ * @return {Array} Filtered results
+ */
 function genderFilter(query, results, acNode) {
 	var gender = acNode.getAttribute('data-gender');
 	return Y.Array.filter(results, function (result) {
 		return result.raw.gender == gender;
 	});
-	// Y.one("input:focus").getAttribute('data-gender')
 }
 
-/* 
-	Filtert die wahrscheinlichste Auswahl heraus, wenn noch kein Suchkriterium eingegeben wurde
-*/
+/**
+ * Filtert die wahrscheinlichste Auswahl heraus, wenn noch kein Suchkriterium eingegeben wurde
+ * 
+ * @param {String} query Query to match
+ * @param {Array} results Results to filter
+ * @param {Node} acNode Current autocomplete node triggering this filter
+ * @return {Array} Filtered results
+ */
 function defaultSuggestionsFilter(query, results, acNode) {
 	if (query == '') {
 		var team = acNode.ancestor('.hometeam') ? 'hometeam' : 'awayteam', // bezieht sich die Abfrage, auf die Heimmannschaft oder Auswärtsmannschaft
@@ -216,7 +166,8 @@ function defaultSuggestionsFilter(query, results, acNode) {
 				
 			/*
 			Spieler von der Liste entfernen, die eigentlich in diesem Spiel nicht aufgestellt werden dürften
-			Keine Spieler direkt vorschlagen, die bereits zwei Mal (oder öfter) in diesem Teamspiel aufgestellt wurden oder schon in der gleichen Disziplin ausgewählt wurden. Dadurch werden 3 falsche Aufstellungen herausgefiltert:
+			Keine Spieler direkt vorschlagen, die bereits zwei Mal (oder öfter) in diesem Teamspiel aufgestellt wurden 
+			oder schon in der gleichen Disziplin ausgewählt wurden. Dadurch werden 3 falsche Aufstellungen herausgefiltert:
 			1) im gleichen Doppel-Match (z.B. 1.HD) wird ein bereits ausgewählter Spieler nicht nochmal als möglicher Partner vorgeschlagen
 			2) in unterschiedlichen Matches der gleichen Disziplin (z.B. 1.HE, 2.HE) werden bereits ausgewählte nicht wieder vorschlagen
 			3) der 3. Einsatz des gleichen Spielers wird nicht vorgeschlagen (z.B. ausgewählt in HD und Mix -> dann nicht noch im HE vorschlagen)
@@ -227,14 +178,13 @@ function defaultSuggestionsFilter(query, results, acNode) {
 					return (athleteLineupCount > 1) || (athleteInput.getAttribute('data-discipline') == discipline);
 				}
 				return false;
-			})
-			) {
+			})) {
 				return false;
 			}
 			// Y.all('.' + team + ' input[data-discipline=' + acNode.getAttribute('data-discipline') + ']:contains(' + result.text + ')').size() == 0
 			
 			/*
-			Standardmäßig nur die wahrscheinlichsten Spieler anzeigen. Diese sind:
+			Standardmäßig nur die wahrscheinlichsten Spieler anzeigen, bei denen eines der folgenden Kriterien zutrifft:
 			1) Stammspieler der Mannschaft
 			2) Spieler mit vorhandenen Einsätzen in dieser Mannschaft
 			3) Spieler die in einem anderen Spiel des Mannschaftswettkampfs bereits ausgewählt wurden, falls dem keine der obigen Regeln widerspricht
@@ -246,51 +196,45 @@ function defaultSuggestionsFilter(query, results, acNode) {
 	return results;
 }
 
+// necessary for styling autocomplete suggestions
+Y.one('body').addClass('yui3-skin-sam');
 
-	Y.all('input.athlete').each(function (inputNode) {
-		inputNode.plug(Y.Plugin.AutoComplete, {
-			maxResults: 10,
-			minQueryLength: 0,
-			queryDelay: 0,
-			scrollIntoView: false, // true funktioniert schlecht, da es in jeden Fall scrollt - auch wenn die Liste schon einsehrbar ist
-			activateFirstItem: true,
-			tabSelect: true, // in Kombination mit activateFirstItem sorgt es für eine möglichst schnelle Eingabe
-			source: inputNode.ancestor('.hometeam') ? club1_athletes : club2_athletes,
-			// resultTextLocator: 'last_name', // einfache Version
-			resultTextLocator: function (result) {
-				return result.first_name + ' ' + result.last_name + ' [' + result.athlete_id + ']';
-			},		
-			// Chain together several filters
-			resultFilters: [Y.rbind(genderFilter, null, inputNode), queryFilter, Y.rbind(defaultSuggestionsFilter, null, inputNode)], // 'phraseMatch'  partialWordMatch
-			resultHighlighter: queryHighlighter, // partialWordMatchHighlighter, // 'phraseMatch'
-			resultFormatter: athleteFormatter
-		});
+Y.all('input.athlete').each(function (inputNode) {
+	inputNode.plug(Y.Plugin.AutoComplete, {
+		maxResults: 10,
+		minQueryLength: 0,
+		queryDelay: 0,
+		scrollIntoView: false, // true funktioniert schlecht, da es in jeden Fall scrollt - auch wenn die Liste schon einsehbar ist
+		activateFirstItem: true,
+		tabSelect: true, // in Kombination mit activateFirstItem sorgt es für eine möglichst schnelle Eingabe
+		source: inputNode.ancestor('.hometeam') ? club1_athletes : club2_athletes,
+		resultTextLocator: function (result) {
+			return result.first_name + ' ' + result.last_name + ' [' + result.athlete_id + ']';
+		},		
+		// Chain together several filters
+		resultFilters: [Y.rbind(genderFilter, null, inputNode), queryFilter, Y.rbind(defaultSuggestionsFilter, null, inputNode)], 
+		resultHighlighter: queryHighlighter, 
+		resultFormatter: athleteFormatter
 	});
-	
-	
-	// When the input node receives focus, send a query to display the full list of suggestions
-	Y.all('input.athlete').on('focus', function (e) {
-		//e.target.select(); // pre-select text so it can be overridden directly by entering text
-		e.target.ac.sendRequest(e.target.get('value'));
-		//e.target.ac.show();
-	});
-	
-	/*
-	Y.all('.team input').each(function(node, index){
-		node.ac.on("query", function (e) {
-			if (index = e.query.indexOf(',') !== -1) {
-				e.query =  e.query.substr(index + 1, e.query.length - index) + e.query.substr(0, index);
-				alert(e.query);
-			}
-		});
-	});
-	*/
+});
 
+// When the input node receives focus, send a query to display the full list of suggestions
+Y.all('input.athlete').on('focus', function (e) {
+	//e.target.select(); // pre-select text so it can be overridden directly by entering text
+	e.target.ac.sendRequest(e.target.get('value'));
+	//e.target.ac.show();
+});
+	
 
-/*
-	Maybe use jQuery Data Linking for this:
-	https://github.com/jquery/jquery-datalink
-*/	
+function allowOnlyNumbers(event) {
+	var charCode = (event.which) ? event.which : event.keyCode
+    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+		event.halt(); // stopPropagation() and preventDefault()
+		return false;
+	}
+	return true;
+}
+
 	
 function calcStats() {
 
@@ -302,7 +246,7 @@ function calcStats() {
 		var match_team1_games = 0, match_team2_games = 0;
 		
 		matchNode.all('.games .effective > li').each(function (gameNode) {
-			var inputs = gameNode.all('input.score'); // input:not([type=hidden])
+			var inputs = gameNode.all('input.score');
 
 			var game_team1_score = inputs.item(0) !== null ? parseInt(inputs.item(0).get('value'), 10) : Number.NaN,
 				game_team2_score = inputs.item(1) !== null ? parseInt(inputs.item(1).get('value'), 10) : Number.NaN;
@@ -342,15 +286,6 @@ function calcStats() {
 }
 
 
-function allowOnlyNumbers(event) {
-	var charCode = (event.which) ? event.which : event.keyCode
-    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
-		event.halt(); // stopPropagation() and preventDefault()
-		return false;
-	}
-	return true;
-}
-
 function isBadmintonGameScoreInRange(score) {
 	return (score == Number.NaN || score >= 0 && score <= 30);
 }
@@ -380,13 +315,17 @@ function isBadmintonGameValid(score1, score2, allowPotential, allowEmpty) {
 	
 	// Wenn kein Kriterium trifft, dann gilt immernoch die vollständige Überprüfung (siehe unten)
 	if (allowPotential) {
-		if (biggerScore < 21 && smallerScore <= 9) {
-			return (score1 == 2 || score1 == 3 || score2 == 2 || score2 == 3);
-		}
-		// wenn höheres Ergebnis größer 21 und kleiner gleich 30 ist und das kleinere Ergebnis einstellig, was eigentlich falsch wäre,
-		// dann erlaube trotzdem ein kleineres Ergebnis mit 2 beginnend (z.B. 22:2x oder 30:2x ) bzw. 2 oder 3 beginnend bei höheres Ergebnis von 28 oder 29 (z.B. 28:3[0], 28:2[6])
-		if (biggerScore >= 22 && biggerScore <= 30 && smallerScore <= 9) {
-			return (biggerScore == 28 || biggerScore == 29) ? (smallerScore == 2 || smallerScore == 3) : (smallerScore == 2);
+		// wenn höheres Ergebnis ungleich 21 und das kleinere Ergebnis einstellig ist, was in jedem Fall eigentlich falsch wäre,
+		// dann erlaube unter Umständen trotzdem ein kleineres Ergebnis 
+		// mit 2 beginnend (z.B. 2:2[1] oder 22:2x oder 30:2x ) bzw. 
+		// 2 oder 3 beginnend (z.B. 28:3[0], 28:2[6])
+		if (smallerScore <= 9 && biggerScore != 21) {
+			if ((biggerScore >= 2 && biggerScore <= 27) || biggerScore == 30) {
+				return (smallerScore == 2);
+			}
+			if (biggerScore == 28 || biggerScore == 29) {
+				return (smallerScore == 2 || smallerScore == 3);
+			}	
 		}
 	} 	
 	
@@ -669,152 +608,91 @@ function manipulateNoticeValue(selectNode) {
 	}
 }
 
-	/*
-		TODO
-		- Remove validation erros when hiding/showing match results
-		- Umwertung gegen -> Gewertetes Ergebnis in Ursprungsergebnis setzten
-		- Result Incident Trennstrich -> radio uncheck
-		- Badminton Validate Result (done)
-			- Ursprüngliches Ergebnis nicht validieren, wenn aufgegeben
-		- Teammatch nicht angetreten -> alle Spieler nicht angetreten
-		- Status der ursprünglichen Ergebnisse (done)
-		-  Badminton Match Validator eingeführt werden, um z.B. ein 3:0 Satzergebnis zu alamieren (done)
-	*/
 	
-	/*
-		initial manipulation checks
-		e.g. hiding unused fields
-	*/
-	checkOptionalThirdGame();
-	checkAnnulledGames();
-	checkNoPlayer();
-	checkNoResult();
-	checkNoticeValue();
-	
-	/*
-		Using event delegation (Event Bubbling)
-		
-		unobtrusive scripting techniques: wiring up your events and scripts without any code inline in your HTML. 
-		You're going to use your access to the DOM and simply attach scripts to the objects on the page using a proper separation of content, presentation, now through JavaScript, behavior
-		
-		Hooking up all those handlers comes with a price, not only in the number of steps to hook them up, but in the cost associated with storing redundant pieces of code in the browsers memory. 
-		Not only that, but if your DOM changes, you've got to rewire your events because a new additions won't be aware of code run onload.
-	*/
-	
-	// http://developer.yahoo.com/yui/3/event/#focusblur
-	
-	
-	// nur die gewerteten Ergebnisse müssen für die Berechnung der Statistiken gebunden werden
-	// bind both keyup and change events. together they handle most circumstances
-	// - keyup does not respond to mouse input (e.g. pasting)
-	// - change only fires after blur -> not live feedback
-	
-	Y.on('keyup', function(e) {
-		// Sicherstellen, dass der Ursprung des Event Bubblings ein Score Input Feld ist
-		// Muss eigentlich sein, da kein anderes Element in Frage kommt, das diesen Event Handler (keyup) unterstützt
-		if (e.target.hasClass('score')) {
-			calcStats();
-		}
-    }, '.games .effective');
-	
-	Y.on('change', function(e) {
-		if (e.target.hasClass('score')) {
-			calcStats();
-		}
-    }, '.games .effective');
-	
-	Y.on('keyup', function(e) {
-		if (e.target.hasClass('score')) {
-			manipulateOptionalThirdGame(e.target.ancestor('ol'));
-		}
-    }, '.games');
-	
-	Y.on('change', function(e) {
-		if (e.target.hasClass('score')) {
-			manipulateOptionalThirdGame(e.target.ancestor('ol'));
-		}
-    }, '.games');
-	
-	Y.on('keypress', function(e) {
-		if (e.target.hasClass('score')) {
-			allowOnlyNumbers(e);
-		}
-    }, '.scoresheet');
-	
-	Y.on('keyup', function(e) {
-        if (e.target.hasClass('score')) {
-			validateBadmintonGamePartially(e.target.ancestor('li'));
-		}
-    }, '.games');
-	
-	Y.on('focus', function(e) {
-		// Y.log(e.target.hasClass('score'));
-        if (e.target.hasClass('score')) {
-			e.target.ancestor('li').removeClass('error'); // validateBadmintonGamePartially(e.target.ancestor('li'));
-			e.target.ancestor('fieldset').removeClass('error');
-		}
-    }, '.games');
-	
-	Y.on('blur', function(e) {
-        if (e.target.hasClass('score')) {
-			validateBadmintonGameFully(e.target.ancestor('li'));
-			validateBadmintonMatch(e.target.ancestor('ol'));
-		}
-    }, '.games');
-	
-	/*
-	Y.on('click', function(e) {
-		Y.log(e.target.get('tagName'));
-    }, '.scoresheet');
-	*/
-	
+/*
+ * initial manipulation checks
+ * e.g. hiding unused fields
+ */
+checkOptionalThirdGame();
+checkAnnulledGames();
+checkNoPlayer();
+checkNoResult();
+checkNoticeValue();
 
 
-	
-	/*
-	Y.log(Y.Text.WordBreak.getUniqueWords("Lena-Meyer - Berlin -Berlin-"));
-	// Returns: ["Lena", "Meyer", "Berlin"]
-	// Expected: ["Lena-Meyer", "Berlin"]
-	// Additionally it's inconsistent with
-	Y.log(Y.Text.WordBreak.getUniqueWords("Lena.Meyer"));
-	// Returns: ["Lena.Meyer"]
-	*/
-	
-	/*
-	alert(Y.Highlight.all("Tobias Schultze", ['tze', 'sch']));
-	alert(Y.Highlight.all("Tobias Schultze", ['tze', 'ultz', 'sch']));
-	
-	alert(Y.Highlight.all("123456789", ['123', '345', '678']));
-	<b class="yui3-highlight">123</b>45<b class="yui3-highlight">678</b>9
-	Expected: <b class="yui3-highlight">12<b class="yui3-highlight">3</b>45</b><b class="yui3-highlight">678</b>9
-	*/
-	
-	// use click event handler. it works as it should. also when changing value with keyboard
-	// change event handler fires in internet explorer only after losing focus of the element, which does not give immediate feedback
-	
-	Y.all('.noplayer input').on('click', checkNoPlayer);
-	
-	Y.all('.noresult input').on('click', checkNoResult);
-	
-	// auch bei kampflosem Radio Field den Event Listener registrieren, da bei deren Auswahl natürlich das Aufgabe Radio Field (.withdrawn input) unchecked wird
-	Y.all('.revaluation select, .result-incident select').on('change', checkAnnulledGames);
-	
-	Y.all('.revaluation select, .result-incident select').on('change', checkNoticeValue);
+/*
+ * Registering event listerners using event delegation (Event Bubbling)
+ */
 
+// Nur die gewerteten Ergebnisse müssen für die Berechnung der Statistiken gebunden werden
+// Bind both keyup and change events. together they handle most circumstances
+// - keyup does not respond to mouse input (e.g. pasting)
+// - change only fires after blur -> not live feedback
+
+Y.on('keyup', function(e) {
+	if (e.target.hasClass('score')) {
+		calcStats();
+	}
+}, '.games .effective');
+
+Y.on('change', function(e) {
+	if (e.target.hasClass('score')) {
+		calcStats();
+	}
+}, '.games .effective');
+
+Y.on('keyup', function(e) {
+	if (e.target.hasClass('score')) {
+		manipulateOptionalThirdGame(e.target.ancestor('ol'));
+	}
+}, '.games');
+
+Y.on('change', function(e) {
+	if (e.target.hasClass('score')) {
+		manipulateOptionalThirdGame(e.target.ancestor('ol'));
+	}
+}, '.games');
+
+Y.on('keypress', function(e) {
+	if (e.target.hasClass('score')) {
+		allowOnlyNumbers(e);
+	}
+}, '.scoresheet');
+
+Y.on('keyup', function(e) {
+	if (e.target.hasClass('score')) {
+		validateBadmintonGamePartially(e.target.ancestor('li'));
+	}
+}, '.games');
+
+Y.on('focus', function(e) {
+	if (e.target.hasClass('score')) {
+		e.target.ancestor('li').removeClass('error');
+		e.target.ancestor('fieldset').removeClass('error');
+	}
+}, '.games');
+
+Y.on('blur', function(e) {
+	if (e.target.hasClass('score')) {
+		validateBadmintonGameFully(e.target.ancestor('li'));
+		validateBadmintonMatch(e.target.ancestor('ol'));
+	}
+}, '.games');
+
+/*
+Y.on('click', function(e) {
+	Y.log(e.target.get('tagName'));
+}, '.scoresheet');
+*/
+
+// Use click event handler for checkbox. It works as it should - also when changing value with keyboard.
+// In contrast the hange event handler fires in internet explorer only after losing focus of the element, 
+// which does not give immediate feedback.
+Y.all('.noplayer input').on('click', checkNoPlayer);
+Y.all('.noresult input').on('click', checkNoResult);
+
+Y.all('.revaluation select, .result-incident select').on('change', checkAnnulledGames);
+Y.all('.revaluation select, .result-incident select').on('change', checkNoticeValue);
 	
-	/*
-	// Old style without event delegation
-	
-	Y.all('.games .effective input.score').on('keyup', calcStats);
-	Y.all('.games .effective input.score').on('change', calcStats);
-	
-	Y.all('.games input.score').on('keyup', checkGamesState);
-	Y.all('.games input.score').on('change', checkGamesState);
-	
-	Y.all('.games input.score').on('keypress', allowOnlyNumbers);
-	Y.all('.games input.score').on('keyup', validateBadmintonGame);
-	Y.all('.games input.score').on('focus', validateBadmintonGame);
-	Y.all('.games input.score').on('blur', validateBadmintonGameBlur);
-	*/	
-	
+
 })

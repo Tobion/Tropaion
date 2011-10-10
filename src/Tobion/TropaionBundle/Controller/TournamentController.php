@@ -591,20 +591,18 @@ class TournamentController extends Controller
 			\Doctrine\ORM\Query::HYDRATE_OBJECT
 		);
 		
-		/* TODO
-		 
-		if (!$this->object->hasDetailedResult())
+				 
+		if (!$teammatch->hasDetailedResult())
 		{
-			$badmintonMatches = array('1.HD', 'DD', '2.HD', 'DE', 'Mix', '1.HE', '2.HE', '3.HE');
+			$badmintonMatchTypes = array(1, 2, 3, 4, 5, 6, 7, 8);
 
-			foreach ($badmintonMatches as $badmintonMatchType) {
-				$match = new Match();
-				$match['match_type'] = $badmintonMatchType;
-				$this->object['Matches'][] = $match;
+			foreach ($badmintonMatchTypes as $matchTypeId) {
+				$match = new Entity\Match();
+				$match->setMatchType($em->getReference('TobionTropaionBundle:MatchType', $matchTypeId));
+				$match->setTeammatch($teammatch);
+				$teammatch->addMatches($match);
 			}
 		}
-	
-		*/
 		
 		foreach ($teammatch->getMatches() as $match) { 	
 			for ($count = count($match->getEffectiveGames()); $count < 3; $count++)

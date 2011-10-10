@@ -807,7 +807,8 @@ class Match
 	*/
 	public function isTeam1NoPlayer()
 	{
-		return is_null($this->getTeam1PlayerId()) && is_null($this->getTeam1PartnerId());
+		return is_null($this->getTeam1PlayerId()) && is_null($this->getTeam1PartnerId()) 
+				&& !is_null($this->getTeammatch()->getSubmittedBy());;
 	}
 	
 	/**
@@ -815,7 +816,8 @@ class Match
 	*/
 	public function isTeam2NoPlayer()
 	{
-		return is_null($this->getTeam2PlayerId()) && is_null($this->getTeam2PartnerId());
+		return is_null($this->getTeam2PlayerId()) && is_null($this->getTeam2PartnerId()) 
+				&& !is_null($this->getTeammatch()->getSubmittedBy());
 	}
 	
 	/**
@@ -873,7 +875,7 @@ class Match
 	
 	public function isNoResult()
 	{
-        return !$this->hasResult();
+        return !$this->hasResult() && !is_null($this->getTeammatch()->getSubmittedBy());
 	}
 	
 	
