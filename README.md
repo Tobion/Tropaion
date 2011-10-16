@@ -8,6 +8,11 @@ with [RDFa](http://en.wikipedia.org/wiki/RDFa), using
 the [Sports-Ontology](https://github.com/Tobion/Sports-Ontology) to describe the tournament structure, 
 participating teams & athletes, the sports results, and their relationships.
 
+### Name meaning
+What do all sports and tournaments have in common? They reward athletes with a trophy (e.g. medal or cup) 
+for a specific achievement. The word *[tropaion]*(http://en.wikipedia.org/wiki/Tropaion) is the Acient Greek
+origin of *trophy*. So I thought this word and a trophy symbol represent a sports results service best.
+
 License
 -------
 Tropaion is Open Source Software, and licensed under the [GNU GPLv3](http://www.gnu.org/licenses/gpl.html) 
