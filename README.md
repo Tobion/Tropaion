@@ -10,7 +10,7 @@ participating teams & athletes, the sports results, and their relationships.
 
 ### Name meaning
 What do all sports and tournaments have in common? They reward athletes with a trophy (e.g. medal or cup) 
-for a specific achievement. The word *[tropaion]*(http://en.wikipedia.org/wiki/Tropaion) is the Acient Greek
+for a specific achievement. The word [*tropaion*](http://en.wikipedia.org/wiki/Tropaion) is the Acient Greek
 origin of *trophy*. So I thought this word and a trophy symbol represent a sports results service best.
 
 License
