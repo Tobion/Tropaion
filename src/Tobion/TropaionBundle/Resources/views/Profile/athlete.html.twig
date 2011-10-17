@@ -7,157 +7,100 @@
 {% endblock %}
 
 {% block head_javascripts %}
-    {{ parent() }}
-	<script type="text/javascript" src="{{ asset('bundles/tobiontropaion/js/ext-4.0.2a/ext.js') }}"></script>
+    {{ parent() }}	
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js"></script>
+	<script type="text/javascript" src="{{ asset('bundles/tobiontropaion/js/highcharts/js/highcharts.js') }}"></script>
+	<script type="text/javascript" src="{{ asset('bundles/tobiontropaion/js/highcharts/js/modules/exporting.js') }}"></script>
 	
-	<script type="text/javascript"><!--//--><![CDATA[//><!--
-	
-	window.ratinghistoryStore = Ext.create('Ext.data.JsonStore', {
-		fields: [
-			{ name: 'singles_rating', type: 'int' },
-			{ name: 'doubles_rating', type: 'int' },
-			{ name: 'mixed_rating', type: 'int' },
-			{ name: 'created_at', type: 'date' }
-		],
-        data: {{ ratinghistory | json_encode | raw }}
-    });
-	
-	Ext.require('Ext.chart.*');
+	<script type="text/javascript">
+	//<![CDATA[
 
-Ext.onReady(function () {
+	$(document).ready(function() {
 
-	var chart = Ext.create('Ext.chart.Chart', {
-		renderTo: 'rating-graph',
-		width: 850,
-		height: 350,
-		animate: false,
-		store: ratinghistoryStore,
-		shadow: false,
-		theme: 'Category1',
-		legend: {
-			position: 'right'
+	var chart = new Highcharts.Chart({
+		chart: {
+			renderTo: 'rating-graph',
+			zoomType: 'x'
 		},
-		axes: [{
-			type: 'Numeric',
-			position: 'left',
-			fields: ['singles_rating','doubles_rating','mixed_rating'],
-			title: '{% trans %}Rating{% endtrans %}',
-			grid: true
-		}, {
-			type: 'Time',
-			position: 'bottom',
-			fields: ['created_at'],
-			title: '{% trans %}Zeit{% endtrans %}',
-			dateFormat: 'M y',
-			groupBy: 'year,month',
-			aggregateOp: 'max',
-			// majorTickSteps : 1,
-			// timeUnit: 'year,month',
-			// step: [Ext.Date.MONTH, 1],
-			label: {
-				orientation: 'horizontal',
-				rotate: {
-					degrees: -90
-				}
+		title: {
+			text: '{% trans with { '%athlete%': athlete.fullName } %}Rating-Entwicklung von %athlete%{% endtrans %}'
+		},
+		subtitle: {
+			text: '{% trans %}Zoomen im Diagramm durch klicken und ziehen{% endtrans %}',
+			align: 'right',
+			verticalAlign: 'bottom',
+			x: 0,
+			y: 0
+		},
+		credits: {
+			enabled: false
+		},
+		xAxis: {
+			type: 'datetime',
+			// maxZoom: 14 * 24 * 3600000, // fourteen days
+			title: {
+				text: 'Zeit'
 			}
-			
+		},
+		yAxis: [{ // left y axis
+			title: {
+				text: '{% trans %}Rating{% endtrans %}'
+			},
+			showFirstLabel: false,
+		  }, { 
+			// right y axis
+			linkedTo: 0,
+			opposite: true,
+			title: {
+				text: null
+			},
+			showFirstLabel: false
 		}],
+		legend: {
+			enabled: true,
+			align: 'left',
+			verticalAlign: 'top',
+			layout: 'vertical',
+			floating: true,
+			x: 90,
+			y: 45,
+			symbolPadding: 10,
+			symbolWidth: 40,
+			borderWidth: 2
+		},
+		tooltip: {
+			shared: true,
+			crosshairs: true
+		}, 
+		plotOptions: {
+			series: {
+				step: true,
+				shadow: false
+			}
+		},
 		series: [{
-			type: 'line',
-			axis: 'left',
-			xField: 'created_at',
-			yField: 'singles_rating',
-			highlight: true,
-			title: 'Einzel-Rating',
-			showInLegend: {
-				size: 10,
-				radius: 1
-			},
-			tips: {
-				trackMouse: true,
-				width: 80,
-				height: 40,
-				renderer: function(storeItem, item) {
-					this.setTitle('Einzel-Rating im ' + storeItem.get('created_at').getMonth() + ' ' + storeItem.get('created_at').getFullYear() + ': ' + storeItem.get('singles_rating'));
-				}
-			},
-			markerConfig: {
-				type: 'cross',
-				size: 3,
-				radius: 3,
-				'stroke-width': 0
-			},
-			style: {
-				lineColor: 0xffffff,
-				lineAlpha:.5,
-				borderColor:0xB5BAC8,
-				fillColor:0xB5BAC8
-			}
-		},
-		{
-			type: 'line',
-			axis: 'left',
-			xField: 'created_at',
-			yField: 'doubles_rating',
-			highlight: true,
-			title: 'Doppel-Rating',
-			showInLegend: {
-				size: 10,
-				radius: 1
-			},
-			tips: {
-				trackMouse: true,
-				width: 80,
-				height: 40,
-				renderer: function(storeItem, item) {
-					this.setTitle('Doppel-Rating im ' + storeItem.get('created_at').getMonth() + ' ' + storeItem.get('created_at').getFullYear() + ': ' + storeItem.get('doubles_rating'));
-				}
-			},
-			markerConfig: {
-				type: 'cross',
-				size: 3,
-				radius: 3,
-				'stroke-width': 0
-			}
-		},
-		{
-			type: 'line',
-			axis: 'left',
-			xField: 'created_at',
-			yField: 'mixed_rating',
-			highlight: true,
-			title: 'Mixed-Rating',
-			showInLegend: {
-				size: 10,
-				radius: 1
-			},
-			tips: {
-				trackMouse: true,
-				width: 80,
-				height: 40,
-				renderer: function(storeItem, item) {
-					this.setTitle('Mixed-Rating im ' + storeItem.get('created_at').getMonth() + ' ' + storeItem.get('created_at').getFullYear() + ': ' + storeItem.get('mixed_rating'));
-				}
-			},
-			markerConfig: {
-				type: 'circle',
-				size: 3,
-				radius: 3,
-				'stroke-width': 0
-			}
+			name: '{% trans %}Einzel{% endtrans %}',
+			data: {{ singlesRatings | json_encode | raw }},
+		}, {
+			name: '{% trans %}Doppel{% endtrans %}',
+			data: {{ doublesRatings | json_encode | raw }},
+		}, {
+			name: '{% trans %}Mixed{% endtrans %}',
+			data: {{ mixedRatings | json_encode | raw }},
 		}]
 	});
+   
+	});
 
-});
+	//]]>
+	</script>
 	
-	//--><!]]>
-	</script> 
 {% endblock %}
 
 {# set pageRdfId = path('profile_athlete', athlete.routingParams|merge({ '_format': 'html' }) ) ~ '.html' #}
 
 {% block title %}
-
+	{{ athlete.fullName }}
 {% endblock %}
 
 {% block metas %}
@@ -173,9 +116,11 @@ Ext.onReady(function () {
 
 
 
-<h1>{{ athlete }}</h1>
+<h1>{{ athlete.fullName }}</h1>
 
 <div id="rating-graph" style="width: 850px; height: 350px;"></div>
+
+<p>TODO: Klick auf einen Punkt öffnet die Seite zu dem entsprechenden Spiel (siehe <a href="http://jsfiddle.net/cfKzS/3/">Beispiel</a>)</p>
 
 </article>
 

@@ -193,6 +193,8 @@
 
 <h1>{% trans with { '%givenName%': athlete.firstName, '%familyName%': athlete.lastName } %}%givenName% %familyName%{% endtrans %}</h1>
 
+<p><a href="{{ path('profile_athlete', athlete.routingParams ) }}">Profil-Seite</a></p>
+
 <section id="my-lineup">
 <h2>{% trans %}Stamm-Mannschaft{% endtrans %}</h2>
 
