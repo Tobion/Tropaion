@@ -1,0 +1,60 @@
+Tabellen-Groeße (NUR DATEN, ohne Index)
+Zeilen entsprechen Saisons (2002-03, 2003-04, 2004-05, 2005-06, 2006-07, 2007-08, 2008-09, 2009-10)
+
+m-spieler-stamm
+57,680 Bytes
+54,252 Bytes
+52,580 Bytes
+64,220 Bytes
+62,996 Bytes
+70,832 Bytes
+74,284 Bytes
+75,316 Bytes
+
+m-aufstellungen
+33,904 Bytes
+31,524 Bytes
+31,312 Bytes
+25,192 Bytes
+22,480 Bytes
+23,212 Bytes
+24,364 Bytes
+24,184 Bytes
+
+m-klasse-staffel
+2,624 Bytes
+2,468 Bytes
+2,476 Bytes
+2,848 Bytes
+2,884 Bytes
+2,848 Bytes
+3,124 Bytes
+3,232 Bytes
+
+m-spieltermine-stamm
+7,496 Bytes
+6,996 Bytes
+6,840 Bytes
+8,164 Bytes
+8,080 Bytes
+7,780 Bytes
+8,740 Bytes
+8,972 Bytes
+    
+m-spieltermine (teammatches 309,0 KiB + matches 2660,4 KiB + games 1544,5 KiB = 4513,9 KiB)
+403,3 KiB
+371,9 KiB
+354,2 KiB
+479,6 KiB
+438,9 KiB 
+406,7 KiB
+488,4 KiB
+511,8 KiB
+= 3454,8 KiB
+
+Athletes:       3546 / 3513 / 4020 / 4028 / 3990 / 4177 / 4237 / 4149   (mitglieder-stamm)
+Locations:      44 / 40 / 37 / 47 / 49 / 49 / 54 / 61                   (hallen-stamm)
+Clubs:          52 / 53 / 74 / 74 / 76 / 73 / 73 / 75                   (verein-stamm)
+Teams:          121 + 112 + 109 + 130 + 129 + 124 + 139 + 143   = 1007  (m-spieltermine-stamm)
+Teammatches:    802 + 732 + 690 + 930 + 854 + 788 + 944 + 998   = 6783  (m-spieltermine / 2)
+Leagues:        16 + 15 + 15 + 16 + 17 + 17 + 18 + 18           = 132 [excl. 8 Ersatzligen] (m-klasse-staffel)

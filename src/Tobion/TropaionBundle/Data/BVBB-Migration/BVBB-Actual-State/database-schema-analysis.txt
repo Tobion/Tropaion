@@ -1,0 +1,72 @@
+Altsystem (legacy system)
+
+Verletzung der Normalformen:
+1. NF: Keine atomaren Werte im Attribut "M-S-Hallen-Tabelle" der Relation "M-Aufstellungen" und  "M-Klasse-Staffel-Text" in "M-Klasse-Staffel"
+2. NF: Der Primärschlüssel der Relation "M-Spieltermine" ist aus den Feldern "Vereins-Nr", "Mannschaft" und "Datum" zusammengesetzt. 
+Die Attribute "Klasse" und "Staffel" sind  nur vom Verein und der Mannschaft abhängig, aber nicht vom Datum. 
+Dies verletzt die 2. Normalform, da die nicht-primären Attribute nicht nur von einem Teil des Schlüssels abhängen dürfen.
+3. NF: Da schon die 1. und 2. NF nicht erfüllt ist, liegt die Datenbank schon gar nicht in der 3. NF vor. 
+Zudem gibt es durchweg Redundanzen, wie sich wiederholende Klassen- und Mannschaftsnamen in "M-Klasse-Staffel" und "M-Spieltermine-Stamm".
+
+Außerdem hat die Datenbank einige Wiederholungsgruppen (sich wiederholende Attribute), die sie sehr unflexibel und nicht erweiterbar macht.
+So kann die Relation "M-Aufstellungen" nur max. 5 Herren und 3 Damen aufnehmen. Und die "M-Spieltermine" max. 8 Disziplinen (8 Spiele) mit jeweils max. 3 Sätzen speichern.
+Würde man größere Mannschaftsaufstellungen oder 5-Satz-Spiele einführen wollen - wie es z.B. im Tennis üblich ist - müssten Spalten nachträglich ergänzt werden.
+Für die meisten Spiele, also Zeilen, wären diese Spalten aber unnötig. Dies führt zu einem erheblich größeren Speicherverbrauch, da für jedes 2-Satz-Spiel trotzdem ein leerer 3. Satz gespeichert werden muss.
+
+
+Mitglieder-Stamm -> athletes
+// Stammdaten der Sportler (Name, Geburtsdatum, Geschlecht, Adresse etc.)
+
+
+Verein-Stamm -> clubs
+// Vereinsdaten (Kürzel, Name, Verantwortliche -> Mitglieder-Stamm, Spielgemeinschaft [max 4])
+// Kann der gleiche Verein, zu mehreren Spielgemeinschaften gehören? Saisonübergreifend sicher JA.
+
+M-Spieltermine-Stamm -> teams
+// Mannschaften (Verein + Nummer) mit ihren Klassen, in denen sie Spielen
+// Redundant mit M-Klasse-Staffel
+- Extra-Felder: zurückgezogen: J/N
+- Berechne: Anzahl nicht-angetreten
+
+
+Hallen-Stamm -> locations
+// Sportanlagen(hallen) mit Adresse und Kommentar
+
+
+M-Klasse-Staffel -> teams + leagues [1-n-Beziehung, d.h. in jeder Saison werden neue Ligen und entsprechend neue Teams erstellt]
+// Klasseneinteilung: Für jede Liga werden die teilnehmenden Mannschaften in eigenen Spalten gespeichert (max 10)
+
+
+M-Spieltermine -> teammatches + matches + games
+// speichert pro Mannschaft das eigene (endgültige und ursprüngliche) Spielergebnis in allen Disziplinen in Spalten
+// sehr redundante Datenhaltung von Wer-gegen-Wen, Datum, Klasse etc
+// Tabelle HTML-hilfs-Spielberichte scheint verständlicher, sie enthält aber nur die Ergebnisse und nicht die Ansetzungen 
+// Extra: 
+// selber-aus-Wertung -> ableitbar aus withdrawn team
+// Aufstellung-vorh -> exists matches und games
+// Ergebnisse-geändert pro Disziplin -> exists games mit annulled = 1
+// nicht-angetreten -> alle matches vom teammatch mit gegnerischer spieler = null
+
+
+M-Aufstellungen
+// Für jede Mannschaft wird die Aufstellung (max 5 Herren, 3 Damen) und alle möglichen Doppelkombinationen (20 Spalten) gespeichert
+// und zwar sowohl für Hinrunde als auch Rückrunde (d.h. pro Team: 2 Zeilen mit 28 Spalten)
+// Frage: M-S-KI-St-Index ???
+
+
+M-Spieler-Stamm
+// Für jeden Spieler wird Mannschaftszugehörigkeit und Aufstellungsbegrenzung für Hin- und Rückrunde gespeichert
+// Außerdem die Anzahl der Einsätze in allen Mannschaften in Spalten (max 13).
+
+// In M-Spieler-Stamm sind zwar auch die Stammspieler vorhanden, aber man kann deren Position innerhalb der Mannschaft nicht ermitteln
+// Daher sind die relevanten Informationen auf zwei Tabellen verteilt
+// -> M-Aufstellungen -> lineups von Stammspielern mit position
+// -> M-Spieler-Stamm -> lineups von Ersatzspielern, wo Spi-Mannschaft = 99
+
+
+
+
+
+Mitglieder-Lebenslauf
+// Speichert unstrukturiert Ereignisse jeden Sportlers mit Datum und zugehörigem Verein 
+// (Spielberechtigung, Mannschafts-Aufstellung, Ranglistenplatz-Änderungen etc.)
