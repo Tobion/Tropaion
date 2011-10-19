@@ -39,7 +39,7 @@ class Club
     /**
      * @var integer $contact_person_id
      *
-     * @ORM\Column(name="contact_person_id", type="integer")
+     * @ORM\Column(name="contact_person_id", type="integer", nullable=true)
      */
     private $contact_person_id;
 

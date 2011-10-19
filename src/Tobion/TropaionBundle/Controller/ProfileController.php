@@ -77,8 +77,10 @@ class ProfileController extends Controller
 		}
 		*/
 		
-		$query = 'SELECT UNIX_TIMESTAMP(r.created_at), r.post_rating rating
+		$query = 'SELECT UNIX_TIMESTAMP(tm.performed_at), r.post_rating rating
 			FROM ratinghistory r
+			INNER JOIN matches m ON r.match_id = m.id
+			INNER JOIN teammatches tm ON m.teammatch_id = tm.id
 			WHERE r.athlete_id = :ATHLETE_ID AND r.discipline = :DISCIPLINE';
 			// ORDER BY r.created_at ASC // not needed
 	

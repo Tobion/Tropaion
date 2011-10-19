@@ -6,7 +6,7 @@
 	<link rel="stylesheet" type="text/css" href="{{ asset('bundles/tobiontropaion/css/jquery-ui-1.8.14.custom.css') }}" />
 {% endblock %}
 
-{% block head_javascripts %}
+{% block tail_javascripts %}
     {{ parent() }}	
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js"></script>
 	<script type="text/javascript" src="{{ asset('bundles/tobiontropaion/js/highcharts/js/highcharts.js') }}"></script>
@@ -20,7 +20,7 @@
 	var chart = new Highcharts.Chart({
 		chart: {
 			renderTo: 'rating-graph',
-			zoomType: 'x'
+			zoomType: 'xy'
 		},
 		title: {
 			text: '{% trans with { '%athlete%': athlete.fullName } %}Rating-Entwicklung von %athlete%{% endtrans %}'
@@ -42,7 +42,8 @@
 				text: 'Zeit'
 			}
 		},
-		yAxis: [{ // left y axis
+		yAxis: [{
+			// left y axis
 			title: {
 				text: '{% trans %}Rating{% endtrans %}'
 			},
@@ -57,13 +58,8 @@
 			showFirstLabel: false
 		}],
 		legend: {
-			enabled: true,
-			align: 'left',
 			verticalAlign: 'top',
-			layout: 'vertical',
-			floating: true,
-			x: 90,
-			y: 45,
+			y: 30,
 			symbolPadding: 10,
 			symbolWidth: 40,
 			borderWidth: 2
@@ -118,7 +114,7 @@
 
 <h1>{{ athlete.fullName }}</h1>
 
-<div id="rating-graph" style="width: 850px; height: 350px;"></div>
+<div id="rating-graph" style="width: 95%; height: 350px;"></div>
 
 <p>TODO: Klick auf einen Punkt öffnet die Seite zu dem entsprechenden Spiel (siehe <a href="http://jsfiddle.net/cfKzS/3/">Beispiel</a>)</p>
 
