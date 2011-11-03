@@ -75,5 +75,4 @@ is hosted at GitHub under <https://github.com/Tobion/Tropaion>.
 
 TODO
 ----
-- make database dump available without any private information
 - describe database initialisation including stored procedures (add command for it)

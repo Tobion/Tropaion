@@ -25,19 +25,11 @@
 		title: {
 			text: '{% trans with { '%athlete%': athlete.fullName } %}Rating-Entwicklung von %athlete%{% endtrans %}'
 		},
-		subtitle: {
-			text: '{% trans %}Zoomen im Diagramm durch klicken und ziehen{% endtrans %}',
-			align: 'right',
-			verticalAlign: 'bottom',
-			x: 0,
-			y: 0
-		},
 		credits: {
 			enabled: false
 		},
 		xAxis: {
 			type: 'datetime',
-			// maxZoom: 14 * 24 * 3600000, // fourteen days
 			title: {
 				text: 'Zeit'
 			}
@@ -66,12 +58,35 @@
 		},
 		tooltip: {
 			shared: true,
-			crosshairs: true
+			crosshairs: true,
+			formatter: function() {
+				var s = '<span style="font-size: 10px">' + 
+					window.Highcharts.dateFormat('%A, %b %e, %Y', this.x) + ': ' + 
+					this.points[0].point.options.teammatch + ' (' +
+					this.points[0].point.options.tournament + ' | ' +
+					this.points[0].point.options.league + ')' +
+					'</span>';
+				$.each(this.points, function(i, p) {
+					s += '<br/><span style="color:' + p.series.color + '">' + 
+							p.series.name +
+							'</span>: <b>' + p.y + '</b> ('+ p.point.options.match + ')';
+				});
+
+				return s;
+			},
 		}, 
 		plotOptions: {
 			series: {
 				step: true,
-				shadow: false
+				shadow: false,
+				cursor: 'pointer',
+				point: {
+					events: {
+						click: function() {
+							window.open(this.options.url,'_blank'); 
+						}
+					}
+            }
 			}
 		},
 		series: [{
@@ -116,7 +131,19 @@
 
 <div id="rating-graph" style="width: 95%; height: 350px;"></div>
 
-<p>TODO: Klick auf einen Punkt öffnet die Seite zu dem entsprechenden Spiel (siehe <a href="http://jsfiddle.net/cfKzS/3/">Beispiel</a>)</p>
+<details>
+	<summary>{% trans %}Hilfe{% endtrans %}</summary>
+	{% trans %}<p>Beim Bewegen des Cursors über den Graphen werden zusätzliche Informationen angezeigt, 
+		wie das jeweilige Rating und das Spielergebnis, das zu der neuen Ratingbewertung geführt hat. 
+		Ein Klick auf den Punkt öffnet die Webseite zum Spiel.
+		</p>
+		<p>Man kann in das Diagramm hineinzoomen, indem man den Bereich durch Klicken und Ziehen auswählt. 
+		Oben rechts befindet sich dann ein Link zum Hinauszoomen.
+		</p> 
+		<p>Über die Buttons in der oberen rechten Ecke kann das Diagramm gedruckt und als Bild exportiert werden.
+		</p>
+	{% endtrans %}
+</details>
 
 </article>
 

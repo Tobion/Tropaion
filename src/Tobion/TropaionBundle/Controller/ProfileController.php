@@ -35,87 +35,143 @@ class ProfileController extends Controller
 		}
 	
 		/*
+		 *	Version with partial selection when using array tree hydration
+			$qb->select('partial h.{id, discipline, post_rating}, 
+				partial m.{id}, 
+				g, 
+				partial tm.{id, performed_at, team1_score, team2_score},
+				partial c1.{id, code},
+				partial c2.{id, code},
+				partial t1.{id, team_number},
+				partial t2.{id, team_number},
+				partial l.{id, class_abbr, division},
+				partial r.{id, short_name, slug},
+				partial o.{id, slug},
+				partial t1p1.{id, first_name, last_name},
+				partial t1p2.{id, first_name, last_name},
+				partial t2p1.{id, first_name, last_name},
+				partial t2p2.{id, first_name, last_name}')
+		*/
+		
 		$qb = $em->createQueryBuilder();
-		$qb->select(array('r.discipline','r.post_rating','r.created_at'))
-			->from('TobionTropaionBundle:Ratinghistory', 'r')
-			->where('r.athlete_id = :id')
-			//->andWhere('r.discipline = :discipline')
-			->orderBy('r.created_at', 'ASC')
-			->setParameter('id', $id)
-			//->setParameter('discipline', 'doubles')
-			;
+		$qb->select(array(
+				'h.discipline', 'h.post_rating',
+				'tm.performed_at', 'tm.team1_score tm_team1_score', 'tm.team2_score tm_team2_score',
+				'm.id match_id',
+				'c1.code team1_club', 't1.team_number team1_number',
+				'c2.code team2_club', 't2.team_number team2_number',
+				'l.class_abbr', 'l.division',
+				'r.short_name', 'r.slug tournament', 'o.slug owner',
+				'g.annulled g_annulled', 'g.team1_score g_team1_score', 'g.team2_score g_team2_score',
+				't1p1.first_name t1p1_first_name', 't1p1.last_name t1p1_last_name',
+				't1p2.first_name t1p2_first_name', 't1p2.last_name t1p2_last_name',
+				't2p1.first_name t2p1_first_name', 't2p1.last_name t2p1_last_name',
+				't2p2.first_name t2p2_first_name', 't2p2.last_name t2p2_last_name'
+			))
+			->from('TobionTropaionBundle:Ratinghistory', 'h')
+			->innerJoin('h.Match', 'm')
+			->innerJoin('m.Teammatch', 'tm')
+			->innerJoin('tm.Team1', 't1')
+    		->innerJoin('tm.Team2', 't2')
+			->innerJoin('t1.Club', 'c1')
+	    	->innerJoin('t2.Club', 'c2')
+	    	->innerJoin('t1.League', 'l')
+			->innerJoin('l.Tournament', 'r')
+			->innerJoin('r.Owner', 'o')
+			->leftJoin('m.Games', 'g')
+	    	->leftJoin('m.Team1_Player', 't1p1')
+	    	->leftJoin('m.Team1_Partner', 't1p2')
+	    	->leftJoin('m.Team2_Player', 't2p1')
+	    	->leftJoin('m.Team2_Partner', 't2p2')
+			->where('h.athlete_id = :id')
+			->orderBy('tm.performed_at', 'ASC')
+			->addOrderBy('m.id', 'ASC')
+			->addOrderBy('g.game_sequence', 'ASC')
+			->setParameter('id', $id);
 		
 		$ratinghistory = $qb->getQuery()->getResult(\Doctrine\ORM\Query::HYDRATE_SCALAR);
-
-		$groupedRatings = array();
+		
+		$match = array();
+		
+		// build all match result texts using games
+		foreach ($ratinghistory as $rating) {
+			if (!isset($match[$rating['match_id']])) {
+				$match[$rating['match_id']]['annulled'] = '';
+				$match[$rating['match_id']]['effective'] = '';
+			}
+			
+			if ($rating['g_annulled']) {
+				$match[$rating['match_id']]['annulled'] .= $rating['g_team1_score'] . ':' . $rating['g_team2_score'] . ' ';
+			} else {
+				$match[$rating['match_id']]['effective'] .= $rating['g_team1_score'] . ':' . $rating['g_team2_score'] . ' ';		
+			}		
+		}
+		
+		$router = $this->get('router');
+		$lastMatchId = false;
+		
 		$singlesRatings = array();
 		$doublesRatings = array();
 		$mixedRatings = array();
+		
 		foreach ($ratinghistory as $rating) {
-			$groupedRatings[$rating['created_at']][$rating['discipline'].'_rating'] = (int) $rating['post_rating'];
-			
-			if ($rating['discipline'] == 'singles') {
-				$singlesRatings[] = array($rating['created_at'], (int) $rating['post_rating']);
+			if ($lastMatchId === $rating['match_id']) {
+				continue;
 			}
-			
-			if ($rating['discipline'] == 'doubles') {
-				$doublesRatings[] = array($rating['created_at'], (int) $rating['post_rating']);
-			}
-			
-			if ($rating['discipline'] == 'mixed') {
-				$mixedRatings[] = array($rating['created_at'], (int) $rating['post_rating']);
-			}
-		}
 
-		$ratinghistory = array();
-		foreach ($groupedRatings as $date => $ratings) {
-			$ratinghistory[] = array_merge(
-				array('singles_rating' => false, 'doubles_rating' => false, 'mixed_rating' => false), 
-				$ratings, 
-				array('created_at' => $date)
+			$lastMatchId = $rating['match_id'];
+			
+			$match[$rating['match_id']]['effective'] = trim($match[$rating['match_id']]['effective']);
+			$match[$rating['match_id']]['annulled'] = trim($match[$rating['match_id']]['annulled']);
+			
+			$r = array(
+				// number of seconds since 1970-01-01 (PHP/MySQL) to number of milliseconds (JavaScript Date.UTC)
+				'x' => strtotime($rating['performed_at']) * 1000, 
+				'y' => (int) $rating['post_rating'],
+				'tournament' => $rating['short_name'],
+				'league' => $rating['division'] ? 
+					$rating['class_abbr'] . ' ' . $rating['division'] :
+					$rating['class_abbr'],
+				'teammatch' => $rating['team1_club'] . ' ' . $rating['team1_number'] .
+					' – ' . $rating['team2_club'] . ' ' . $rating['team2_number'] .
+					' = ' . $rating['tm_team1_score'] . ':' . $rating['tm_team2_score'],
+				'match' => $rating['t1p1_last_name'] . 
+					($rating['t1p1_last_name'] && $rating['t1p2_last_name'] ? '/' : '') . 
+					$rating['t1p2_last_name'] .
+					' – ' . 
+					$rating['t2p1_last_name'] . 
+					($rating['t2p1_last_name'] && $rating['t2p2_last_name'] ? '/' : '') . 
+					$rating['t2p2_last_name'] .
+					' = ' . 
+					($match[$rating['match_id']]['annulled'] ?: $match[$rating['match_id']]['effective']),
+				'url' => $router->generate('tournament_teammatch', array(
+					'owner' => $rating['owner'],
+					'tournament' => $rating['tournament'],
+					'league' => $rating['division'] ? 
+						$rating['class_abbr'] . '-' . $rating['division'] :
+						$rating['class_abbr'],
+					'team1Club' => $rating['team1_club'],
+					'team1Number' => $rating['team1_number'],
+					'team2Club' => $rating['team2_club'],
+					'team2Number' => $rating['team2_number']
+				)) . '#match-' . $rating['match_id']
 			);
+			
+			switch ($rating['discipline']) {
+				case 'singles':
+					$singlesRatings[] = $r;
+					break;
+				case 'doubles':
+					$doublesRatings[] = $r;
+					break;
+				case 'mixed':
+					$mixedRatings[] = $r;
+					break;
+			}
 		}
-		*/
-		
-		$query = 'SELECT UNIX_TIMESTAMP(tm.performed_at), r.post_rating rating
-			FROM ratinghistory r
-			INNER JOIN matches m ON r.match_id = m.id
-			INNER JOIN teammatches tm ON m.teammatch_id = tm.id
-			WHERE r.athlete_id = :ATHLETE_ID AND r.discipline = :DISCIPLINE';
-			// ORDER BY r.created_at ASC // not needed
-	
-		$conn = $this->getDoctrine()->getEntityManager()->getConnection();
-		
-		$stmt = $conn->prepare($query);
-		
-		$sqlParams = array();
-		$sqlParams['ATHLETE_ID'] = $athlete->getId();
-		
-		$sqlParams['DISCIPLINE'] = 'singles';
-		$stmt->execute($sqlParams);
-		$singlesRatings = $stmt->fetchAll(PDO::FETCH_NUM);
-		
-		$sqlParams['DISCIPLINE'] = 'doubles';
-		$stmt->execute($sqlParams);
-		$doublesRatings = $stmt->fetchAll(PDO::FETCH_NUM);
-		
-		$sqlParams['DISCIPLINE'] = 'mixed';
-		$stmt->execute($sqlParams);
-		$mixedRatings = $stmt->fetchAll(PDO::FETCH_NUM);
-		
-		$convertRating = function(&$rating, $key) { 
-			$rating = array(
-				(int) $rating[0] * 1000, // number of seconds since 1970-01-01 (PHP/MySQL) to number of milliseconds (JavaScript Date.UTC)
-				(int) $rating[1]
-			);
-		};
-		array_walk($singlesRatings, $convertRating);
-		array_walk($doublesRatings, $convertRating);
-		array_walk($mixedRatings, $convertRating);
-		
+			
 		return array(
 			'athlete' => $athlete,
-			// 'ratinghistory' => $ratinghistory,
 			'singlesRatings' => $singlesRatings,
 			'doublesRatings' => $doublesRatings,
 			'mixedRatings' => $mixedRatings
