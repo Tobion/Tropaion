@@ -1439,30 +1439,7 @@ class Match
 		
 		return null;		
 	}
-	
-	
-//	/**
-//     * Returns a human-readable identifier for team1_player
-//     *
-//     * @return string
-//     */
-//    public function getTeam1PlayerReadableId()
-//    {
-//		if ($this->team1_player_readable_id === null) {
-//			$this->team1_player_readable_id = $this->Team1_Player ? $this->Team1_Player->getReadableId() : '';
-//		}
-//		return $this->team1_player_readable_id;
-//    }
-//	
-//	/**
-//     *
-//     */
-//    public function setTeam1PlayerReadableId($readableId)
-//    {
-//		$this->team1_player_readable_id = $readableId === null ? '' : $readableId;
-//    }
-//
-	
+
 	
 	function __toString()
     {

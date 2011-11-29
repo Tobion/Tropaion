@@ -1,0 +1,19 @@
+Capifony
+
+cd /var/www/web0/
+ln -s tropaion/current/web html/tropaion/web
+chown -R web0:web0 tropaion
+mit suPHP
+bzw 
+chown -R www-data:www-data tropaion
+bei mod_php
+chmod -R 755 tropaion
+vi /etc/suphp/suphp.conf (check_vhost_docroot=false)
+[SoftException in Application.cpp:221: File "..." is not in document root of Vhost "..."]
+
+Import Database
+Export from local database using zip compression
+Upload via FTP
+unzip tropaion/tropaion.sql.zip
+mysql -u web0 -p usr_web0_2 < tropaion.sql
+rm tropaion.sql
