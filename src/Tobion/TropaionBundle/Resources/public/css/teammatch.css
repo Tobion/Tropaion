@@ -46,6 +46,9 @@ table > caption {
 	padding-bottom: 1em;
 	white-space: normal;
 }
+table > caption > details:last-child {
+	padding-bottom: 0;
+}
 table abbr {
 	border: 0;
 	text-decoration: none;
@@ -507,16 +510,18 @@ th div.DataTables_sort_wrapper span {
 	color: silver;
 }
 
-.scoresheet .error {
+.scoresheet input.error, .scoresheet select.error, .scoresheet div.error input, .scoresheet li.error {
 	/* outline and not border because it does not take up extra space and thus will not displace elements */
 	outline: 2px solid red;
-}
-.scoresheet fieldset.error {
-	outline: none;
 }
 .scoresheet fieldset.error > legend {
 	color: red;
 }
+.scoresheet div.error > ul {
+	padding-left: 15px;
+	margin: 5px 0;
+}
+
 
 
 /** 
@@ -524,7 +529,7 @@ th div.DataTables_sort_wrapper span {
  */
 details { 
 	margin: 0; 
-	padding: 0.5em 0 0 1em; 
+	padding: 0.5em 0 0.5em 1em; 
 	white-space: normal; 
 }
 details > summary { 
@@ -533,6 +538,7 @@ details > summary {
 	padding: 0;
 	width: 10em;
 }
+
 
 /** 
  * Javascript <details> fallback for non supporting browsers
@@ -565,6 +571,7 @@ details > summary {
 /* Make sure summary remains visible, and apply a pointer cursor upon hover to indicate it’s a clickable element */
 .no-details details summary { display: block; }
 
+/* Samsung Galaxy S2 does not show ► but it does show ▼ ?! So it supports generated content but somehow only on open state */
 
 
 

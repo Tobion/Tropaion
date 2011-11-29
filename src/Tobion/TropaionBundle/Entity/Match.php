@@ -225,6 +225,21 @@ class Match
      * @ORM\JoinColumn(name="id", referencedColumnName="match_id")
      */
     private $Ratinghistory;
+	
+	/**
+	 * Contain a human-readable identifier for the athletes
+	 * Properties used by the form and filled and transformed by the MatchAthletesToIdTransformer
+	 */
+	public $team1_player_readable_id;
+	public $team1_partner_readable_id;
+	public $team2_player_readable_id;
+	public $team2_partner_readable_id;
+	
+	public $team1_noplayer;
+	public $team2_noplayer;
+	
+	public $result_incident;
+	public $revaluation_against;
 
 
     public function __construct()
@@ -696,7 +711,7 @@ class Match
      *
      * @param Tobion\TropaionBundle\Entity\Athlete $team1Player
      */
-    public function setTeam1Player(\Tobion\TropaionBundle\Entity\Athlete $team1Player)
+    public function setTeam1Player(\Tobion\TropaionBundle\Entity\Athlete $team1Player = null)
     {
         $this->Team1_Player = $team1Player;
     }
@@ -716,7 +731,7 @@ class Match
      *
      * @param Tobion\TropaionBundle\Entity\Athlete $team1Partner
      */
-    public function setTeam1Partner(\Tobion\TropaionBundle\Entity\Athlete $team1Partner)
+    public function setTeam1Partner(\Tobion\TropaionBundle\Entity\Athlete $team1Partner = null)
     {
         $this->Team1_Partner = $team1Partner;
     }
@@ -736,7 +751,7 @@ class Match
      *
      * @param Tobion\TropaionBundle\Entity\Athlete $team2Player
      */
-    public function setTeam2Player(\Tobion\TropaionBundle\Entity\Athlete $team2Player)
+    public function setTeam2Player(\Tobion\TropaionBundle\Entity\Athlete $team2Player = null)
     {
         $this->Team2_Player = $team2Player;
     }
@@ -756,7 +771,7 @@ class Match
      *
      * @param Tobion\TropaionBundle\Entity\Athlete $team2Partner
      */
-    public function setTeam2Partner(\Tobion\TropaionBundle\Entity\Athlete $team2Partner)
+    public function setTeam2Partner(\Tobion\TropaionBundle\Entity\Athlete $team2Partner = null)
     {
         $this->Team2_Partner = $team2Partner;
     }
@@ -808,8 +823,9 @@ class Match
 	public function isTeam1NoPlayer()
 	{
 		return is_null($this->getTeam1PlayerId()) && is_null($this->getTeam1PartnerId()) 
-				&& !is_null($this->getTeammatch()->getSubmittedBy());;
+				&& !is_null($this->getTeammatch()->getSubmittedBy());
 	}
+	
 	
 	/**
 	* Team2 nicht angetreten
@@ -1111,7 +1127,7 @@ class Match
 		
 	}
 	
-	
+
 	/**
 	 * Gibt die tatsaechlich geltenden Saetze zurueck
 	 * 
@@ -1119,15 +1135,15 @@ class Match
 	 */
 	public function getEffectiveGames()
 	{
-        $games = array();
-        foreach ($this->Games as $game) {
-        	if (!$game->getAnnulled()) {
+		$games = array();
+		foreach ($this->Games as $game) {
+			if (!$game->getAnnulled()) {
 				$games[] = $game;
-        	}
+			}
 		}
 		return $games;
 	}
-	
+
 	/**
 	 * Gibt die urspruenglichen, annullierten Saetze zurueck
 	 * 
@@ -1135,11 +1151,11 @@ class Match
 	 */
 	public function getAnnulledGames()
 	{
-        $games = array();
-        foreach ($this->Games as $game) {
-        	if ($game->getAnnulled()) {
+		$games = array();
+		foreach ($this->Games as $game) {
+			if ($game->getAnnulled()) {
 				$games[] = $game;
-        	}
+			}
 		}
 		return $games;
 	}
@@ -1425,46 +1441,29 @@ class Match
 	}
 	
 	
-	/**
-     * Returns a human-readable identifier for team1_player
-     *
-     * @return string
-     */
-    public function getTeam1PlayerReadableId()
-    {
-		return $this->Team1_Player ? $this->Team1_Player->getReadableId() :	'';
-    }
+//	/**
+//     * Returns a human-readable identifier for team1_player
+//     *
+//     * @return string
+//     */
+//    public function getTeam1PlayerReadableId()
+//    {
+//		if ($this->team1_player_readable_id === null) {
+//			$this->team1_player_readable_id = $this->Team1_Player ? $this->Team1_Player->getReadableId() : '';
+//		}
+//		return $this->team1_player_readable_id;
+//    }
+//	
+//	/**
+//     *
+//     */
+//    public function setTeam1PlayerReadableId($readableId)
+//    {
+//		$this->team1_player_readable_id = $readableId === null ? '' : $readableId;
+//    }
+//
 	
-	/**
-     * Returns a human-readable identifier for team1_partner
-     *
-     * @return string
-     */
-    public function getTeam1PartnerReadableId()
-    {
-        return $this->Team1_Partner ? $this->Team1_Partner->getReadableId() : '';
-    }
 	
-	/**
-     * Returns a human-readable identifier for team2_player
-     *
-     * @return string
-     */
-    public function getTeam2PlayerReadableId()
-    {
-        return $this->Team2_Player ? $this->Team2_Player->getReadableId() : '';
-    }
-	
-	/**
-     * Returns a human-readable identifier for team2_partner
-     *
-     * @return string
-     */
-    public function getTeam2PartnerReadableId()
-    {
-        return $this->Team2_Partner ? $this->Team2_Partner->getReadableId() : '';
-    }
-
 	function __toString()
     {
     	if ($this->isDoubles()) {
@@ -1482,5 +1481,63 @@ class Match
         	);
     	}
     }
+	
+
+	public function checkAthletesSpecified(\Symfony\Component\Validator\ExecutionContext $context)
+	{
+		$basePath = $context->getPropertyPath();
+		
+		// when using TransformationFailedException
+		// basePath is children[matches].data[0]
+		// instead of the real children[matches][0].data
+		//var_dump($basePath);
+		
+		//echo 'VALIDATOR:';
+		//var_dump($this->team1_player_readable_id);
+		//var_dump($this->team1_noplayer);
+		//var_dump($this->getGames()->get(0)->getTeam1Score());
+		
+		if (!$this->team1_noplayer) {
+			if ($this->team1_player_readable_id === null || $this->team1_player_readable_id === '') {
+				$context->setPropertyPath($basePath . '.team1_player_readable_id');
+				$context->addViolation('Not blank', array(), null);
+			}
+			if ($this->getMatchType()->getXOnX() != 1 && 
+				($this->team1_partner_readable_id === null || $this->team1_partner_readable_id === '')) {
+				$context->setPropertyPath($basePath . '.team1_partner_readable_id');
+				$context->addViolation('Not blank', array(), null);
+			}
+		} else {
+			if (!($this->team1_player_readable_id === null || $this->team1_player_readable_id === '')) {
+				$context->setPropertyPath($basePath . '.team1_player_readable_id');
+				$context->addViolation('Should be blank', array(), null);
+			}
+			if (!($this->team1_partner_readable_id === null || $this->team1_partner_readable_id === '')) {
+				$context->setPropertyPath($basePath . '.team1_partner_readable_id');
+				$context->addViolation('Should be blank', array(), null);
+			}
+		}
+		
+		if (!$this->team2_noplayer) {
+			if ($this->team2_player_readable_id === null || $this->team2_player_readable_id === '') {
+				$context->setPropertyPath($basePath . '.team2_player_readable_id');
+				$context->addViolation('Not blank', array(), null);
+			}
+			if ($this->getMatchType()->getXOnX() != 1 && 
+				($this->team2_partner_readable_id === null || $this->team2_partner_readable_id === '')) {
+				$context->setPropertyPath($basePath . '.team2_partner_readable_id');
+				$context->addViolation('Not blank', array(), null);
+			}
+		} else {
+			if (!($this->team2_player_readable_id === null || $this->team2_player_readable_id === '')) {
+				$context->setPropertyPath($basePath . '.team2_player_readable_id');
+				$context->addViolation('Should be blank', array(), null);
+			}
+			if (!($this->team2_partner_readable_id === null || $this->team2_partner_readable_id === '')) {
+				$context->setPropertyPath($basePath . '.team2_partner_readable_id');
+				$context->addViolation('Should be blank', array(), null);
+			}
+		}
+	}
 
 }

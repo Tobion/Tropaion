@@ -1,19 +1,23 @@
 {% extends "TobionTropaionBundle::layout.html.twig" %}
 
+{% block title %}
+	{{ athlete.fullName }}
+{% endblock %}
+
 {% block stylesheets %}
 	{{ parent() }}
-	<link rel="stylesheet" type="text/css" href="{{ asset('bundles/tobiontropaion/css/teammatch.css') }}" />
-	<link rel="stylesheet" type="text/css" href="{{ asset('bundles/tobiontropaion/css/jquery-ui-1.8.14.custom.css') }}" />
+	<link rel="stylesheet" href="{{ asset('bundles/tobiontropaion/css/teammatch.css') }}" />
+	<link rel="stylesheet" href="{{ asset('bundles/tobiontropaion/css/jquery-ui-1.8.14.custom.css') }}" />
 {% endblock %}
 
 {% block tail_javascripts %}
     {{ parent() }}
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-	<script type="text/javascript" src="{{ asset('bundles/tobiontropaion/js/Placeholder-jQuery-Plugin/jquery.placeholder.min.js') }}"></script>
-	<script type="text/javascript" src="{{ asset('bundles/tobiontropaion/js/DataTables-1.8.1/media/js/jquery.dataTables.min.js') }}"></script>
-	<script type="text/javascript" src="{{ asset('bundles/tobiontropaion/js/Sparkline-JQuery-Plugin/jquery.sparkline.min.js') }}"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+	<script src="{{ asset('bundles/tobiontropaion/js/Placeholder-jQuery-Plugin/jquery.placeholder.min.js') }}"></script>
+	<script src="{{ asset('bundles/tobiontropaion/js/DataTables-1.8.1/media/js/jquery.dataTables.min.js') }}"></script>
+	<script src="{{ asset('bundles/tobiontropaion/js/Sparkline-JQuery-Plugin/jquery.sparkline.min.js') }}"></script>
 	
-	<script type="text/javascript">
+	<script>
 	//<![CDATA[
 		/* Global variables used to activate filters and access the matrix column in the filtering functions */
 		var filter_stage_cellindex      = 2, 
@@ -24,9 +28,9 @@
 	//]]>
 	</script>
 	
-	<script type="text/javascript" src="{{ asset('bundles/tobiontropaion/js/dataTables-custom-functions.js') }}"></script>
+	<script src="{{ asset('bundles/tobiontropaion/js/dataTables-custom-functions.js') }}"></script>
 	
-	<script type="text/javascript">
+	<script>
 	//<![CDATA[
 	
 		$(document).ready(function() {
@@ -179,10 +183,6 @@
 
 {% set pageRdfId = path('tournament_athlete', athlete.routingParams(tournament)) %}
 
-{% block title %}
-
-{% endblock %}
-
 {% block metas %}
 	{{ parent() }}
 {% endblock %}
@@ -211,7 +211,7 @@
 		{% set leagueLink %}
 			<a href="{{ path('tournament_league', lineup.team.league.routingParams ) }} ">{{ lineup.team.league.fullName }}</a>
 		{% endset %}
-		{% trans with { '%team%': teamLink, '%position%' : lineup.position, '%league%' : leagueLink } %}%team% an Position <strong>%position%</strong> in %league%{% endtrans %}
+		{% trans with { '%team%': teamLink, '%position%' : lineup.position, '%league%' : leagueLink } %}%team% an Meldeposition <strong>%position%</strong> in %league%{% endtrans %}
 	{% endif %}
 {% endmacro %}
 
@@ -247,7 +247,7 @@
 
 {% include 'TobionTropaionBundle::matches-profile-view.html.twig' with {'matches': matches, 'athlete': athlete} %}
 
-<p>ToDo: Partner Search not working yet!</p>
+<p>ToDo: Partner Search funktioniert noch nicht!</p>
 
 </section>
 

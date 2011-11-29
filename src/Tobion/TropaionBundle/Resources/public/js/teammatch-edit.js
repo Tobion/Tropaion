@@ -320,8 +320,11 @@ function isBadmintonGameValid(score1, score2, allowPotential, allowEmpty) {
 		// mit 2 beginnend (z.B. 2:2[1] oder 22:2x oder 30:2x ) bzw. 
 		// 2 oder 3 beginnend (z.B. 28:3[0], 28:2[6])
 		if (smallerScore <= 9 && biggerScore != 21) {
-			if ((biggerScore >= 2 && biggerScore <= 27) || biggerScore == 30) {
+			if ((biggerScore >= 3 && biggerScore <= 27) || biggerScore == 30) {
 				return (smallerScore == 2);
+			}
+			if (biggerScore == 2) {
+				return (smallerScore >= 0 && smallerScore <= 2);
 			}
 			if (biggerScore == 28 || biggerScore == 29) {
 				return (smallerScore == 2 || smallerScore == 3);

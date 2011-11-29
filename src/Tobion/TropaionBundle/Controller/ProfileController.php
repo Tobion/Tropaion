@@ -14,7 +14,7 @@ class ProfileController extends Controller
 {
 
     /**
-     * @Route("/athlete/{firstName}-{lastName}_{id}.{_format}",
+     * @Route("/@{id}/{firstName}-{lastName}.{_format}",
      *     name="profile_athlete",
      *     defaults={"_format" = "html"},
 	 *     requirements={"firstName" = ".+", "lastName" = ".+", "id" = "\d+", "_format" = "html|atom"}
@@ -26,13 +26,25 @@ class ProfileController extends Controller
 		$em = $this->getDoctrine()->getEntityManager();
 		$rep = $this->getDoctrine()->getRepository('TobionTropaionBundle:Ratinghistory');
 	
-		$athlete = $this->getDoctrine()
-			->getRepository('TobionTropaionBundle:Athlete')
-			->find($id);
-			
-		if (!$athlete) {
+		$qb = $em->createQueryBuilder();
+		$qb->select(array('a', 'c', 'u'))
+			->from('TobionTropaionBundle:Athlete', 'a')
+			->leftJoin('a.Club', 'c')
+			->leftJoin('a.User', 'u')
+			->where('a.id = :id')
+			->setParameter('id', $id);
+		
+		try {
+			$athlete = $qb->getQuery()->getSingleResult();
+		} catch (\Doctrine\Orm\NoResultException $e) {
 			throw $this->createNotFoundException('Athlete not found.');
 		}
+
+		
+		if ($athlete->getFirstName() != $firstName || $athlete->getLastName() != $lastName) {
+			return $this->redirect($this->generateUrl('profile_athlete', $athlete->routingParams()), 301);
+		}
+		
 	
 		/*
 		 *	Version with partial selection when using array tree hydration
@@ -114,20 +126,30 @@ class ProfileController extends Controller
 		$doublesRatings = array();
 		$mixedRatings = array();
 		
+		$singlesRatingMin = null;
+		$singlesRatingMinAt = null;
+		
+		$ratingStats = array_fill_keys(
+			array('singles', 'doubles', 'mixed'), 
+			array('minRating' => null, 'minAt' => null, 'maxRating' => null, 'maxAt' => null)
+		);
+	
 		foreach ($ratinghistory as $rating) {
 			if ($lastMatchId === $rating['match_id']) {
 				continue;
 			}
 
 			$lastMatchId = $rating['match_id'];
-			
+						
 			$match[$rating['match_id']]['effective'] = trim($match[$rating['match_id']]['effective']);
 			$match[$rating['match_id']]['annulled'] = trim($match[$rating['match_id']]['annulled']);
+			
+			$rating['post_rating'] = (int) $rating['post_rating'];
 			
 			$r = array(
 				// number of seconds since 1970-01-01 (PHP/MySQL) to number of milliseconds (JavaScript Date.UTC)
 				'x' => strtotime($rating['performed_at']) * 1000, 
-				'y' => (int) $rating['post_rating'],
+				'y' => $rating['post_rating'],
 				'tournament' => $rating['short_name'],
 				'league' => $rating['division'] ? 
 					$rating['class_abbr'] . ' ' . $rating['division'] :
@@ -168,13 +190,31 @@ class ProfileController extends Controller
 					$mixedRatings[] = $r;
 					break;
 			}
+			
+			$disciplineStats =& $ratingStats[$rating['discipline']];
+			
+			if ($disciplineStats['minRating'] === null || 
+				$disciplineStats['minRating'] > $rating['post_rating']) 
+			{
+				$disciplineStats['minRating'] = $rating['post_rating'];
+				$disciplineStats['minAt'] = new \DateTime($rating['performed_at']);
+			}
+			
+			if ($disciplineStats['maxRating'] === null || 
+				$disciplineStats['maxRating'] < $rating['post_rating']) 
+			{
+				$disciplineStats['maxRating'] = $rating['post_rating'];
+				$disciplineStats['maxAt'] = new \DateTime($rating['performed_at']);
+			}
+			
 		}
 			
 		return array(
 			'athlete' => $athlete,
 			'singlesRatings' => $singlesRatings,
 			'doublesRatings' => $doublesRatings,
-			'mixedRatings' => $mixedRatings
+			'mixedRatings' => $mixedRatings,
+			'ratingStats' => $ratingStats
 		);
 	}
 
@@ -187,23 +227,27 @@ class ProfileController extends Controller
      * ) 
      * @Template()
      */
-    public function clubAction($id = null)
+    public function clubAction($club)
     {
-		// Übersicht Turniere
-		// Spielgemeinschaft
-		// Verantwortliche
+
 	}
 
 
 	/**
-     * @Route("/venues/{venue}.{_format}",
-     *     name="profile_venue",
-     *     defaults={"_format" = "html"},
-	 *     requirements={"firstName" = ".+", "lastName" = ".+", "id" = "\d+", "_format" = "html"}
-     * ) 
+     * @Route("/venues/{venue}", name="profile_venue") 
      * @Template()
      */
     public function venueAction($venue)
+    {
+
+	}
+	
+	
+	/**
+     * @Route("/{user}",name="profile_user") 
+     * @Template()
+     */
+    public function userAction($user)
     {
 
 	}

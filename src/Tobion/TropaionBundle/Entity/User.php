@@ -232,6 +232,13 @@ class User
         return $this->Athlete;
     }
 
+	
+	public function routingParams()
+    {
+        return array(
+			'user' => $this->getSlug()
+        );
+    }
 
 	function __toString()
     {

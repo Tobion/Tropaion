@@ -2,7 +2,7 @@
 
 namespace Tobion\TropaionBundle\Util;
 
-class SignedIntToSortableStringConverter
+abstract class SignedIntToSortableStringConverter
 {
 
    	/**

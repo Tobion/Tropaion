@@ -147,10 +147,18 @@ class Athlete
     /**
      * @var Club
      *
-     * @ORM\ManyToOne(targetEntity="Club", inversedBy="Athletes")
+     * @ORM\ManyToOne(targetEntity="Club")
      * @ORM\JoinColumn(name="club_id", referencedColumnName="id")
      */
     private $Club;
+	
+	/**
+     * @var User
+     *
+     * @ORM\OneToOne(targetEntity="User", mappedBy="Athlete")
+     * @ORM\JoinColumn(name="id", referencedColumnName="athlete_id")
+     */
+    private $User;
 
 
 	public function __construct()
@@ -556,6 +564,16 @@ class Athlete
     {
         return $this->Club;
     }
+	
+    /**
+     * Get User
+     *
+     * @return Tobion\TropaionBundle\Entity\User $user
+     */
+    public function getUser()
+    {
+        return $this->User;
+    }
 
 	
 	public function routingParams(\Tobion\TropaionBundle\Entity\Tournament $tournament = null)
@@ -574,6 +592,13 @@ class Athlete
         
     }
 	
+	function getFullName()
+    {
+    	return sprintf('%s %s', 
+        	$this->getFirstName(), $this->getLastName()
+        );
+    }
+	
 	function getReadableId()
     {
     	return sprintf('%s %s [%s]', 
@@ -584,7 +609,7 @@ class Athlete
 
 	function __toString()
     {
-    	return $this->getReadableId();
+    	return $this->getFullName();
     }
 
 }

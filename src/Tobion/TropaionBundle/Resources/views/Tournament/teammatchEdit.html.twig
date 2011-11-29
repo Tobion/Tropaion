@@ -1,22 +1,30 @@
 {% extends "TobionTropaionBundle::layout.html.twig" %}
 
+{% block title %}
+	{% trans with {
+		'%team1%': teammatch.team1.__toString,
+		'%team2%': teammatch.team2.__toString,
+		'%league%': teammatch.league.classAbbr
+	} %}Ergebniseingabe: %team1% vs %team2% | %league%{% endtrans %}
+{% endblock %}
+
 {% block stylesheets %}
 	{{ parent() }}
-	<link rel="stylesheet" type="text/css" href="{{ asset('bundles/tobiontropaion/css/teammatch.css') }}" />
+	<link rel="stylesheet" href="{{ asset('bundles/tobiontropaion/css/teammatch.css') }}" />
 {% endblock %}
 
 {% block tail_javascripts %}
     {{ parent() }}
 
-	<script type="text/javascript">
+	<script>
 	//<![CDATA[
 		var club1_athletes = {{ club1_athletes | json_encode | raw }};
 		var club2_athletes = {{ club2_athletes | json_encode | raw }};
 	//]]>
-	</script> 
+	</script>
 	
-	<script type="text/javascript" src="http://yui.yahooapis.com/3.4.1/build/yui/yui-min.js"></script>
-	<script type="text/javascript" src="{{ asset('bundles/tobiontropaion/js/teammatch-edit.js') }}"></script>
+	<script src="http://yui.yahooapis.com/3.4.1/build/yui/yui-min.js"></script>
+	<script src="{{ asset('bundles/tobiontropaion/js/teammatch-edit.js') }}"></script>
 {% endblock %}
 	
 {% block content %}
@@ -60,13 +68,25 @@
 	<caption><a href="#scoresheet-teammatch-{{ teammatch.id }}">{% trans %}Spielbericht{% endtrans %}</a>
 		<details>
 		<summary>{% trans %}Hilfe{% endtrans %}</summary>
-		<p>{% trans %}Spielbericht des Mannschaftsspiels mit allen seinen Individualspielen und deren Sätzen.
-			Eingesetzte Ersatzspieler sind in grauer Schrift geschrieben. 
-			Ergebnislose und ungewerte Spiele sind durchgestrichen.
-			Kampflose Diszplinen sind rot.
-			Wurde ein Ergebnis aus formalen Gründen geändert ist das Spielergebnis violett. Liegen dabei die ursprüngliche Satzergebnisse vor werden diese rot angezeigt.
-			Bei vorzeitiger Aufgabe eines Spielers (z.B. durch Verletzung) ist das Spielergebnis silber hinterlegt.
-			Wenn man ein bestimmtes Spiel referenzieren will, kann man durch Klicken auf die Diszplin einen Anker darauf setzen.{% endtrans %}</p>
+		{% trans %}<p>Das Design des Formulars zum Eingeben von Mannschaftsspielen ist konsistent mit dem der Spielberichte. 
+			Daher sollte die Bedeutung der Felder selbsterklärend sein.
+			</p> 
+			<p>Die Spielerauswahl erfolgt mittels der sog. Autovervollständigung. Beim Fokussieren des entsprechenden Textfeldes,
+			erscheint eine Liste mit Vorschlägen von Spielern, die wahrscheinlich eingesetzt wurden (Stammspieler oder Spieler mit früheren Einsätzen in dieser Mannschaft).
+			Durch Eingeben des Spielernamens kann man außerdem nach weiteren Spielern suchen, falls der gewünschte Spieler nicht dabei ist.
+			Die Anzeige der Einträge enthält zusätzliche Daten zum Spieler, wie die ID und Mannschaftszugehörigkeit, um eine Mehrdeutigkeit bei gleichem Namen zu verhindern.
+			Mit der Maus oder der Tastatur kann dann der entsprechende Spieler ausgewählt werden.
+			</p>
+			<p>Die Berechnung des Mannschaftergebnisses sowie der Punkt- und Satzergebnisse findet automatisch und unmittelbar statt.
+			Auch die Validierung der Badminton-Ergebnisse erfolgt während der Eingabe, sodass Tippfehler sofort bemerkt werden.
+			</p>
+			<p>Bitte das Spiel als "kampflosen Sieg" kennzeichnen, falls eine Partei gewonnen hat, ohne das das Spiel ausgetragen wurde.
+			Die Option "Aufgabe" bedeutet dagegen, dass das Spiel <em>während</em> des Spielens aufgegeben wurde (z.B. aufgrund einer Verletzung).
+			In diesem Fall kann der Spielstand zum Zeitpunkt der Aufgabe in das "ursprüngliche Ergebnis" eingetragen werden.
+			Bei einer Umwertung bezieht sich ein kampfloser Sieg bzw. eine Aufgabe nur auf das - sofern vorhanden - ursprüngliche Ergebnis.
+			</p>
+			<p>Tipp für eine schnelle Eingabe: Mit der Tabulator-Taste kann man von Feld zu Feld springen.
+			</p>{% endtrans %}
 		</details>
 	</caption>
 	<thead>
@@ -88,6 +108,7 @@
 			</th>
 			<td class="score"><div><mark class="teammatch-result">
 				{% spaceless %}
+					{{ form_errors(form.team1_score) }}
 					{{ form_widget(form.team1_score) }}
 					<abbr>:</abbr>
 					{{ form_widget(form.team2_score) }}
@@ -121,7 +142,7 @@
 		<tr tabindex="-1">
 			<td colspan="5">
 				<a href="{{ path('tournament_teammatch', teammatch.routingParams ) }}">{% trans %}Abbrechen{% endtrans %}</a>
-		        <input type="submit" />
+		        <input type="submit" value="{% trans %}Speichern{% endtrans %}" />
 			</td>
       	</tr>
 	</tfoot>
@@ -142,25 +163,24 @@
 					{{ form_widget(matchForm.team1_noplayer) }}
 					{{ form_label(matchForm.team1_noplayer, 'Nicht angetreten') }}
 				</div>
+				{% if matchForm.team1_player_readable_id.all.errors | length > 0 %}
+					<div class="error">
+					{{ form_errors(matchForm.team1_player_readable_id) }}
+				{% endif %}
+				{{ form_widget(matchForm.team1_player_readable_id) }}
+				{% if matchForm.team1_player_readable_id.all.errors | length > 0 %}
+					</div>
+				{% endif %}
 
-				{{ form_errors(matchForm.team1_player_readable_id) }}
-				{{ form_widget(matchForm.team1_player_readable_id, { 
-					'attr': {
-						'data-gender': match.matchType.gender == 0 ? 'both' : 
-							(match.matchType.gender == 2 ? 'female' : 'male'), 
-						'data-discipline': match.matchType.discipline
-					} 
-				}) }}
-
-				{% if match.matchType.xOnx != 1 %}
-	    			{{ form_errors(matchForm.team1_partner_readable_id) }}
-					{{ form_widget(matchForm.team1_partner_readable_id, { 
-						'attr': {
-							'data-gender': match.matchType.gender == 0 ? 'both' : 
-								(match.matchType.gender == 1 ? 'male' : 'female'), 
-							'data-discipline': match.matchType.discipline
-						} 
-					}) }}
+				{% if matchForm.team1_partner_readable_id is defined %}
+					{% if matchForm.team1_partner_readable_id.all.errors | length > 0 %}
+						<div class="error">
+						{{ form_errors(matchForm.team1_partner_readable_id) }}
+					{% endif %}
+					{{ form_widget(matchForm.team1_partner_readable_id) }}
+					{% if matchForm.team1_partner_readable_id.all.errors | length > 0 %}
+						</div>
+					{% endif %}
 				{% endif %}
 			</td>
 			<td class="score" >
@@ -181,25 +201,24 @@
 					{{ form_widget(matchForm.team2_noplayer) }}
 					{{ form_label(matchForm.team2_noplayer, 'Nicht angetreten') }}
 				</div>
+				{% if matchForm.team2_player_readable_id.all.errors | length > 0 %}
+					<div class="error">
+					{{ form_errors(matchForm.team2_player_readable_id) }}
+				{% endif %}
+				{{ form_widget(matchForm.team2_player_readable_id) }}
+				{% if matchForm.team2_player_readable_id.all.errors | length > 0 %}
+					</div>
+				{% endif %}
 				
-				{{ form_errors(matchForm.team2_player_readable_id) }}
-				{{ form_widget(matchForm.team2_player_readable_id, { 
-					'attr': {
-						'data-gender': match.matchType.gender == 0 ? 'both' : 
-							(match.matchType.gender == 2 ? 'female' : 'male'), 
-						'data-discipline': match.matchType.discipline
-					} 
-				}) }}
-				
-				{% if match.matchType.xOnx != 1 %}
-	    			{{ form_errors(matchForm.team2_partner_readable_id) }}
-					{{ form_widget(matchForm.team2_partner_readable_id, { 
-						'attr': {
-							'data-gender': match.matchType.gender == 0 ? 'both' : 
-								(match.matchType.gender == 1 ? 'male' : 'female'), 
-							'data-discipline': match.matchType.discipline
-						} 
-					}) }}
+				{% if matchForm.team2_partner_readable_id is defined %}
+					{% if matchForm.team2_partner_readable_id.all.errors | length > 0 %}
+						<div class="error">
+						{{ form_errors(matchForm.team2_partner_readable_id) }}
+					{% endif %}
+					{{ form_widget(matchForm.team2_partner_readable_id) }}
+					{% if matchForm.team2_partner_readable_id.all.errors | length > 0 %}
+						</div>
+					{% endif %}
 				{% endif %}
 			</td>
 			<td class="games">

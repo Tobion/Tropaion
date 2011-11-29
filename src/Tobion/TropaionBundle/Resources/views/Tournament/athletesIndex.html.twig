@@ -1,0 +1,14 @@
+{% extends "TobionTropaionBundle::layout.html.twig" %}
+
+{% block title "Spielerstatistik"|trans %}
+
+{% block content %}
+
+<article>
+	<h1>{% trans %}Spielerstatistik{% endtrans %}</h1>
+	<p>Spalten: Spieler, Mannschaft, Liga, Spiele + Balkendiagramm, Sätze, 
+		Summe Delta Rating (unerwartet gute / schlechte Leistung)</p>
+	<p>Filter: Spielername, Geschlecht, Verein, Liga, Disziplin, Min. Anz. Spiele</p>
+</article>
+
+{% endblock %}

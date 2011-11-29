@@ -285,7 +285,7 @@ class League
 	
 	
 	/**
-	 * Only unique in the right context (per league).
+	 * Only unique in the right context (per tournament).
 	 */
 	public function getSlug()
     {

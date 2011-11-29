@@ -81,19 +81,33 @@ function fnAppendOptions(sSelectSelector, aData)
 	}
 	$(sSelectSelector).append(r);
 }
+
+function parseDate(dateStr)
+{
+	var x = Date.parse(dateStr);
+	/*
+		Samsung Galaxy S2 cannot parse the date format
+		Date.parse("2008-09-28T12:00:00+02:00") == NaN
+		Date.parse("2008-09-28 12:00:00") == works
+	*/
+	if (isNaN(x)) {
+		x = Date.parse(dateStr.substr(0, 10) + ' ' + dateStr.substr(11, 8));
+	}
+	return x;
+}
 	
-	
+
 /* Custom type sorting functions */
 
 jQuery.fn.dataTableExt.oSort['time-element-asc']  = function(a,b) {
-	var x = Date.parse(a.match(/datetime="(.*?)"/)[1]);
-	var y = Date.parse(b.match(/datetime="(.*?)"/)[1]);
+	var x = parseDate(a.match(/datetime="(.*?)"/)[1]);
+	var y = parseDate(b.match(/datetime="(.*?)"/)[1]);
 	return ((x < y) ? -1 : ((x > y) ?  1 : 0));
 };
 
 jQuery.fn.dataTableExt.oSort['time-element-desc'] = function(a,b) {
-	var x = Date.parse(a.match(/datetime="(.*?)"/)[1]);
-	var y = Date.parse(b.match(/datetime="(.*?)"/)[1]);
+	var x = parseDate(a.match(/datetime="(.*?)"/)[1]);
+	var y = parseDate(b.match(/datetime="(.*?)"/)[1]);
 	return ((x < y) ?  1 : ((x > y) ? -1 : 0));
 };
 		

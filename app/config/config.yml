@@ -8,8 +8,8 @@ framework:
     router:          { resource: "%kernel.root_dir%/config/routing.yml" }
     form:            true
     csrf_protection: true
-    validation:      { enable_annotations: true }
-    templating:      { engines: ['twig', 'php'] } #assets_version: SomeVersionScheme
+    validation:      { enable_annotations: false }
+    templating:      { engines: ['twig'] } #assets_version: SomeVersionScheme
     session:
         default_locale: %locale%
         auto_start:     true

@@ -1,17 +1,21 @@
 {% extends "TobionTropaionBundle::layout.html.twig" %}
 
+{% block title %}
+	{{ league.className }} {{ league.division }}
+{% endblock %}
+
 {% import "TobionTropaionBundle::macros.html.twig" as macros %}
 
 {% block stylesheets %}
     {{ parent() }}
-    <link rel="stylesheet" type="text/css" href="{{ asset('bundles/tobiontropaion/css/teammatch.css') }}" />
+    <link rel="stylesheet" href="{{ asset('bundles/tobiontropaion/css/teammatch.css') }}" />
 {% endblock %}
 
 {% block tail_javascripts %}
     {{ parent() }}
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
  
-	<script type="text/javascript">
+	<script>
 	//<![CDATA[
 
 		var crossover_first_cellindex = $("td.crossover").get(0).cellIndex; // get DOM node's property
@@ -25,7 +29,7 @@
 	//]]>
 	</script>
 	
-<script type="text/javascript">
+<script>
 //<![CDATA[
 	// http://mathiasbynens.be/notes/html5-details-jquery
    $(function() {
@@ -129,14 +133,9 @@
 
 {% endblock %}
 
-
 {% set pageRdfId = path('tournament_league', league.routingParams|merge({ '_format': 'html' }) ) ~ '.html' %}
 
 {% set leagueRdfUri = path('tournament_league', league.routingParams ) %}
-
-{% block title %}
-	{{ league.className }} {{ league.division }} - {{ league.tournament.shortName }}
-{% endblock %}
 
 {% block metas %}
 	{{ parent() }}
@@ -157,8 +156,7 @@
 <header>
 
 <h1 about="{{ leagueRdfUri }}" typeof="sport:League" xml:lang="de">
-	<a rel="sport:partOfEvent" href="{{ path('tournament', league.tournament.routingParams ) }}"><span property="dc:title">{{ league.tournament.shortName }}</span></a>
-	&gt;
+	<a style="display:none;" rel="sport:partOfEvent" href="{{ path('tournament', league.tournament.routingParams ) }}"><span property="dc:title">{{ league.tournament.shortName }}</span></a>
 	<span property="sport:class">{{ league.className }}</span>
 	<span {% if not league.division %}style="display:none;" {% endif %}property="sport:division">{{ league.division }}</span>
 </h1>

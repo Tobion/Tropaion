@@ -1,18 +1,22 @@
 {% extends "TobionTropaionBundle::layout.html.twig" %}
 
+{% block title %}
+	{{ team }}
+{% endblock %}
+
 {% block stylesheets %}
 	{{ parent() }}
-	<link rel="stylesheet" type="text/css" href="{{ asset('bundles/tobiontropaion/css/teammatch.css') }}" />
-	<link rel="stylesheet" type="text/css" href="{{ asset('bundles/tobiontropaion/css/jquery-ui-1.8.14.custom.css') }}" />
+	<link rel="stylesheet" href="{{ asset('bundles/tobiontropaion/css/teammatch.css') }}" />
+	<link rel="stylesheet" href="{{ asset('bundles/tobiontropaion/css/jquery-ui-1.8.14.custom.css') }}" />
 {% endblock %}
 
 {% block head_javascripts %}
     {{ parent() }}
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-	<script type="text/javascript" src="{{ asset('bundles/tobiontropaion/js/Placeholder-jQuery-Plugin/jquery.placeholder.min.js') }}"></script>
-	<script type="text/javascript" src="{{ asset('bundles/tobiontropaion/js/DataTables-1.8.1/media/js/jquery.dataTables.min.js') }}"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+	<script src="{{ asset('bundles/tobiontropaion/js/Placeholder-jQuery-Plugin/jquery.placeholder.min.js') }}"></script>
+	<script src="{{ asset('bundles/tobiontropaion/js/DataTables-1.8.1/media/js/jquery.dataTables.min.js') }}"></script>
 	
-	<script type="text/javascript">
+	<script>
 	//<![CDATA[
 		/* Global variables used to activate filters and access the matrix column in the filtering functions */
 		var filter_date_cellindex      = 0, 	// $("th.date").get(0).cellIndex
@@ -24,7 +28,7 @@
 	
 	<script type="text/javascript" src="{{ asset('bundles/tobiontropaion/js/dataTables-custom-functions.js') }}"></script>
 	
-	<script type="text/javascript">
+	<script>
 	//<![CDATA[
 		$(document).ready(function() {
 			var dataTable = $('#teammatches').dataTable({
@@ -62,26 +66,23 @@
 
 {% set pageRdfId = path('tournament_team', team.routingParams|merge({ '_format': 'html' }) ) ~ '.html' %}
 
-{% block title %}
-
-{% endblock %}
-
 {% block metas %}
 	{{ parent() }}
-
 	<meta property="og:type" content="sports_team" />
-
 {% endblock %}
 
 {% block content %}
-
-<h1>{{ tournament }}</h1>
 
 <article id="team-{{ team.id }}" about="{{ path('tournament_team', team.routingParams ) }}" typeof="sport:Team">
 
 <h1>{{ team }}</h1>
 
-<h2>{{ team.league.className }} {{ team.league.division }}</h2>
+<dl>
+	<dt>{% trans %}Klasse{% endtrans %}</dt>
+	<dd><a href="{{ path('tournament_league', team.league.routingParams ) }}#team-{{ team.id }}">{{ team.league.className }}{% if team.league.division %} {{ team.league.division }}{% endif %}</a></dd>
+	<dt>{% trans %}Verein{% endtrans %}</dt>
+	<dd><a href="{{ path('tournament_club', team.club.routingParams(tournament) ) }}">{{ team.club.name }}</a></dd>
+</dl>
 
 <section id="lineup" rel="sport:teamMate">
 <h2>{% trans %}Aufstellung{% endtrans %}</h2>
@@ -139,14 +140,6 @@
 
 </section>
 
-<dl>
-	<dt>{% trans %}Turnier{% endtrans %}</dt>
-	<dd><a href="{{ path('tournament', tournament.routingParams ) }}">{{ tournament.fullName }}</a></dd>
-	<dt>{% trans %}Klasse{% endtrans %}</dt>
-	<dd><a href="{{ path('tournament_league', team.league.routingParams ) }}#team-{{ team.id }}">{{ team.league.className }}{% if team.league.division %} {{ team.league.division }}{% endif %}</a></dd>
-	<dt>{% trans %}Verein{% endtrans %}</dt>
-	<dd><a href="{{ path('tournament_club', team.club.routingParams(tournament) ) }}">{{ team.club.name }}</a></dd>
-</dl>
 
 <section id="my-results">
 <h2>{% trans with { '%team%': team.__toString } %}Spiele der Mannschaft <em>%team%</em>{% endtrans %}</h2>

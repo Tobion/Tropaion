@@ -4,42 +4,29 @@ namespace Tobion\TropaionBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Bridge\Doctrine\RegistryInterface;
+use Tobion\TropaionBundle\Form\EventListener\AddAthletesListener;
+use Tobion\TropaionBundle\Form\EventListener\TransformAthletesListener;
 
 class BadmintonMatchType extends AbstractType
 {
+	protected $registry;
+	
+	public function __construct(RegistryInterface $registry)	
+	{	
+		$this->registry = $registry;
+	}
+	
     public function buildForm(FormBuilder $builder, array $options)
     {
 		$builder->add('match_type_id', 'hidden');
-		
-		$builder->add('team1_player_readable_id', 'text', array(
-			'required' => false,
-			'attr' => array(
-				'class' => 'athlete'
-			)
-		));
-		$builder->add('team1_partner_readable_id', 'text', array(
-			'required' => false,
-			'attr' => array(
-				'class' => 'athlete'
-			)
-		));
-		$builder->add('team2_player_readable_id', 'text', array(
-			'required' => false,
-			'attr' => array(
-				'class' => 'athlete'
-			)
-		));
-		$builder->add('team2_partner_readable_id', 'text', array(
-			'required' => false,
-			'attr' => array(
-				'class' => 'athlete'
-			)
-		));
 		
 		$builder->add('noresult', 'checkbox', array(
 			'required' => false
 		));
 		
+        $builder->addEventSubscriber(new AddAthletesListener($builder->getFormFactory()));
+	
 		$builder->add('team1_noplayer', 'checkbox', array(
 			'required' => false
 		));
@@ -47,14 +34,6 @@ class BadmintonMatchType extends AbstractType
 			'required' => false
 		));
 		
-		/*
-		$builder->add('team1_revaluated_against', 'checkbox', array(
-			'required' => false
-		));
-		$builder->add('team2_revaluated_against', 'checkbox', array(
-			'required' => false
-		));
-		*/
 		
 		$builder->add('revaluation_against', 'choice', array(
 			'required' => false,
@@ -87,7 +66,10 @@ class BadmintonMatchType extends AbstractType
 			'allow_add' => false, 
 			'allow_delete' => false, 
 			'prototype' => false,
+			'by_reference' => true,
 		));
+		
+		$builder->addEventSubscriber(new TransformAthletesListener($this->registry));
 		
     }
     

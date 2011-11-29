@@ -143,9 +143,9 @@ INSERT INTO `league_classes` (`class_abbr`, `class_name`) VALUES
 
 REPLACE INTO `users` (`id`, `username`, `slug`, `email`) 
     VALUES (1, 'BVBB', 'BVBB', 'info@bvbb.net');
-REPLACE INTO `users` (`id`, `username`, `slug`, `email`) 
-    VALUES (2, 'Schuch', '2_Schuch', 'wolfgang.schuch@steuerberater-schuch.de');
-	
+REPLACE INTO `users` (`id`, `username`, `slug`, `email`, `athlete_id`) 
+    VALUES (2, 'Schuch', '2_Schuch', 'wolfgang.schuch@steuerberater-schuch.de', 800847);
+
 	
 REPLACE INTO `tournaments` (`id`, `owner_id`, `host_id`, `short_name`, `full_name`, `season`, `slug`, `sport`) VALUES
 (1, 1, NULL, 'BBMM 2002/03', 'Berlin-Brandenburger Mannschaftsmeisterschaft Saison 2002/03', '2002/03', 'BBMM-2002-03', 'Badminton'),
@@ -325,71 +325,6 @@ END
 
 
 DROP PROCEDURE IF EXISTS migrate_games //  
-/*
-# alte version
-
-CREATE PROCEDURE migrate_games(
-    IN match_id INT UNSIGNED,
-    IN game1_team1_score SMALLINT UNSIGNED, IN game1_team2_score SMALLINT UNSIGNED, 
-    IN game2_team1_score SMALLINT UNSIGNED, IN game2_team2_score SMALLINT UNSIGNED, 
-    IN game3_team1_score SMALLINT UNSIGNED, IN game3_team2_score SMALLINT UNSIGNED,
-    IN annulled_score TINYINT,
-    IN game1_team1_orig_score SMALLINT UNSIGNED, IN game1_team2_orig_score SMALLINT UNSIGNED, 
-    IN game2_team1_orig_score SMALLINT UNSIGNED, IN game2_team2_orig_score SMALLINT UNSIGNED, 
-    IN game3_team1_orig_score SMALLINT UNSIGNED, IN game3_team2_orig_score SMALLINT UNSIGNED
-    )
-BEGIN
-    DECLARE game_sequence TINYINT DEFAULT 1;
-    
-    # Saetze mit 0-0 als Ergebnis brauchen nicht aufgenommen werden, da sie nicht ausgetragen wurden und nur Fassade sind
-    # Ein Match ohne Beteiligung hat somit verstaendlicherweise auch keine Saetze
-    
-    SET game_sequence = 1;
-
-    IF (game1_team1_score <> 0 OR game1_team2_score <> 0) THEN
-        INSERT INTO `games` (`match_id`, `game_sequence`, `team1_score`, `team2_score`) 
-            VALUES (match_id, game_sequence, game1_team1_score, game1_team2_score); 
-        SET game_sequence = game_sequence + 1;
-    END IF;
-    IF (game2_team1_score <> 0 OR game2_team2_score <> 0) THEN
-        INSERT INTO `games` (`match_id`, `game_sequence`, `team1_score`, `team2_score`) 
-            VALUES (match_id, game_sequence, game2_team1_score, game2_team2_score); 
-        SET game_sequence = game_sequence + 1;
-    END IF;
-    IF (game3_team1_score <> 0 OR game3_team2_score <> 0) THEN
-        INSERT INTO `games` (`match_id`, `game_sequence`, `team1_score`, `team2_score`) 
-            VALUES (match_id, game_sequence, game3_team1_score, game3_team2_score);
-        SET game_sequence = game_sequence + 1;
-    END IF;
-                
-    IF (annulled_score) THEN
-        SET game_sequence = 1;
-        
-        # ein umgewertetes Spiel kann auch uspruenglich 0-0 ausgegangen sein (bei einem Match ohne Beteiligung)
-        # dieses muss also einfuegt werden, um auf Aenderung pruefen zu koennen 
-        # -> hinfaellig mit der Aufnahme von revised_score in matches
-        
-        IF (game1_team1_orig_score <> 0 OR game1_team2_orig_score <> 0) THEN
-            INSERT INTO `games` (`match_id`, `game_sequence`, `team1_score`, `team2_score`, `annulled`) 
-                VALUES (match_id, game_sequence, game1_team1_orig_score, game1_team2_orig_score, 1); 
-            SET game_sequence = game_sequence + 1;
-        END IF;
-
-        IF (game2_team1_orig_score <> 0 OR game2_team2_orig_score <> 0) THEN
-            INSERT INTO `games` (`match_id`, `game_sequence`, `team1_score`, `team2_score`, `annulled`) 
-                VALUES (match_id, game_sequence, game2_team1_orig_score, game2_team2_orig_score, 1); 
-            SET game_sequence = game_sequence + 1;
-        END IF; 
-        
-        IF (game3_team1_orig_score <> 99 OR game3_team2_orig_score <> 99) THEN
-            INSERT INTO `games` (`match_id`, `game_sequence`, `team1_score`, `team2_score`, `annulled`) 
-                VALUES (match_id, game_sequence, game3_team1_orig_score, game3_team2_orig_score, 1);
-            SET game_sequence = game_sequence + 1;
-        END IF; 
-    END IF;
-END
-//
-*/
 
 CREATE PROCEDURE migrate_games(
     IN match_id INT UNSIGNED,

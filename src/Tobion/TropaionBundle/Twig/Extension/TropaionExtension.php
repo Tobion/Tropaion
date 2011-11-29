@@ -7,6 +7,7 @@ class TropaionExtension extends \Twig_Extension
     public function getFilters()
     {
         return array(
+			'roman_numeral' => new \Twig_Filter_Function('\Tobion\TropaionBundle\Util\RomanNumeral::convertIntToRoman'),
             'pad' => new \Twig_Filter_Method($this, 'padFilter', array('is_safe' => array('html'))),
 			'class_attribute' => new \Twig_Filter_Method($this, 'classAttributeFilter', array('is_safe' => array('html'))),
 			'class_names' => new \Twig_Filter_Method($this, 'classNamesFilter', array('is_safe' => array('html'))),

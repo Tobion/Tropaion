@@ -104,9 +104,11 @@ class TournamentController extends Controller
      * @Route(".{_format}", 
      *     name="tournament",
      *     defaults={"_format" = "html"},
-	 *     requirements={"_format" = "html|atom"}
+	 *     requirements={"_format" = "html"}
      * ) 
      * @Template()
+	 * 
+	 * .html suffix for identifying the page about the tournament in RDF
      */
     public function tournamentAction()
     {
@@ -117,7 +119,66 @@ class TournamentController extends Controller
 		);
 
 	}
+	
+    /**
+     * @Route("/leagues", name="tournament_leagues_index") 
+     * @Template()
+     */
+    public function leaguesIndexAction()
+    {
+		$tournament = $this->getTournament();
+		
+		return array(
+			'tournament' => $tournament,
+		);
 
+	}
+	
+	/**
+     * @Route("/matches", 
+     *     name="tournament_matches_index",
+     *     defaults={"_format" = "html"},
+	 *     requirements={"_format" = "html|atom"}
+     * ) 
+     * @Template()
+     */
+    public function matchesIndexAction()
+    {
+		$tournament = $this->getTournament();
+		
+		return array(
+			'tournament' => $tournament,
+		);
+
+	}
+
+    /**
+     * @Route("/teams", name="tournament_teams_index") 
+     * @Template()
+     */
+    public function teamsIndexAction()
+    {
+		$tournament = $this->getTournament();
+		
+		return array(
+			'tournament' => $tournament,
+		);
+
+	}
+	
+    /**
+     * @Route("/players", name="tournament_athletes_index") 
+     * @Template()
+     */
+    public function athletesIndexAction()
+    {
+		$tournament = $this->getTournament();
+		
+		return array(
+			'tournament' => $tournament,
+		);
+
+	}
 
     /**
      * @Route("/{league}.{_format}", 
@@ -171,9 +232,9 @@ class TournamentController extends Controller
 		$qb->select(array('tm','t1','t2','c1','c2'))
 			->from('TobionTropaionBundle:Teammatch', 'tm')
 			->innerJoin('tm.Team1', 't1')
-	    	->innerJoin('tm.Team2', 't2')
-    		->innerJoin('t1.Club', 'c1')
-	    	->innerJoin('t2.Club', 'c2')
+			->innerJoin('tm.Team2', 't2')
+			->innerJoin('t1.Club', 'c1')
+			->innerJoin('t2.Club', 'c2')
 			->where($qb->expr()->eq('t1.league_id', ':id'))
 			->setParameter('id', $league->getId());
 		
@@ -327,9 +388,9 @@ class TournamentController extends Controller
 		$qb->select(array('tm','t1','t2','c1','c2','v'))
 			->from('TobionTropaionBundle:Teammatch', 'tm')
 			->innerJoin('tm.Team1', 't1')
-    		->innerJoin('tm.Team2', 't2')
+			->innerJoin('tm.Team2', 't2')
 			->innerJoin('t1.Club', 'c1')
-	    	->innerJoin('t2.Club', 'c2')
+			->innerJoin('t2.Club', 'c2')
 			->innerJoin('tm.Venue', 'v')
 			->where('tm.team1_id = :id OR tm.team2_id = :id')
 			->orderBy('tm.performed_at', 'ASC')
@@ -392,9 +453,9 @@ class TournamentController extends Controller
 		$qb->select(array('tm','t1','t2','c1','c2','v'))
 			->from('TobionTropaionBundle:Teammatch', 'tm')
 			->innerJoin('tm.Team1', 't1')
-    		->innerJoin('tm.Team2', 't2')
+			->innerJoin('tm.Team2', 't2')
 			->innerJoin('t1.Club', 'c1')
-	    	->innerJoin('t2.Club', 'c2')
+			->innerJoin('t2.Club', 'c2')
 			->innerJoin('t1.League', 'l')
 			->innerJoin('tm.Venue', 'v')
 			->where('t1.club_id = :club_id OR t2.club_id = :club_id')
@@ -419,7 +480,7 @@ class TournamentController extends Controller
 
 	
     /**
-     * @Route("/athlete/{firstName}-{lastName}_{id}.{_format}",
+     * @Route("/players/@{id}/{firstName}-{lastName}.{_format}",
      *     name="tournament_athlete",
      *     defaults={"_format" = "html"},
 	 *     requirements={"firstName" = ".+", "lastName" = ".+", "id" = "\d+", "_format" = "html"}
@@ -456,21 +517,21 @@ class TournamentController extends Controller
 			->from('TobionTropaionBundle:Match', 'm')
 			->innerJoin('m.Teammatch', 'tm')
 			->innerJoin('tm.Team1', 't1')
-    		->innerJoin('tm.Team2', 't2')
+			->innerJoin('tm.Team2', 't2')
 			->innerJoin('t1.Club', 'c1')
-	    	->innerJoin('t2.Club', 'c2')
+			->innerJoin('t2.Club', 'c2')
 			->innerJoin('t1.League', 'l')
 			->innerJoin('t2.League', 'l2')
 			->innerJoin('tm.Venue', 'v')
 			->innerJoin('m.MatchType', 'y')
-	    	->leftJoin('m.Games', 'g')
-	    	->leftJoin('m.Team1_Player', 't1p1')
-	    	->leftJoin('m.Team1_Partner', 't1p2')
-	    	->leftJoin('m.Team2_Player', 't2p1')
-	    	->leftJoin('m.Team2_Partner', 't2p2')
+			->leftJoin('m.Games', 'g')
+			->leftJoin('m.Team1_Player', 't1p1')
+			->leftJoin('m.Team1_Partner', 't1p2')
+			->leftJoin('m.Team2_Player', 't2p1')
+			->leftJoin('m.Team2_Partner', 't2p2')
 			->leftJoin('m.Ratinghistory', 'rh', 'WITH', $qb->expr()->eq('rh.athlete_id', ':athlete_id')) // \Doctrine\ORM\Expr\Join::WITH
 			->where('m.team1_player_id = :athlete_id OR m.team1_partner_id = :athlete_id OR ' .
-			        'm.team2_player_id = :athlete_id OR m.team2_partner_id = :athlete_id')
+				'm.team2_player_id = :athlete_id OR m.team2_partner_id = :athlete_id')
 			->andWhere($qb->expr()->eq('l.tournament_id', ':tournament_id'))
 			->orderBy('tm.performed_at', 'ASC')
 			->addOrderBy('m.match_type_id', 'ASC')
@@ -577,7 +638,7 @@ class TournamentController extends Controller
 		$em = $this->getDoctrine()->getEntityManager();
 		$rep = $this->getDoctrine()->getRepository('TobionTropaionBundle:Teammatch');
 	
-		$leagueParts = \Tobion\TropaionBundle\Entity\League::parseSlug($this->getRequest()->get('league'));	
+		$leagueParts = Entity\League::parseSlug($this->getRequest()->get('league'));	
 
 		$teammatch = $rep->findByParamsJoinedAll(
 			$this->getRequest()->get('owner'),
@@ -620,7 +681,17 @@ class TournamentController extends Controller
 			}
 		}
 
-		$form = $this->createForm(new BadmintonTeammatchType(), $teammatch);
+		$form = $this->createForm(new BadmintonTeammatchType($this->getDoctrine()), $teammatch);
+		
+		if ($this->getRequest()->getMethod() == 'POST') {
+			$form->bindRequest($this->getRequest());
+
+			if ($form->isValid()) {
+				// perform some action, such as saving the task to the database
+
+				return $this->redirect($this->generateUrl('tournament_teammatch', $teammatch->routingParams()));
+			}
+		}
 		
 		/*
 			Alle möglichen einsetzbaren Spieler in einer Mannschaft ermitteln
@@ -691,10 +762,11 @@ class TournamentController extends Controller
 		$club2_athletes = $conn->fetchAll($query, $sqlParams);
 
         return array(
+			'tournament' => $tournament,
 			'teammatch' => $teammatch,
-            'form' => $form->createView(),
+			'form' => $form->createView(),
 			'club1_athletes' => $club1_athletes,
-            'club2_athletes' => $club2_athletes,
+			'club2_athletes' => $club2_athletes,
         );
     }
 

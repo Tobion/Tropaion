@@ -1,18 +1,22 @@
 {% extends "TobionTropaionBundle::layout.html.twig" %}
 
+{% block title %}
+	{{ club }}
+{% endblock %}
+
 {% block stylesheets %}
 	{{ parent() }}
-	<link rel="stylesheet" type="text/css" href="{{ asset('bundles/tobiontropaion/css/teammatch.css') }}" />
-	<link rel="stylesheet" type="text/css" href="{{ asset('bundles/tobiontropaion/css/jquery-ui-1.8.14.custom.css') }}" />
+	<link rel="stylesheet" href="{{ asset('bundles/tobiontropaion/css/teammatch.css') }}" />
+	<link rel="stylesheet" href="{{ asset('bundles/tobiontropaion/css/jquery-ui-1.8.14.custom.css') }}" />
 {% endblock %}
 
 {% block tail_javascripts %}
     {{ parent() }}
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-	<script type="text/javascript" src="{{ asset('bundles/tobiontropaion/js/Placeholder-jQuery-Plugin/jquery.placeholder.min.js') }}"></script>
-	<script type="text/javascript" src="{{ asset('bundles/tobiontropaion/js/DataTables-1.8.1/media/js/jquery.dataTables.min.js') }}"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+	<script src="{{ asset('bundles/tobiontropaion/js/Placeholder-jQuery-Plugin/jquery.placeholder.min.js') }}"></script>
+	<script src="{{ asset('bundles/tobiontropaion/js/DataTables-1.8.1/media/js/jquery.dataTables.min.js') }}"></script>
 	
-	<script type="text/javascript">
+	<script>
 	//<![CDATA[
 		/* Global variables used to activate filters and access the matrix column in the filtering functions */
 		var filter_date_cellindex      = 0, 	// $("th.date").get(0).cellIndex
@@ -23,9 +27,9 @@
 	//]]>
 	</script>
 	
-	<script type="text/javascript" src="{{ asset('bundles/tobiontropaion/js/dataTables-custom-functions.js') }}"></script>
+	<script src="{{ asset('bundles/tobiontropaion/js/dataTables-custom-functions.js') }}"></script>
 	
-	<script type="text/javascript">
+	<script>
 	//<![CDATA[
 
 		$(document).ready(function() {
@@ -72,15 +76,9 @@
 
 {% set pageRdfId = path('tournament_club', club.routingParams(tournament)) %}
 
-{% block title %}
-
-{% endblock %}
-
 {% block metas %}
 	{{ parent() }}
-
 	<meta property="og:type" content="sports_team" />
-
 {% endblock %}
 
 {% block content %}
@@ -88,6 +86,14 @@
 <article id="club-{{ club.id }}">
 
 <h1>{{ club }}</h1>
+
+<p><a href="{{ path('profile_club', club.routingParams ) }}">{% trans %}Profil-Seite{% endtrans %}</a></p>
+
+<section id="lineups">
+	<h2>{% trans %}Aufstellungen{% endtrans %}</h2>
+	<p>Mannschaften + Ersatzspieler</p>
+	<p>Link zur <a href="{{ path('tournament_athletes_index', tournament.routingParams|merge({ 'club': club.id })) }}">Spielerstatistik des Vereins</a></p>
+</section>
 
 <section id="my-results">
 <h2>{% trans with { '%club%': club.code } %}Spiele des Vereins <em>%club%</em>{% endtrans %}</h2>

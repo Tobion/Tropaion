@@ -1,0 +1,11 @@
+Tobion\TropaionBundle\Entity\Teammatch:
+    properties:
+        team1_score:
+            - NotBlank: ~
+        #Matches:
+            #- Valid: ~
+
+Tobion\TropaionBundle\Entity\Match:
+    constraints:
+        - Callback:
+            methods:   [checkAthletesSpecified]

@@ -1,17 +1,21 @@
 {% extends "TobionTropaionBundle::layout.html.twig" %}
 
+{% block title %}
+	{% trans with {
+		'%team1%': teammatch.team1.__toString,
+		'%team2%': teammatch.team2.__toString,
+		'%league%': teammatch.league.classAbbr
+	} %}%team1% vs %team2% | %league%{% endtrans %}
+{% endblock %}
+
 {% block stylesheets %}
 	{{ parent() }}
-	<link rel="stylesheet" type="text/css" href="{{ asset('bundles/tobiontropaion/css/teammatch.css') }}" />
+	<link rel="stylesheet" href="{{ asset('bundles/tobiontropaion/css/teammatch.css') }}" />
 {% endblock %}
 
 {% set pageRdfId = path('tournament_teammatch', teammatch.routingParams|merge({ '_format': 'html' }) ) ~ '.html' %}
 
 {% set teammatchRdfUri = path('tournament_teammatch', teammatch.routingParams ) %}
-
-{% block title %}
-	{{ teammatch.team1 }} vs  {{ teammatch.team2 }} | {{ teammatch.league.classAbbr }} {{ teammatch.league.division }} - {{ teammatch.league.tournament.shortName }}
-{% endblock %}
 
 {% block metas %}
 	{{ parent() }}
@@ -77,18 +81,16 @@
 
 <header id="meta-teammatch-{{ teammatch.id }}" about="{{ teammatchRdfUri }}" typeof="sport:Match">
 
-<div rel="sport:partOfEvent">
-<h1 about="{{ path('tournament_league', teammatch.league.routingParams ) }}" typeof="sport:League" xml:lang="de">
-	<a rel="sport:partOfEvent" href="{{ path('tournament', teammatch.league.tournament.routingParams ) }}"><span property="dc:title">{{ teammatch.league.tournament.shortName }}</span></a>
-	&gt;
-	<a href="{{ path('tournament_league', teammatch.league.routingParams ) }}">
-		<span property="sport:class">{{ teammatch.league.className }}</span>
-		<span {% if not teammatch.league.division %}style="display:none;" {% endif %}property="sport:division">{{ teammatch.league.division }}</span>
-	</a>
-</h1>
-</div>
-
-<h2>{{ teammatch.team1 }} <abbr title="{% trans %}versus{% endtrans %}">{% trans %}vs{% endtrans %}</abbr>  {{ teammatch.team2 }}</h2>
+<hgroup rel="sport:partOfEvent">  
+	<h1>{{ teammatch.team1 }} <abbr title="{% trans %}versus{% endtrans %}">{% trans %}vs{% endtrans %}</abbr>  {{ teammatch.team2 }}</h1>  
+	<h2 about="{{ path('tournament_league', teammatch.league.routingParams ) }}" typeof="sport:League" xml:lang="de">
+		<a href="{{ path('tournament_league', teammatch.league.routingParams ) }}">
+			<span property="sport:class">{{ teammatch.league.className }}</span>
+			<span {% if not teammatch.league.division %}style="display:none;" {% endif %}property="sport:division">{{ teammatch.league.division }}</span>
+		</a>
+		<a style="display:none;" rel="sport:partOfEvent" href="{{ path('tournament', teammatch.league.tournament.routingParams ) }}">(<span property="dc:title">{{ teammatch.league.tournament.shortName }}</span>)</a>
+	</h2>
+</hgroup>
 
 <dl>
 	<dt>{% trans %}Austragungsdatum{% endtrans %}</dt>
