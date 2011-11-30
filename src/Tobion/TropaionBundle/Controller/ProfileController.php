@@ -13,19 +13,19 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 class ProfileController extends Controller
 {
 
-    /**
-     * @Route("/@{id}/{firstName}-{lastName}.{_format}",
-     *     name="profile_athlete",
-     *     defaults={"_format" = "html"},
+	/**
+	 * @Route("/@{id}/{firstName}-{lastName}.{_format}",
+	 *     name="profile_athlete",
+	 *     defaults={"_format" = "html"},
 	 *     requirements={"firstName" = ".+", "lastName" = ".+", "id" = "\d+", "_format" = "html|atom"}
-     * ) 
-     * @Template()
-     */
-    public function athleteAction($firstName, $lastName, $id)
-    {
+	 * ) 
+	 * @Template()
+	 */
+	public function athleteAction($firstName, $lastName, $id)
+	{
 		$em = $this->getDoctrine()->getEntityManager();
 		$rep = $this->getDoctrine()->getRepository('TobionTropaionBundle:Ratinghistory');
-	
+
 		$qb = $em->createQueryBuilder();
 		$qb->select(array('a', 'c', 'u'))
 			->from('TobionTropaionBundle:Athlete', 'a')
@@ -33,19 +33,19 @@ class ProfileController extends Controller
 			->leftJoin('a.User', 'u')
 			->where('a.id = :id')
 			->setParameter('id', $id);
-		
+
 		try {
 			$athlete = $qb->getQuery()->getSingleResult();
 		} catch (\Doctrine\Orm\NoResultException $e) {
 			throw $this->createNotFoundException('Athlete not found.');
 		}
 
-		
+
 		if ($athlete->getFirstName() != $firstName || $athlete->getLastName() != $lastName) {
 			return $this->redirect($this->generateUrl('profile_athlete', $athlete->routingParams()), 301);
 		}
-		
-	
+
+
 		/*
 		 *	Version with partial selection when using array tree hydration
 			$qb->select('partial h.{id, discipline, post_rating}, 
@@ -64,7 +64,7 @@ class ProfileController extends Controller
 				partial t2p1.{id, first_name, last_name},
 				partial t2p2.{id, first_name, last_name}')
 		*/
-		
+
 		$qb = $em->createQueryBuilder();
 		$qb->select(array(
 				'h.discipline', 'h.post_rating',
@@ -100,52 +100,52 @@ class ProfileController extends Controller
 			->addOrderBy('m.id', 'ASC')
 			->addOrderBy('g.game_sequence', 'ASC')
 			->setParameter('id', $id);
-		
+
 		$ratinghistory = $qb->getQuery()->getResult(\Doctrine\ORM\Query::HYDRATE_SCALAR);
-		
+
 		$match = array();
-		
+
 		// build all match result texts using games
 		foreach ($ratinghistory as $rating) {
 			if (!isset($match[$rating['match_id']])) {
 				$match[$rating['match_id']]['annulled'] = '';
 				$match[$rating['match_id']]['effective'] = '';
 			}
-			
+
 			if ($rating['g_annulled']) {
 				$match[$rating['match_id']]['annulled'] .= $rating['g_team1_score'] . ':' . $rating['g_team2_score'] . ' ';
 			} else {
 				$match[$rating['match_id']]['effective'] .= $rating['g_team1_score'] . ':' . $rating['g_team2_score'] . ' ';		
 			}		
 		}
-		
+
 		$router = $this->get('router');
 		$lastMatchId = false;
-		
+
 		$singlesRatings = array();
 		$doublesRatings = array();
 		$mixedRatings = array();
-		
+
 		$singlesRatingMin = null;
 		$singlesRatingMinAt = null;
-		
+
 		$ratingStats = array_fill_keys(
 			array('singles', 'doubles', 'mixed'), 
 			array('minRating' => null, 'minAt' => null, 'maxRating' => null, 'maxAt' => null)
 		);
-	
+
 		foreach ($ratinghistory as $rating) {
 			if ($lastMatchId === $rating['match_id']) {
 				continue;
 			}
 
 			$lastMatchId = $rating['match_id'];
-						
+
 			$match[$rating['match_id']]['effective'] = trim($match[$rating['match_id']]['effective']);
 			$match[$rating['match_id']]['annulled'] = trim($match[$rating['match_id']]['annulled']);
-			
+
 			$rating['post_rating'] = (int) $rating['post_rating'];
-			
+
 			$r = array(
 				// number of seconds since 1970-01-01 (PHP/MySQL) to number of milliseconds (JavaScript Date.UTC)
 				'x' => strtotime($rating['performed_at']) * 1000, 
@@ -178,7 +178,7 @@ class ProfileController extends Controller
 					'team2Number' => $rating['team2_number']
 				)) . '#match-' . $rating['match_id']
 			);
-			
+
 			switch ($rating['discipline']) {
 				case 'singles':
 					$singlesRatings[] = $r;
@@ -190,25 +190,25 @@ class ProfileController extends Controller
 					$mixedRatings[] = $r;
 					break;
 			}
-			
+
 			$disciplineStats =& $ratingStats[$rating['discipline']];
-			
+
 			if ($disciplineStats['minRating'] === null || 
 				$disciplineStats['minRating'] > $rating['post_rating']) 
 			{
 				$disciplineStats['minRating'] = $rating['post_rating'];
 				$disciplineStats['minAt'] = new \DateTime($rating['performed_at']);
 			}
-			
+
 			if ($disciplineStats['maxRating'] === null || 
 				$disciplineStats['maxRating'] < $rating['post_rating']) 
 			{
 				$disciplineStats['maxRating'] = $rating['post_rating'];
 				$disciplineStats['maxAt'] = new \DateTime($rating['performed_at']);
 			}
-			
+
 		}
-			
+
 		return array(
 			'athlete' => $athlete,
 			'singlesRatings' => $singlesRatings,
@@ -219,36 +219,36 @@ class ProfileController extends Controller
 	}
 
 
-    /**
-     * @Route("/clubs/{club}.{_format}",
-     *     name="profile_club",
-     *     defaults={"_format" = "html"},
+	/**
+	 * @Route("/clubs/{club}.{_format}",
+	 *     name="profile_club",
+	 *     defaults={"_format" = "html"},
 	 *     requirements={"club" = ".+", "_format" = "html|atom"}
-     * ) 
-     * @Template()
-     */
-    public function clubAction($club)
-    {
+	 * ) 
+	 * @Template()
+	 */
+	public function clubAction($club)
+	{
 
 	}
 
 
 	/**
-     * @Route("/venues/{venue}", name="profile_venue") 
-     * @Template()
-     */
-    public function venueAction($venue)
-    {
+	 * @Route("/venues/{venue}", name="profile_venue") 
+	 * @Template()
+	 */
+	public function venueAction($venue)
+	{
 
 	}
-	
-	
+
+
 	/**
-     * @Route("/{user}",name="profile_user") 
-     * @Template()
-     */
-    public function userAction($user)
-    {
+	 * @Route("/{user}",name="profile_user") 
+	 * @Template()
+	 */
+	public function userAction($user)
+	{
 
 	}
 

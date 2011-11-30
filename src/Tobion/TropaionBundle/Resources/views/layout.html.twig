@@ -52,7 +52,7 @@
 			<h2 title="bvbb.net"><a href="http://bvbb.net">{% trans %}Badminton-Verband Berlin-Brandenburg <abbr title="eingetragener Verein">e. V.</abbr>{% endtrans %}</a></h2>
 		</hgroup>	
 	</header>
-	
+
 	<nav id="main-menu" style="clear:left;">
 		{% block main_menu %}
 			<ul>
@@ -89,13 +89,13 @@
 			</ul>
 		{% endblock %}
 	</nav>
-	
+
 	{% if app.session.flash('notice') %}
 		<div class="flash-message">
 			<em>Notice</em>: {{ app.session.flash('notice') }}
 		</div>
 	{% endif %}
-	
+
 	<section id="content">
 		{% if tournament is defined %}
 		<header>
@@ -105,7 +105,7 @@
 				{% trans %}Turnier:{% endtrans %} 
 					<a href="{{ path('tournament', tournament.routingParams ) }}">{{ tournament.shortName }}</a></h1>
 		</header>
-		
+
 		<nav id="tournament-menu">
 			<ul>
 				<li title="{% trans %}News und Spielverlegungen{% endtrans %}"><a href="{{ path('tournament', tournament.routingParams ) }}">
@@ -129,11 +129,11 @@
 			</ul>
 		</nav>
 		{% endif %}
-		
+
 		{% block content %}
 		{% endblock %}
 	</section>
-	
+
 	<footer id="main-footer">
 		<p>{% trans %}Powered by{% endtrans %} <img src="{{ asset('bundles/tobiontropaion/images/trophy/trophy_32px_24bit.png') }}" alt="{% trans %}Trophäe{% endtrans %}" /> <a href="https://github.com/Tobion/Tropaion" title="{% trans %}Tropaion - Der soziale und semantische Sportergebnisdienst{% endtrans %}">Tropaion</a></p>
 	<!--
@@ -147,7 +147,7 @@
 		{% trans %}Semantically annotated using{% endtrans %} <a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml-rdfa-blue" width="88" height="31" alt="Valid XHTML + RDFa" /></a>
 	</p>
 	-->
-	
+
 		<nav id="main-footer-menu">
 			<ul>
 				<li><a href="">
@@ -168,7 +168,7 @@
 			</ul>
 		</nav>
 	</footer>
-	
+
 	{% block tail_javascripts %}{% endblock %}
 </body>
 </html>

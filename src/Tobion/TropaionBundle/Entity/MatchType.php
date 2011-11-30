@@ -12,110 +12,110 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class MatchType
 {
-    /**
-     * @var integer $id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
-
-    /**
-     * @var string $name
-     *
-     * @ORM\Column(type="string", length=20)
-     */
-    private $name;
-	
 	/**
-     * @var smallint $x_on_x
-     * 0 = Varierend (keine Beschränkung; z.B. 1 vs 2); 1 = 1 gegen 1 (Einzel); 2 = 2 gegen 2 (Doppel)
-     *
-     * @ORM\Column(type="smallint")
-     */
-    private $x_on_x;
-	
+	 * @var integer $id
+	 *
+	 * @ORM\Column(type="integer")
+	 * @ORM\Id
+	 * @ORM\GeneratedValue(strategy="AUTO")
+	 */
+	private $id;
+
 	/**
-     * @var smallint $gender
-     * 0 = Varierend (keine Beschränkung; z.B. Herren vs Damen); 1 = alles Herren; 2 = alles Frauen; 3 = Mixed Teams (Herr + Dame vs Herr + Dame)
-     *
-     * @ORM\Column(type="smallint")
-     */
-    private $gender;
-	
+	 * @var string $name
+	 *
+	 * @ORM\Column(type="string", length=20)
+	 */
+	private $name;
 
-    /**
-     * Get id
-     *
-     * @return integer $id
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
+	/**
+	 * @var smallint $x_on_x
+	 * 0 = Varierend (keine Beschränkung; z.B. 1 vs 2); 1 = 1 gegen 1 (Einzel); 2 = 2 gegen 2 (Doppel)
+	 *
+	 * @ORM\Column(type="smallint")
+	 */
+	private $x_on_x;
 
-    /**
-     * Set name
-     *
-     * @param string $name
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-    }
+	/**
+	 * @var smallint $gender
+	 * 0 = Varierend (keine Beschränkung; z.B. Herren vs Damen); 1 = alles Herren; 2 = alles Frauen; 3 = Mixed Teams (Herr + Dame vs Herr + Dame)
+	 *
+	 * @ORM\Column(type="smallint")
+	 */
+	private $gender;
 
-    /**
-     * Get name
-     *
-     * @return string $name
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
 
-    /**
-     * Set x_on_x
-     *
-     * @param smallint $xOnX
-     */
-    public function setXOnX($xOnX)
-    {
-        $this->x_on_x = $xOnX;
-    }
+	/**
+	 * Get id
+	 *
+	 * @return integer $id
+	 */
+	public function getId()
+	{
+		return $this->id;
+	}
 
-    /**
-     * Get x_on_x
-     *
-     * @return smallint $xOnX
-     */
-    public function getXOnX()
-    {
-        return $this->x_on_x;
-    }
+	/**
+	 * Set name
+	 *
+	 * @param string $name
+	 */
+	public function setName($name)
+	{
+		$this->name = $name;
+	}
 
-    /**
-     * Set gender
-     *
-     * @param smallint $gender
-     */
-    public function setGender($gender)
-    {
-        $this->gender = $gender;
-    }
+	/**
+	 * Get name
+	 *
+	 * @return string $name
+	 */
+	public function getName()
+	{
+		return $this->name;
+	}
 
-    /**
-     * Get gender
-     *
-     * @return smallint $gender
-     */
-    public function getGender()
-    {
-        return $this->gender;
-    }
-	
-	
+	/**
+	 * Set x_on_x
+	 *
+	 * @param smallint $xOnX
+	 */
+	public function setXOnX($xOnX)
+	{
+		$this->x_on_x = $xOnX;
+	}
+
+	/**
+	 * Get x_on_x
+	 *
+	 * @return smallint $xOnX
+	 */
+	public function getXOnX()
+	{
+		return $this->x_on_x;
+	}
+
+	/**
+	 * Set gender
+	 *
+	 * @param smallint $gender
+	 */
+	public function setGender($gender)
+	{
+		$this->gender = $gender;
+	}
+
+	/**
+	 * Get gender
+	 *
+	 * @return smallint $gender
+	 */
+	public function getGender()
+	{
+		return $this->gender;
+	}
+
+
 	/**
 	 * @return string (singles || doubles || mixed)
 	 */
@@ -130,10 +130,10 @@ class MatchType
 		return 'singles';
 	}
 
-	
+
 	function __toString()
-    {
-        return $this->getName();
-    }
+	{
+		return $this->getName();
+	}
 
 }

@@ -4,7 +4,7 @@
 	{% trans with {
 		'%team1%': teammatch.team1.__toString,
 		'%team2%': teammatch.team2.__toString,
-		'%league%': teammatch.league.classAbbr
+		'%league%': teammatch.league.shortName
 	} %}Ergebniseingabe: %team1% vs %team2% | %league%{% endtrans %}
 {% endblock %}
 
@@ -14,7 +14,7 @@
 {% endblock %}
 
 {% block tail_javascripts %}
-    {{ parent() }}
+	{{ parent() }}
 
 	<script>
 	//<![CDATA[
@@ -22,17 +22,17 @@
 		var club2_athletes = {{ club2_athletes | json_encode | raw }};
 	//]]>
 	</script>
-	
+
 	<script src="http://yui.yahooapis.com/3.4.1/build/yui/yui-min.js"></script>
 	<script src="{{ asset('bundles/tobiontropaion/js/teammatch-edit.js') }}"></script>
 {% endblock %}
-	
+
 {% block content %}
 
 <article>
-	
+
 <form action="{{ path('tournament_teammatch_edit', teammatch.routingParams) }}" method="post" {{ form_enctype(form) }}>
-    {# form_widget(form) #}
+	{# form_widget(form) #}
 	{{ form_errors(form) }}
 
 	{{ form_widget(form._token) }}
@@ -63,7 +63,7 @@
 	tabindex="-1": exclude the element from sequential focus navigation 
 	(otherwise IE makes LI and TR focusable)
 #}
-		
+
 <table class="scoresheet edit" id="scoresheet-teammatch-{{ teammatch.id }}">
 	<caption><a href="#scoresheet-teammatch-{{ teammatch.id }}">{% trans %}Spielbericht{% endtrans %}</a>
 		<details>
@@ -94,7 +94,7 @@
 			<th scope="col" class="matchtype">{% trans %}Disziplin{% endtrans %}</th>
 			<th scope="col" class="team hometeam" title="{% trans %}Heimmannschaft{% endtrans %}">
 				{{ teammatch.team1.fullName }}
-				
+
 				<ul class="status">
 					<li class="nofight">
 						{{ form_widget(form.team1_nofight) }}
@@ -116,7 +116,7 @@
 			</mark></div></td>
 			<th scope="col" class="team awayteam" title="{% trans %}Auswärtsmannschaft{% endtrans %}">
 				{{ teammatch.team2.fullName }}
-				
+
 				<ul class="status">
 					<li class="nofight">
 						{{ form_widget(form.team2_nofight) }}
@@ -142,9 +142,9 @@
 		<tr tabindex="-1">
 			<td colspan="5">
 				<a href="{{ path('tournament_teammatch', teammatch.routingParams ) }}">{% trans %}Abbrechen{% endtrans %}</a>
-		        <input type="submit" value="{% trans %}Speichern{% endtrans %}" />
+				<input type="submit" value="{% trans %}Speichern{% endtrans %}" />
 			</td>
-      	</tr>
+		</tr>
 	</tfoot>
 	<tbody>
 		{% for matchForm in form.matches %}
@@ -209,7 +209,7 @@
 				{% if matchForm.team2_player_readable_id.all.errors | length > 0 %}
 					</div>
 				{% endif %}
-				
+
 				{% if matchForm.team2_partner_readable_id is defined %}
 					{% if matchForm.team2_partner_readable_id.all.errors | length > 0 %}
 						<div class="error">
@@ -224,39 +224,39 @@
 			<td class="games">
 				<fieldset class="effective-fieldset">
 					<legend>{% trans %}Gewertetes Ergebnis{% endtrans %}</legend>
-	    	 		<ol class="effective">
+					<ol class="effective">
 						{% for gameForm in matchForm.games %}
 						{% if not gameForm.annulled.get('value') %}
-	    				<li tabindex="-1">
+						<li tabindex="-1">
 							{# form_widget(gameForm.annulled) #}
-								
+
 							{{ form_errors(gameForm.team1_score) }}
-								
+
 							{{ form_widget(gameForm.team1_score) }}
 							<abbr> : </abbr>
 							{{ form_widget(gameForm.team2_score) }}
-	    				</li>
+						</li>
 						{% endif %}
 						{% endfor %}
-	    	 		</ol>
+					</ol>
 				</fieldset>
 				<fieldset class="annulled-fieldset">
 					<legend>{% trans %}Usprüngliches Ergebnis{% endtrans %}</legend>
 					<ol class="annulled">
-	    			{% for gameForm in matchForm.games %}
+					{% for gameForm in matchForm.games %}
 						{% if gameForm.annulled.get('value') %}
-	    				<li tabindex="-1">
+						<li tabindex="-1">
 							{{ form_widget(gameForm.annulled) }}
-								
+
 							{{ form_errors(gameForm.team1_score) }}
-								
+
 							{{ form_widget(gameForm.team1_score) }}
 							<abbr> : </abbr>
 							{{ form_widget(gameForm.team2_score) }}
-	    				</li>
+						</li>
 						{% endif %}
 						{% endfor %}
-	    	 		</ol>
+					</ol>
 				</fieldset>
 			</td>
 		</tr>

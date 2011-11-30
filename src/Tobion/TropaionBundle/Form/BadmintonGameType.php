@@ -7,8 +7,8 @@ use Symfony\Component\Form\FormBuilder;
 
 class BadmintonGameType extends AbstractType
 {
-    public function buildForm(FormBuilder $builder, array $options)
-    {
+	public function buildForm(FormBuilder $builder, array $options)
+	{
 		$builder->add('annulled', 'hidden');
 
 		$builder->add('team1_score', 'integer', array(
@@ -31,18 +31,18 @@ class BadmintonGameType extends AbstractType
 				'autocomplete' => 'off'
 			)
 		));
-		
-    }
-    
+
+	}
+
 	public function getDefaultOptions(array $options)
 	{
 		return array(
 			'data_class' => 'Tobion\TropaionBundle\Entity\Game',
 		);
 	}
-	
-    public function getName()
-    {
+
+	public function getName()
+	{
 		return 'bmg';
-    }
+	}
 }

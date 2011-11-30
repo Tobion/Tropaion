@@ -14,10 +14,10 @@ class LeagueRepository extends EntityRepository
 {
 
 /*
-	
+
 Ummeldungen zur Rueckrunde einer bestimmten Saison:	
 Beide Abfragen haben das gleiche Ergebnis.
-	
+
 SELECT u1.* , u2.*
 FROM lineups u1
 INNER JOIN teams t1 ON t1.id = u1.team_id
@@ -50,8 +50,8 @@ GROUP BY athlete_id
 HAVING MIN(team_id) <> MAX(team_id) OR MIN(position) <> MAX(position)
 ORDER BY u.athlete_id ASC
 
-	 */
-	
+*/
+
 	/**
 	 * Gibt den aktuellen Tabellenstand als Array zurück. 
 	 * Berücksichtigt auch zurückgezogene Teams (withdrawn) und Teammatches, das beide Mannschaften komplett verloren haben (beide scores = 0)
@@ -66,7 +66,7 @@ ORDER BY u.athlete_id ASC
 	public function getStandings($leagueId, $round = 0, $homeaway = 0, $winPoints = 2, $drawPoints = 1)
 	{
 		$sqlParams = array();
-		
+
 		if ($homeaway == 1) {
 			$homeawayJoin = ' LEFT JOIN teammatches tm ON (t.id = tm.team1_id) ';
 		}
@@ -76,7 +76,7 @@ ORDER BY u.athlete_id ASC
 		else {
 			$homeawayJoin = ' LEFT JOIN teammatches tm ON (t.id = tm.team1_id OR t.id = tm.team2_id) ';
 		}
-		
+
 		if ($round) {
 			$roundCondition = ' AND tm.season_round = :ROUND ';
 			$sqlParams['ROUND'] = $round;
@@ -84,7 +84,7 @@ ORDER BY u.athlete_id ASC
 		else {
 			$roundCondition = '';
 		}
-		
+
 		/*
 		$query = 'SELECT 
 				t.id, t.club_id, c.code AS club_code, c.name AS club_name, t.team_number, t.withdrawn,
@@ -149,8 +149,8 @@ ORDER BY u.athlete_id ASC
 			) AS points,
 			# ifnull due to possible division by zero
 			IFNULL(ROUND(
-            SUM(
-            	IF(tm.team1_id = t.id, 
+			SUM(
+				IF(tm.team1_id = t.id, 
 					CASE WHEN tm.team1_score > tm.team2_score THEN :WIN_POINTS WHEN tm.team1_score = tm.team2_score AND tm.team1_score <> 0 THEN :DRAW_POINTS ELSE 0 END,
 					CASE WHEN tm.team1_score < tm.team2_score THEN :WIN_POINTS WHEN tm.team1_score = tm.team2_score AND tm.team1_score <> 0 THEN :DRAW_POINTS ELSE 0 END
 				)
@@ -187,8 +187,8 @@ ORDER BY u.athlete_id ASC
 			diff_games DESC, 
 			diff_score DESC';
 		*/
-		
-  		$query = 'SELECT 
+
+		$query = 'SELECT 
 				t.id, t.club_id, c.code AS club_code, c.name AS club_name, t.team_number, t.withdrawn,
 			SUM(IF((tm.annulled AND NOT t.withdrawn) OR tm.team1_score IS NULL OR tm.team2_score IS NULL, 0, tm.id IS NOT NULL)) AS number_teammatches,
 			SUM(
@@ -262,8 +262,8 @@ ORDER BY u.athlete_id ASC
 			) AS lost_points,
 			# ifnull due to possible division by zero
 			IFNULL(ROUND(
-            SUM(
-            	IF(tm.team1_id = t.id, 
+			SUM(
+				IF(tm.team1_id = t.id, 
 					CASE WHEN tm.team1_score > tm.team2_score THEN :WIN_POINTS WHEN tm.team1_score = tm.team2_score AND tm.team1_score <> 0 THEN :DRAW_POINTS ELSE 0 END,
 					CASE WHEN tm.team1_score < tm.team2_score THEN :WIN_POINTS WHEN tm.team1_score = tm.team2_score AND tm.team1_score <> 0 THEN :DRAW_POINTS ELSE 0 END
 				)
@@ -289,20 +289,20 @@ ORDER BY u.athlete_id ASC
 			won_matches DESC, 
 			diff_games DESC, 
 			diff_score DESC';
-	
+
 		$conn = $this->getEntityManager()->getConnection();
-		
+
 		$sqlParams['LEAGUE_ID'] = $leagueId;
 		$sqlParams['WIN_POINTS'] = $winPoints;
 		$sqlParams['DRAW_POINTS'] = $drawPoints;
-		
+
 		return $conn->fetchAll($query, $sqlParams);
-		
+
 	}
-	
-	
+
+
 	public function findHierarchicallyPrevious($league)
-    {		
+	{		
 		$qb = $this->createQueryBuilder('l');
 		$qb->select(array('l','r','o'))
 			->innerJoin('l.Tournament', 'r')
@@ -318,16 +318,16 @@ ORDER BY u.athlete_id ASC
 			->setParameter('class_level', $league->getClassLevel())
 			->setParameter('division', $league->getDivision())
 			->setMaxResults(1);
-		
+
 		try {
 			return $qb->getQuery()->getSingleResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
 		} catch (\Doctrine\Orm\NoResultException $e) {
 			return null;
 		}
-    }
-	
+	}
+
 	public function findHierarchicallyNext($league)
-    {		
+	{		
 		$qb = $this->createQueryBuilder('l');
 		$qb->select(array('l','r','o'))
 			->innerJoin('l.Tournament', 'r')
@@ -343,11 +343,11 @@ ORDER BY u.athlete_id ASC
 			->setParameter('class_level', $league->getClassLevel())
 			->setParameter('division', $league->getDivision())
 			->setMaxResults(1);
-		
+
 		try {
 			return $qb->getQuery()->getSingleResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
 		} catch (\Doctrine\Orm\NoResultException $e) {
 			return null;
 		}
-    }
+	}
 }

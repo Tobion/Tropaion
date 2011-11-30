@@ -3,7 +3,7 @@
 <table id="matches" class="match-list profile-view" about="{{ path('profile_athlete', athlete.routingParams ) }}" typeof="sport:Athlete" xmlns:rel="http://purl.org/vocab/relationship/">
 <caption>
 <fieldset id="filters">
-    <legend>{% trans %}Filter{% endtrans %}</legend>
+	<legend>{% trans %}Filter{% endtrans %}</legend>
 	<div>
 	<label><span>{% trans %}Runde{% endtrans %}:</span>
 		<select id="stage-filter">
@@ -45,7 +45,7 @@
 	</div>
 </fieldset>
 <fieldset id="statistics">
-    <legend>{% trans with { '%nbMatches%': matches | length } %}Statistiken: <span id="entries-displayed">%nbMatches%</span> Spiele<span style="display:none"> (gefiltert von insgesamt <span id="entries-total">%nbMatches%</span>){% endtrans %}</legend>
+	<legend>{% trans with { '%nbMatches%': matches | length } %}Statistiken: <span id="entries-displayed">%nbMatches%</span> Spiele<span style="display:none"> (gefiltert von insgesamt <span id="entries-total">%nbMatches%</span>){% endtrans %}</legend>
 	<div>
 		<div style="float: left; width: 200px;">
 			<p>{% trans %}<span id="wins">%wins%</span> Siege: <span id="wins-percent">%winsPercent%</span>%%{% endtrans %}</p>

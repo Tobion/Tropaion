@@ -11,11 +11,11 @@
 {% endblock %}
 
 {% block head_javascripts %}
-    {{ parent() }}
+	{{ parent() }}
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
 	<script src="{{ asset('bundles/tobiontropaion/js/Placeholder-jQuery-Plugin/jquery.placeholder.min.js') }}"></script>
 	<script src="{{ asset('bundles/tobiontropaion/js/DataTables-1.8.1/media/js/jquery.dataTables.min.js') }}"></script>
-	
+
 	<script>
 	//<![CDATA[
 		/* Global variables used to activate filters and access the matrix column in the filtering functions */
@@ -25,9 +25,9 @@
 			filter_opponent_cellindex  = 5;	
 	//]]>
 	</script>
-	
+
 	<script type="text/javascript" src="{{ asset('bundles/tobiontropaion/js/dataTables-custom-functions.js') }}"></script>
-	
+
 	<script>
 	//<![CDATA[
 		$(document).ready(function() {
@@ -53,7 +53,7 @@
 				],
 				// "aaSorting": [[0,'asc']]
 			});
-			
+
 			/* Add event listeners to filtering inputs */
 			$('#date-filter').change( function() { dataTable.fnDraw(); } );
 			$('#stage-filter').change( function() { dataTable.fnDraw(); } );

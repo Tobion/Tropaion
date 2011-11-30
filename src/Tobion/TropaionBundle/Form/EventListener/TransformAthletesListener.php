@@ -23,38 +23,38 @@ use Tobion\TropaionBundle\Entity\Match;
 class TransformAthletesListener implements EventSubscriberInterface
 {
 	protected $registry;
-	
+
 	public function __construct(RegistryInterface $registry)	
 	{	
 		$this->registry = $registry;
 	}
 
-    public static function getSubscribedEvents()
-    {
-        return array(
+	public static function getSubscribedEvents()
+	{
+		return array(
 			FormEvents::SET_DATA => 'setData', 
 			FormEvents::BIND_NORM_DATA  => 'onBindNormData'
 		);
-    }
-	
+	}
+
 	/**
 	 * Sets the default readable ID for the athletes
 	 *
 	 * @param FilterDataEvent $event
 	 */
-    public function setData(FilterDataEvent $event)
-    {
-        $match = $event->getData();
-        $form = $event->getForm();
+	public function setData(FilterDataEvent $event)
+	{
+		$match = $event->getData();
+		$form = $event->getForm();
 
-        if (null === $match) {
-            return;
-        }
-		
+		if (null === $match) {
+			return;
+		}
+
 		if (!$match instanceof Match) {
-            throw new UnexpectedTypeException($match, 'Tobion\TropaionBundle\Entity\Match');
-        }
-				
+			throw new UnexpectedTypeException($match, 'Tobion\TropaionBundle\Entity\Match');
+		}
+
 		$match->team1_player_readable_id = $match->getTeam1Player() ? 
 			$match->getTeam1Player()->getReadableId() :	'';
 		$match->team1_partner_readable_id = $match->getTeam1Partner() ? 
@@ -63,11 +63,11 @@ class TransformAthletesListener implements EventSubscriberInterface
 			$match->getTeam2Player()->getReadableId() :	'';
 		$match->team2_partner_readable_id = $match->getTeam2Partner() ? 
 			$match->getTeam2Partner()->getReadableId() : '';
-					
+
 		$event->setData($match);
 
-    }
-	
+	}
+
 	/**
 	 * Updates the match athletes according the user input
 	 * Adds errors to the fields if it is ambiguous
@@ -75,22 +75,22 @@ class TransformAthletesListener implements EventSubscriberInterface
 	 * @param FilterDataEvent $event
 	 */
 	public function onBindNormData(FilterDataEvent $event)
-    {
-        $match = $event->getData();
-        $form = $event->getForm();
+	{
+		$match = $event->getData();
+		$form = $event->getForm();
 
-        if (null === $match) {
-            return;
-        }
-		
+		if (null === $match) {
+			return;
+		}
+
 		if (!$match instanceof Match) {
-            throw new UnexpectedTypeException($match, 'Tobion\TropaionBundle\Entity\Match');
-        }
-		
+			throw new UnexpectedTypeException($match, 'Tobion\TropaionBundle\Entity\Match');
+		}
+
 		// this clears the readable id correctly on the object
 		// but the form still displays the submitted data because it works on the client data
 		// so we would need to do this on BIND_CLIENT_DATA event
-		
+
 //		if ($match->team1_noplayer) {
 //			$match->team1_player_readable_id = null;
 //			$match->team1_partner_readable_id = null;
@@ -103,19 +103,19 @@ class TransformAthletesListener implements EventSubscriberInterface
 
 		//echo 'BINDNORM:';
 		//var_dump($match->team1_player_readable_id);		
-		
+
 		try {
 			$match->setTeam1Player($this->findAthlete($match->team1_player_readable_id));
 		} catch (NotValidException $e) {
 			$form->get('team1_player_readable_id')->addError(new FormError($e->getMessage()));
 		}
-		
+
 		try {
 			$match->setTeam2Player($this->findAthlete($match->team2_player_readable_id));
 		} catch (NotValidException $e) {
 			$form->get('team2_player_readable_id')->addError(new FormError($e->getMessage()));
 		}
-		
+
 		if ($form->has('team1_partner_readable_id')) {
 			try {
 				$match->setTeam1Partner($this->findAthlete($match->team1_partner_readable_id));
@@ -123,7 +123,7 @@ class TransformAthletesListener implements EventSubscriberInterface
 				$form->get('team1_partner_readable_id')->addError(new FormError($e->getMessage()));
 			}
 		}
-		
+
 		if ($form->has('team2_partner_readable_id')) {
 			try {
 				$match->setTeam2Partner($this->findAthlete($match->team2_partner_readable_id));
@@ -131,24 +131,24 @@ class TransformAthletesListener implements EventSubscriberInterface
 				$form->get('team2_partner_readable_id')->addError(new FormError($e->getMessage()));
 			}
 		}
-	
+
 		//echo 'Player:'.$match->getTeam1Player();
-		
+
 		$event->setData($match);
 
-    }
-	
+	}
+
 	/**
 	 * Try to fetch the entity from its id in the database
 	 * 
-     * @param  string  $readableId Human-readable id
+	 * @param  string  $readableId Human-readable id
 	 * 
 	 * @throws NotValidException when Athlete could not be found
-     *
-     * @return Athlete|null The found Athlete or null
-     */
-    private function findAthlete($readableId)
-    {
+	 *
+	 * @return Athlete|null The found Athlete or null
+	 */
+	private function findAthlete($readableId)
+	{
 		if ($readableId === null || $readableId === '') {
 			return null;
 		} else if (is_numeric($readableId)) {
@@ -161,7 +161,7 @@ class TransformAthletesListener implements EventSubscriberInterface
 			$name = $readableId;
 			$id = null;
 		}
-		
+
 		if ($id !== null) { // find by ID
 			$athlete = $this->registry->getEntityManager()->getRepository('TobionTropaionBundle:Athlete')->find($id);	
 			if (!$athlete) {
@@ -171,8 +171,8 @@ class TransformAthletesListener implements EventSubscriberInterface
 			}
 			return $athlete;
 		}
-		
+
 		// find by name TODO
 		throw new NotValidException('No ID given. Name search not supported yet.');
-    }
+	}
 }

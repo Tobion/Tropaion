@@ -9,14 +9,14 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 class BadmintonTeammatchType extends AbstractType
 {
 	protected $registry;
-	
+
 	public function __construct(RegistryInterface $registry)	
 	{	
 		$this->registry = $registry;
 	}
-	
-    public function buildForm(FormBuilder $builder, array $options)
-    {
+
+	public function buildForm(FormBuilder $builder, array $options)
+	{
 		$builder->add('performed_at', 'datetime');
 		$builder->add('venue', 'entity', array(
 			'class' => 'Tobion\TropaionBundle\Entity\Venue'
@@ -33,7 +33,7 @@ class BadmintonTeammatchType extends AbstractType
 		$builder->add('team2_score', 'integer', array(
 			// 'precision' => 0
 		));
-		
+
 		$builder->add('team1_nofight', 'checkbox', array(
 			'required' => false
 		));
@@ -46,7 +46,7 @@ class BadmintonTeammatchType extends AbstractType
 		$builder->add('team2_revaluated_against', 'checkbox', array(
 			'required' => false
 		));
-		
+
 		$builder->add('matches', 'collection', array(
 			'type' => new BadmintonMatchType($this->registry), 
 			'allow_add' => false, 
@@ -54,17 +54,17 @@ class BadmintonTeammatchType extends AbstractType
 			'prototype' => false,
 			'by_reference' => true,
 		));
-    }
-    
+	}
+
 	public function getDefaultOptions(array $options)
 	{
 		return array(
 			'data_class' => 'Tobion\TropaionBundle\Entity\Teammatch',
 		);
 	}
-	
-    public function getName()
-    {
+
+	public function getName()
+	{
 		return 'bmtm';
-    }
+	}
 }

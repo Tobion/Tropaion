@@ -4,7 +4,7 @@
 	{% trans with {
 		'%team1%': teammatch.team1.__toString,
 		'%team2%': teammatch.team2.__toString,
-		'%league%': teammatch.league.classAbbr
+		'%league%': teammatch.league.shortName
 	} %}%team1% vs %team2% | %league%{% endtrans %}
 {% endblock %}
 

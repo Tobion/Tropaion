@@ -4,19 +4,19 @@ namespace Tobion\TropaionBundle\Twig\Extension;
 
 class TropaionExtension extends \Twig_Extension
 {
-    public function getFilters()
-    {
-        return array(
+	public function getFilters()
+	{
+		return array(
 			'roman_numeral' => new \Twig_Filter_Function('\Tobion\TropaionBundle\Util\RomanNumeral::convertIntToRoman'),
-            'pad' => new \Twig_Filter_Method($this, 'padFilter', array('is_safe' => array('html'))),
+			'pad' => new \Twig_Filter_Method($this, 'padFilter', array('is_safe' => array('html'))),
 			'class_attribute' => new \Twig_Filter_Method($this, 'classAttributeFilter', array('is_safe' => array('html'))),
 			'class_names' => new \Twig_Filter_Method($this, 'classNamesFilter', array('is_safe' => array('html'))),
-        );
-    }
+		);
+	}
 
 
-    public function padFilter($value, $pad_length = 2, $pad_string = '&#8199;', $pad_type = STR_PAD_LEFT)
-  	{
+	public function padFilter($value, $pad_length = 2, $pad_string = '&#8199;', $pad_type = STR_PAD_LEFT)
+	{
 		// &#160; = &nbsp; = non-breaking space
 		// &#8199; = figure space
 		return str_replace('~', $pad_string, str_pad((string) $value, $pad_length, '~', $pad_type));
@@ -43,23 +43,23 @@ class TropaionExtension extends \Twig_Extension
 	 *
 	 */	
 	public function classAttributeFilter($array)
-  	{
+	{
 		$classes = self::classNamesFilter($array);
 		return ($classes === '') ? '' : 'class="' . $classes . '"';
 	}
-	
+
 	public function classNamesFilter($array)
-  	{
+	{
 		return implode(' ', array_keys(array_filter($array))); // twig_get_array_keys_filter + twig_join_filter
 	}
 
-    /**
-     * Returns the name of the extension.
-     *
-     * @return string The extension name
-     */
-    public function getName()
-    {
-        return 'tropaion';
-    }
+	/**
+	 * Returns the name of the extension.
+	 *
+	 * @return string The extension name
+	 */
+	public function getName()
+	{
+		return 'tropaion';
+	}
 }
