@@ -95,38 +95,33 @@
 			<th scope="col" class="team hometeam" title="{% trans %}Heimmannschaft{% endtrans %}">
 				{{ teammatch.team1.fullName }}
 
-				<ul class="status">
-					<li class="nofight">
-						{{ form_widget(form.team1_nofight) }}
-						{{ form_label(form.team1_nofight, 'Nicht angetreten') }}
-					</li>
-					<li class="revaluation">
-						{{ form_widget(form.team1_revaluated_against) }}
-						{{ form_label(form.team1_revaluated_against, 'Umgewertet gegen') }}
-					</li>
-				</ul>
+				<div class="nofight">
+					{{ form_widget(form.team1_nofight) }}
+					{{ form_label(form.team1_nofight, 'Nicht angetreten') }}
+				</div>
 			</th>
-			<td class="score"><div><mark class="teammatch-result">
+			<td class="score">
+				{{ form_errors(form.team1_score) }}
+				{{ form_errors(form.team2_score) }}
+				<div><mark class="teammatch-result">
 				{% spaceless %}
-					{{ form_errors(form.team1_score) }}
 					{{ form_widget(form.team1_score) }}
 					<abbr>:</abbr>
 					{{ form_widget(form.team2_score) }}
 				{% endspaceless %}
-			</mark></div></td>
+				</mark></div>
+				{# <div class="revaluation"> #}
+					{{ form_errors(form.revaluation_against) }}
+					{{ form_widget(form.revaluation_against) }}
+				{# </div> #}
+			</td>
 			<th scope="col" class="team awayteam" title="{% trans %}Auswärtsmannschaft{% endtrans %}">
 				{{ teammatch.team2.fullName }}
 
-				<ul class="status">
-					<li class="nofight">
-						{{ form_widget(form.team2_nofight) }}
-						{{ form_label(form.team2_nofight, 'Nicht angetreten') }}
-					</li>
-					<li class="revaluation">
-						{{ form_widget(form.team2_revaluated_against) }}
-						{{ form_label(form.team2_revaluated_against, 'Umgewertet gegen') }}
-					</li>
-				</ul>
+				<div class="nofight">
+					{{ form_widget(form.team2_nofight) }}
+					{{ form_label(form.team2_nofight, 'Nicht angetreten') }}
+				</div>
 			</th>	
 			<th scope="col" class="games">{% trans %}Sätze{% endtrans %}</th>
 		</tr>
@@ -153,9 +148,10 @@
 			<th scope="row" class="matchtype">
 				{{ form_widget(matchForm.match_type_id) }}
 				{{ match.matchType }}
-				<div class="noresult">
+				<div class="noresult{% if matchForm.noresult.all.errors|length > 0 %} error{% endif %}">
 					{{ form_label(matchForm.noresult, 'Kein Ergebnis') }}
 					{{ form_widget(matchForm.noresult) }}
+					{{ form_errors(matchForm.noresult) }}
 				</div>
 			</th>
 			<td class="team hometeam">
@@ -163,24 +159,17 @@
 					{{ form_widget(matchForm.team1_noplayer) }}
 					{{ form_label(matchForm.team1_noplayer, 'Nicht angetreten') }}
 				</div>
-				{% if matchForm.team1_player_readable_id.all.errors | length > 0 %}
-					<div class="error">
+				
+				<div{% if matchForm.team1_player_readable_id.all.errors|length > 0 %} class="error"{% endif %}>
 					{{ form_errors(matchForm.team1_player_readable_id) }}
-				{% endif %}
-				{{ form_widget(matchForm.team1_player_readable_id) }}
-				{% if matchForm.team1_player_readable_id.all.errors | length > 0 %}
-					</div>
-				{% endif %}
+					{{ form_widget(matchForm.team1_player_readable_id) }}
+				</div>
 
 				{% if matchForm.team1_partner_readable_id is defined %}
-					{% if matchForm.team1_partner_readable_id.all.errors | length > 0 %}
-						<div class="error">
+					<div{% if matchForm.team1_partner_readable_id.all.errors|length > 0 %} class="error"{% endif %}>
 						{{ form_errors(matchForm.team1_partner_readable_id) }}
-					{% endif %}
-					{{ form_widget(matchForm.team1_partner_readable_id) }}
-					{% if matchForm.team1_partner_readable_id.all.errors | length > 0 %}
-						</div>
-					{% endif %}
+						{{ form_widget(matchForm.team1_partner_readable_id) }}
+					</div>
 				{% endif %}
 			</td>
 			<td class="score" >
@@ -201,43 +190,34 @@
 					{{ form_widget(matchForm.team2_noplayer) }}
 					{{ form_label(matchForm.team2_noplayer, 'Nicht angetreten') }}
 				</div>
-				{% if matchForm.team2_player_readable_id.all.errors | length > 0 %}
-					<div class="error">
+				<div{% if matchForm.team2_player_readable_id.all.errors|length > 0 %} class="error"{% endif %}>
 					{{ form_errors(matchForm.team2_player_readable_id) }}
-				{% endif %}
-				{{ form_widget(matchForm.team2_player_readable_id) }}
-				{% if matchForm.team2_player_readable_id.all.errors | length > 0 %}
-					</div>
-				{% endif %}
+					{{ form_widget(matchForm.team2_player_readable_id) }}
+				</div>
 
 				{% if matchForm.team2_partner_readable_id is defined %}
-					{% if matchForm.team2_partner_readable_id.all.errors | length > 0 %}
-						<div class="error">
+					<div{% if matchForm.team2_partner_readable_id.all.errors|length > 0 %} class="error"{% endif %}>
 						{{ form_errors(matchForm.team2_partner_readable_id) }}
-					{% endif %}
-					{{ form_widget(matchForm.team2_partner_readable_id) }}
-					{% if matchForm.team2_partner_readable_id.all.errors | length > 0 %}
-						</div>
-					{% endif %}
+						{{ form_widget(matchForm.team2_partner_readable_id) }}
+					</div>
 				{% endif %}
 			</td>
 			<td class="games">
-				<fieldset class="effective-fieldset">
+				{# form_errors(matchForm.games) #}
+				<fieldset class="effective-fieldset{% if matchForm.games.all.errors|length > 0 %} error{% endif %}">
 					<legend>{% trans %}Gewertetes Ergebnis{% endtrans %}</legend>
 					<ol class="effective">
-						{% for gameForm in matchForm.games %}
+					{% for gameForm in matchForm.games %}
 						{% if not gameForm.annulled.get('value') %}
-						<li tabindex="-1">
+						<li tabindex="-1"{% if gameForm.all.errors|length > 0 %} class="error"{% endif %}>
 							{# form_widget(gameForm.annulled) #}
-
-							{{ form_errors(gameForm.team1_score) }}
-
+							{# form_errors(gameForm) #}
 							{{ form_widget(gameForm.team1_score) }}
 							<abbr> : </abbr>
 							{{ form_widget(gameForm.team2_score) }}
 						</li>
 						{% endif %}
-						{% endfor %}
+					{% endfor %}
 					</ol>
 				</fieldset>
 				<fieldset class="annulled-fieldset">
@@ -245,17 +225,14 @@
 					<ol class="annulled">
 					{% for gameForm in matchForm.games %}
 						{% if gameForm.annulled.get('value') %}
-						<li tabindex="-1">
+						<li tabindex="-1"{% if gameForm.all.errors|length > 0 %} class="error"{% endif %}>
 							{{ form_widget(gameForm.annulled) }}
-
-							{{ form_errors(gameForm.team1_score) }}
-
 							{{ form_widget(gameForm.team1_score) }}
 							<abbr> : </abbr>
 							{{ form_widget(gameForm.team2_score) }}
 						</li>
 						{% endif %}
-						{% endfor %}
+					{% endfor %}
 					</ol>
 				</fieldset>
 			</td>

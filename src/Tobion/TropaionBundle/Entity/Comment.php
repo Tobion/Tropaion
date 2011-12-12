@@ -4,8 +4,12 @@ namespace Tobion\TropaionBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Tobion\TropaionBundle\Entity\Match;
+use Tobion\TropaionBundle\Entity\Teammatch;
+use Tobion\TropaionBundle\Entity\User;
+
 /**
- * Tobion\TropaionBundle\Entity\Comment
+ * Kommentare zu Spielen
  *
  * @ORM\Table(name="comments")
  * @ORM\Entity
@@ -77,7 +81,7 @@ class Comment
 	/**
 	 * Get id
 	 *
-	 * @return integer $id
+	 * @return integer
 	 */
 	public function getId()
 	{
@@ -97,7 +101,7 @@ class Comment
 	/**
 	 * Get author_id
 	 *
-	 * @return integer $authorId
+	 * @return integer
 	 */
 	public function getAuthorId()
 	{
@@ -117,7 +121,7 @@ class Comment
 	/**
 	 * Get teammatch_id
 	 *
-	 * @return integer $teammatchId
+	 * @return integer
 	 */
 	public function getTeammatchId()
 	{
@@ -137,7 +141,7 @@ class Comment
 	/**
 	 * Get match_id
 	 *
-	 * @return integer $matchId
+	 * @return integer
 	 */
 	public function getMatchId()
 	{
@@ -157,7 +161,7 @@ class Comment
 	/**
 	 * Get title
 	 *
-	 * @return string $title
+	 * @return string
 	 */
 	public function getTitle()
 	{
@@ -177,7 +181,7 @@ class Comment
 	/**
 	 * Get message
 	 *
-	 * @return text $message
+	 * @return text
 	 */
 	public function getMessage()
 	{
@@ -187,9 +191,9 @@ class Comment
 	/**
 	 * Set Author
 	 *
-	 * @param Tobion\TropaionBundle\Entity\User $author
+	 * @param User $author
 	 */
-	public function setAuthor(\Tobion\TropaionBundle\Entity\User $author)
+	public function setAuthor(User $author)
 	{
 		$this->Author = $author;
 	}
@@ -197,7 +201,7 @@ class Comment
 	/**
 	 * Get Author
 	 *
-	 * @return Tobion\TropaionBundle\Entity\User $author
+	 * @return User
 	 */
 	public function getAuthor()
 	{
@@ -207,9 +211,9 @@ class Comment
 	/**
 	 * Set Teammatch
 	 *
-	 * @param Tobion\TropaionBundle\Entity\Teammatch $teammatch
+	 * @param Teammatch $teammatch
 	 */
-	public function setTeammatch(\Tobion\TropaionBundle\Entity\Teammatch $teammatch)
+	public function setTeammatch(Teammatch $teammatch)
 	{
 		$this->Teammatch = $teammatch;
 	}
@@ -217,7 +221,7 @@ class Comment
 	/**
 	 * Get Teammatch
 	 *
-	 * @return Tobion\TropaionBundle\Entity\Teammatch $teammatch
+	 * @return Teammatch
 	 */
 	public function getTeammatch()
 	{

@@ -4,8 +4,11 @@ namespace Tobion\TropaionBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Tobion\TropaionBundle\Entity\Athlete;
+use Tobion\TropaionBundle\Entity\Match;
+
 /**
- * Tobion\TropaionBundle\Entity\Ratinghistory
+ * Rating der Spieler über die Zeit
  *
  * @ORM\Table(name="ratinghistory",indexes={@ORM\index(name="rating_date_index", columns={"created_at"})})
  * @ORM\Entity
@@ -36,6 +39,7 @@ class Ratinghistory
 	private $match_id;
 
 	/**
+	 * singles, doubles, mixed
 	 * @var string $discipline
 	 *
 	 * @ORM\Column(type="string", length=7)
@@ -70,7 +74,7 @@ class Ratinghistory
 	private $Athlete;
 
 	/**
-	 * @var Athlete
+	 * @var Match
 	 *
 	 * @ORM\ManyToOne(targetEntity="Match", inversedBy="Ratinghistory")
 	 * @ORM\JoinColumn(name="match_id", referencedColumnName="id")
@@ -87,7 +91,7 @@ class Ratinghistory
 	/**
 	 * Get id
 	 *
-	 * @return integer $id
+	 * @return integer
 	 */
 	public function getId()
 	{
@@ -107,7 +111,7 @@ class Ratinghistory
 	/**
 	 * Get athlete_id
 	 *
-	 * @return integer $athleteId
+	 * @return integer
 	 */
 	public function getAthleteId()
 	{
@@ -127,7 +131,7 @@ class Ratinghistory
 	/**
 	 * Get match_id
 	 *
-	 * @return integer $matchId
+	 * @return integer
 	 */
 	public function getMatchId()
 	{
@@ -147,7 +151,7 @@ class Ratinghistory
 	/**
 	 * Get discipline
 	 *
-	 * @return string $discipline
+	 * @return string
 	 */
 	public function getDiscipline()
 	{
@@ -167,7 +171,7 @@ class Ratinghistory
 	/**
 	 * Get pre_rating
 	 *
-	 * @return smallint $pre_rating
+	 * @return smallint
 	 */
 	public function getPreRating()
 	{
@@ -187,7 +191,7 @@ class Ratinghistory
 	/**
 	 * Get post_rating
 	 *
-	 * @return smallint $post_rating
+	 * @return smallint
 	 */
 	public function getPostRating()
 	{
@@ -207,7 +211,7 @@ class Ratinghistory
 	/**
 	 * Get created_at
 	 *
-	 * @return date $createdAt
+	 * @return date
 	 */
 	public function getCreatedAt()
 	{
@@ -217,9 +221,9 @@ class Ratinghistory
 	/**
 	 * Set Athlete
 	 *
-	 * @param Tobion\TropaionBundle\Entity\Athlete $athlete
+	 * @param Athlete $athlete
 	 */
-	public function setAthlete(\Tobion\TropaionBundle\Entity\Athlete $athlete)
+	public function setAthlete(Athlete $athlete)
 	{
 		$this->Athlete = $athlete;
 	}
@@ -227,7 +231,7 @@ class Ratinghistory
 	/**
 	 * Get Athlete
 	 *
-	 * @return Tobion\TropaionBundle\Entity\Athlete $athlete
+	 * @return Athlete
 	 */
 	public function getAthlete()
 	{
@@ -237,9 +241,9 @@ class Ratinghistory
 	/**
 	 * Set Match
 	 *
-	 * @param Tobion\TropaionBundle\Entity\Match $match
+	 * @param Match $match
 	 */
-	public function setMatch(\Tobion\TropaionBundle\Entity\Match $match)
+	public function setMatch(Match $match)
 	{
 		$this->Match = $match;
 	}
@@ -247,7 +251,7 @@ class Ratinghistory
 	/**
 	 * Get Match
 	 *
-	 * @return Tobion\TropaionBundle\Entity\Match $match
+	 * @return Match
 	 */
 	public function getMatch()
 	{

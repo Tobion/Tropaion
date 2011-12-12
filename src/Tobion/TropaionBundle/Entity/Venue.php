@@ -5,7 +5,7 @@ namespace Tobion\TropaionBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Tobion\TropaionBundle\Entity\Venue
+ * Venue
  *
  * @ORM\Table(name="venues")
  * @ORM\Entity
@@ -89,7 +89,7 @@ class Venue
 	/**
 	 * Get id
 	 *
-	 * @return integer $id
+	 * @return integer
 	 */
 	public function getId()
 	{
@@ -109,7 +109,7 @@ class Venue
 	/**
 	 * Get code
 	 *
-	 * @return string $code
+	 * @return string
 	 */
 	public function getCode()
 	{
@@ -129,7 +129,7 @@ class Venue
 	/**
 	 * Get zip
 	 *
-	 * @return string $zip
+	 * @return string
 	 */
 	public function getZip()
 	{
@@ -149,7 +149,7 @@ class Venue
 	/**
 	 * Get city
 	 *
-	 * @return string $city
+	 * @return string
 	 */
 	public function getCity()
 	{
@@ -169,7 +169,7 @@ class Venue
 	/**
 	 * Get street
 	 *
-	 * @return string $street
+	 * @return string
 	 */
 	public function getStreet()
 	{
@@ -189,7 +189,7 @@ class Venue
 	/**
 	 * Get latitude
 	 *
-	 * @return string $latitude
+	 * @return string
 	 */
 	public function getLatitude()
 	{
@@ -209,7 +209,7 @@ class Venue
 	/**
 	 * Get longitude
 	 *
-	 * @return string $longitude
+	 * @return string
 	 */
 	public function getLongitude()
 	{
@@ -229,7 +229,7 @@ class Venue
 	/**
 	 * Get description
 	 *
-	 * @return text $description
+	 * @return text
 	 */
 	public function getDescription()
 	{
@@ -249,7 +249,7 @@ class Venue
 	/**
 	 * Get updated_at
 	 *
-	 * @return datetime $updatedAt
+	 * @return datetime
 	 */
 	public function getUpdatedAt()
 	{

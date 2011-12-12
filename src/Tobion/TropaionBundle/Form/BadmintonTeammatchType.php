@@ -40,11 +40,17 @@ class BadmintonTeammatchType extends AbstractType
 		$builder->add('team2_nofight', 'checkbox', array(
 			'required' => false
 		));
-		$builder->add('team1_revaluated_against', 'checkbox', array(
-			'required' => false
-		));
-		$builder->add('team2_revaluated_against', 'checkbox', array(
-			'required' => false
+		
+		$builder->add('revaluation_against', 'choice', array(
+			'required' => false,
+			'choices'   => array(
+				'team1' => 'Umw. gegen: Heim',
+				'team2' => 'Umw. gegen: Gast',
+				'both' => 'Umw. gegen: Beide',
+			),
+			'multiple'  => false,
+			'expanded'  => false,
+			'empty_value'  => 'Umwertung?',
 		));
 
 		$builder->add('matches', 'collection', array(

@@ -3,10 +3,18 @@
 namespace Tobion\TropaionBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+
+use Tobion\TropaionBundle\Entity\Club;
+use Tobion\TropaionBundle\Entity\Match;
+use Tobion\TropaionBundle\Entity\Team;
+use Tobion\TropaionBundle\Entity\User;
+use Tobion\TropaionBundle\Entity\Venue;
 use Tobion\TropaionBundle\Util\SignedIntToSortableStringConverter;
 
 /**
- * Tobion\TropaionBundle\Entity\Teammatch
+ * Spiele zwischen zwei Mannschaften
+ * Sowohl geplante (ohne Ergebnis) als auch absolvierte,
+ * die aus mehreren Individual-Matches bestehen können
  *
  * @ORM\Table(name="teammatches",indexes={@ORM\index(name="performed_at_index", columns={"performed_at"})})
  * @ORM\Entity(repositoryClass="Tobion\TropaionBundle\Repository\TeammatchRepository")
@@ -31,6 +39,7 @@ class Teammatch
 	private $venue_id;
 
 	/**
+	 * Ursprünglich geplantes Datum des Spiels, wenn abweichend von performed_at
 	 * @var datetime $scheduled_at
 	 *
 	 * @ORM\Column(type="datetime")
@@ -38,6 +47,7 @@ class Teammatch
 	private $scheduled_at;
 
 	/**
+	 * Verlegter Spieltermin
 	 * @var datetime $moved_at
 	 *
 	 * @ORM\Column(type="datetime", nullable=true)
@@ -45,6 +55,7 @@ class Teammatch
 	private $moved_at;
 
 	/**
+	 * Austragungsdatum des Spiels
 	 * @var datetime $performed_at
 	 *
 	 * @ORM\Column(type="datetime")
@@ -52,13 +63,15 @@ class Teammatch
 	private $performed_at;
 
 	/**
-	 * @var integer $season_round
+	 * Hinrunde = 1, Rückrunde = 2
+	 * @var integer $stage
 	 *
 	 * @ORM\Column(type="smallint")
 	 */
-	private $season_round;
+	private $stage;
 
 	/**
+	 * Heimmannschaft bzw. erstes Team bei Spielen auf neutralem Grund
 	 * @var integer $team1_id
 	 *
 	 * @ORM\Column(type="integer")
@@ -66,6 +79,7 @@ class Teammatch
 	private $team1_id;
 
 	/**
+	 * Auswärtsmannschaft bzw. zweites Team bei Spielen auf neutralem Grund
 	 * @var integer $team2_id
 	 *
 	 * @ORM\Column(type="integer")
@@ -73,6 +87,7 @@ class Teammatch
 	private $team2_id;
 
 	/**
+	 * Resultat für Team 1 (z.B. gewonnene Spiele oder erzielte Tore)
 	 * @var integer $team1_score
 	 *
 	 * @ORM\Column(type="smallint", nullable=true)
@@ -80,6 +95,7 @@ class Teammatch
 	private $team1_score;
 
 	/**
+	 * Resultat für Team 2 (z.B. gewonnene Spiele oder erzielte Tore)
 	 * @var integer $team2_score
 	 *
 	 * @ORM\Column(type="smallint", nullable=true)
@@ -87,6 +103,7 @@ class Teammatch
 	private $team2_score;
 
 	/**
+	 * Gewonnene Sätze von Team 1
 	 * @var integer $team1_games
 	 *
 	 * @ORM\Column(type="smallint", nullable=true)
@@ -94,6 +111,7 @@ class Teammatch
 	private $team1_games;
 
 	/**
+	 * Gewonnene Sätze von Team 2
 	 * @var integer $team2_games
 	 *
 	 * @ORM\Column(type="smallint", nullable=true)
@@ -101,6 +119,7 @@ class Teammatch
 	private $team2_games;
 
 	/**
+	 * Gewonnene Spielpunkte von Team 1
 	 * @var integer $team1_points
 	 *
 	 * @ORM\Column(type="smallint", nullable=true)
@@ -108,6 +127,7 @@ class Teammatch
 	private $team1_points;
 
 	/**
+	 * Gewonnene Spielpunkte von Team 2
 	 * @var integer $team2_points
 	 *
 	 * @ORM\Column(type="smallint", nullable=true)
@@ -115,6 +135,7 @@ class Teammatch
 	private $team2_points;
 
 	/**
+	 * Kampflos beendetes Spiel, z.B. nicht angetretene Mannschaft
 	 * @var boolean $no_fight
 	 *
 	 * @ORM\Column(type="boolean")
@@ -122,6 +143,7 @@ class Teammatch
 	private $no_fight = false;
 
 	/**
+	 * Unbewertetes Ergebnis bzw. gestrichene Ansetzung, z.B. durch zurückgezogene Mannschaft
 	 * @var boolean $annulled
 	 *
 	 * @ORM\Column(type="boolean")
@@ -129,6 +151,10 @@ class Teammatch
 	private $annulled = false;
 
 	/**
+	 * Ob Ergebnis revidiert wurde; D.h. hat matches mit revised_score = 1
+	 * Dient zusätzlich als Flag für Aufstellungsfehler in den einzelnen Disziplinen,
+	 * wobei nur diese umgewertet wurden. Im Gegensatz zur globalen Teammatch-Umwertung
+	 * mittels revaluation_wrongdoer.
 	 * @var boolean $revised_score
 	 *
 	 * @ORM\Column(type="boolean")
@@ -136,6 +162,9 @@ class Teammatch
 	private $revised_score = false;
 
 	/**
+	 * Ob und wer einen (Aufstellungs-)Fehler begangen hat,
+	 * der zu einer Umwertung führt (Verursacher)
+	 * 0 = false, 1 = Fehler verursacht von Team1, 2 = Team2, 3 = beide schuldig
 	 * @var integer $revaluation_wrongdoer
 	 *
 	 * @ORM\Column(type="smallint")
@@ -143,6 +172,8 @@ class Teammatch
 	private $revaluation_wrongdoer = 0;
 
 	/**
+	 * Begründung der Umwertung
+	 * 0 = false, sonst Fehlernummer
 	 * @var integer $revaluation_reason
 	 *
 	 * @ORM\Column(type="smallint")
@@ -150,6 +181,7 @@ class Teammatch
 	private $revaluation_reason = 0;
 
 	/**
+	 * Unvollständige Aufstellung; D.h. hat matches mit player = NULL
 	 * @var boolean $incomplete_lineup
 	 *
 	 * @ORM\Column(type="boolean")
@@ -157,6 +189,7 @@ class Teammatch
 	private $incomplete_lineup;
 
 	/**
+	 * Ergebnis eingegeben von welchem Nutzer
 	 * @var integer $submitted_by_id
 	 *
 	 * @ORM\Column(type="integer", nullable=true)
@@ -171,6 +204,7 @@ class Teammatch
 	private $submitted_at;
 
 	/**
+	 * Ergebnis bestätigt von welchem Nutzer
 	 * @var integer $confirmed_by_id
 	 *
 	 * @ORM\Column(type="integer", nullable=true)
@@ -185,6 +219,7 @@ class Teammatch
 	private $confirmed_at;
 
 	/**
+	 * Ergebnis genehmigt von welchem Nutzer
 	 * @var integer $approved_by_id
 	 *
 	 * @ORM\Column(type="integer", nullable=true)
@@ -264,7 +299,7 @@ class Teammatch
 	private $Approved_By;
 
 	/**
-	 * @var Match
+	 * @var Match[]
 	 *
 	 * @ORM\OneToMany(targetEntity="Match", mappedBy="Teammatch")
 	 * @ORM\JoinColumn(name="id", referencedColumnName="teammatch_id")
@@ -290,7 +325,7 @@ class Teammatch
 	/**
 	 * Get id
 	 *
-	 * @return integer $id
+	 * @return integer
 	 */
 	public function getId()
 	{
@@ -310,7 +345,7 @@ class Teammatch
 	/**
 	 * Get venue_id
 	 *
-	 * @return integer $venueId
+	 * @return integer
 	 */
 	public function getVenueId()
 	{
@@ -330,7 +365,7 @@ class Teammatch
 	/**
 	 * Get scheduled_at
 	 *
-	 * @return datetime $scheduledAt
+	 * @return datetime
 	 */
 	public function getScheduledAt()
 	{
@@ -350,7 +385,7 @@ class Teammatch
 	/**
 	 * Get moved_at
 	 *
-	 * @return datetime $movedAt
+	 * @return datetime
 	 */
 	public function getMovedAt()
 	{
@@ -370,7 +405,7 @@ class Teammatch
 	/**
 	 * Get performed_at
 	 *
-	 * @return datetime $performedAt
+	 * @return datetime
 	 */
 	public function getPerformedAt()
 	{
@@ -378,23 +413,23 @@ class Teammatch
 	}
 
 	/**
-	 * Set season_round
+	 * Set stage
 	 *
-	 * @param smallint $seasonRound
+	 * @param smallint $stage
 	 */
-	public function setSeasonRound($seasonRound)
+	public function setStage($stage)
 	{
-		$this->season_round = $seasonRound;
+		$this->stage = $stage;
 	}
 
 	/**
-	 * Get season_round
+	 * Get stage
 	 *
-	 * @return smallint $seasonRound
+	 * @return smallint
 	 */
-	public function getSeasonRound()
+	public function getStage()
 	{
-		return $this->season_round;
+		return $this->stage;
 	}
 
 	/**
@@ -410,7 +445,7 @@ class Teammatch
 	/**
 	 * Get team1_id
 	 *
-	 * @return integer $team1Id
+	 * @return integer
 	 */
 	public function getTeam1Id()
 	{
@@ -430,7 +465,7 @@ class Teammatch
 	/**
 	 * Get team2_id
 	 *
-	 * @return integer $team2Id
+	 * @return integer
 	 */
 	public function getTeam2Id()
 	{
@@ -450,7 +485,7 @@ class Teammatch
 	/**
 	 * Get team1_score
 	 *
-	 * @return smallint $team1Score
+	 * @return smallint
 	 */
 	public function getTeam1Score()
 	{
@@ -470,7 +505,7 @@ class Teammatch
 	/**
 	 * Get team2_score
 	 *
-	 * @return smallint $team2Score
+	 * @return smallint
 	 */
 	public function getTeam2Score()
 	{
@@ -490,7 +525,7 @@ class Teammatch
 	/**
 	 * Get team1_games
 	 *
-	 * @return smallint $team1Games
+	 * @return smallint
 	 */
 	public function getTeam1Games()
 	{
@@ -510,7 +545,7 @@ class Teammatch
 	/**
 	 * Get team2_games
 	 *
-	 * @return smallint $team2Games
+	 * @return smallint
 	 */
 	public function getTeam2Games()
 	{
@@ -530,7 +565,7 @@ class Teammatch
 	/**
 	 * Get team1_points
 	 *
-	 * @return smallint $team1Points
+	 * @return smallint
 	 */
 	public function getTeam1Points()
 	{
@@ -550,7 +585,7 @@ class Teammatch
 	/**
 	 * Get team2_points
 	 *
-	 * @return smallint $team2Points
+	 * @return smallint
 	 */
 	public function getTeam2Points()
 	{
@@ -570,7 +605,7 @@ class Teammatch
 	/**
 	 * Get no_fight
 	 *
-	 * @return boolean $noFight
+	 * @return boolean
 	 */
 	public function getNoFight()
 	{
@@ -590,7 +625,7 @@ class Teammatch
 	/**
 	 * Get annulled
 	 *
-	 * @return boolean $annulled
+	 * @return boolean
 	 */
 	public function getAnnulled()
 	{
@@ -610,7 +645,7 @@ class Teammatch
 	/**
 	 * Get revised_score
 	 *
-	 * @return boolean $revisedScore
+	 * @return boolean
 	 */
 	public function getRevisedScore()
 	{
@@ -630,7 +665,7 @@ class Teammatch
 	/**
 	 * Get revaluation_wrongdoer
 	 *
-	 * @return smallint $revaluationWrongdoer
+	 * @return smallint
 	 */
 	public function getRevaluationWrongdoer()
 	{
@@ -650,7 +685,7 @@ class Teammatch
 	/**
 	 * Get revaluation_reason
 	 *
-	 * @return smallint $revaluationReason
+	 * @return smallint
 	 */
 	public function getRevaluationReason()
 	{
@@ -670,7 +705,7 @@ class Teammatch
 	/**
 	 * Get incomplete_lineup
 	 *
-	 * @return boolean $incompleteLineup
+	 * @return boolean
 	 */
 	public function getIncompleteLineup()
 	{
@@ -690,7 +725,7 @@ class Teammatch
 	/**
 	 * Get submitted_by_id
 	 *
-	 * @return integer $submittedById
+	 * @return integer
 	 */
 	public function getSubmittedById()
 	{
@@ -710,7 +745,7 @@ class Teammatch
 	/**
 	 * Get submitted_at
 	 *
-	 * @return datetime $submittedAt
+	 * @return datetime
 	 */
 	public function getSubmittedAt()
 	{
@@ -730,7 +765,7 @@ class Teammatch
 	/**
 	 * Get confirmed_by_id
 	 *
-	 * @return integer $confirmedById
+	 * @return integer
 	 */
 	public function getConfirmedById()
 	{
@@ -750,7 +785,7 @@ class Teammatch
 	/**
 	 * Get confirmed_at
 	 *
-	 * @return datetime $confirmedAt
+	 * @return datetime
 	 */
 	public function getConfirmedAt()
 	{
@@ -770,7 +805,7 @@ class Teammatch
 	/**
 	 * Get approved_by_id
 	 *
-	 * @return integer $approvedById
+	 * @return integer
 	 */
 	public function getApprovedById()
 	{
@@ -790,7 +825,7 @@ class Teammatch
 	/**
 	 * Get approved_at
 	 *
-	 * @return datetime $approvedAt
+	 * @return datetime
 	 */
 	public function getApprovedAt()
 	{
@@ -810,7 +845,7 @@ class Teammatch
 	/**
 	 * Get description
 	 *
-	 * @return text $description
+	 * @return text
 	 */
 	public function getDescription()
 	{
@@ -830,7 +865,7 @@ class Teammatch
 	/**
 	 * Get created_at
 	 *
-	 * @return datetime $createdAt
+	 * @return datetime
 	 */
 	public function getCreatedAt()
 	{
@@ -850,7 +885,7 @@ class Teammatch
 	/**
 	 * Get updated_at
 	 *
-	 * @return datetime $updatedAt
+	 * @return datetime
 	 */
 	public function getUpdatedAt()
 	{
@@ -860,9 +895,9 @@ class Teammatch
 	/**
 	 * Set Venue
 	 *
-	 * @param Tobion\TropaionBundle\Entity\Venue $venue
+	 * @param Venue $venue
 	 */
-	public function setVenue(\Tobion\TropaionBundle\Entity\Venue $venue)
+	public function setVenue(Venue $venue)
 	{
 		$this->Venue = $venue;
 	}
@@ -870,7 +905,7 @@ class Teammatch
 	/**
 	 * Get Venue
 	 *
-	 * @return Tobion\TropaionBundle\Entity\Venue $venue
+	 * @return Venue
 	 */
 	public function getVenue()
 	{
@@ -880,9 +915,9 @@ class Teammatch
 	/**
 	 * Set Team1
 	 *
-	 * @param Tobion\TropaionBundle\Entity\Team $team1
+	 * @param Team $team1
 	 */
-	public function setTeam1(\Tobion\TropaionBundle\Entity\Team $team1)
+	public function setTeam1(Team $team1)
 	{
 		$this->Team1 = $team1;
 	}
@@ -890,7 +925,7 @@ class Teammatch
 	/**
 	 * Get Team1
 	 *
-	 * @return Tobion\TropaionBundle\Entity\Team $team1
+	 * @return Team
 	 */
 	public function getTeam1()
 	{
@@ -900,9 +935,9 @@ class Teammatch
 	/**
 	 * Set Team2
 	 *
-	 * @param Tobion\TropaionBundle\Entity\Team $team2
+	 * @param Team $team2
 	 */
-	public function setTeam2(\Tobion\TropaionBundle\Entity\Team $team2)
+	public function setTeam2(Team $team2)
 	{
 		$this->Team2 = $team2;
 	}
@@ -910,7 +945,7 @@ class Teammatch
 	/**
 	 * Get Team2
 	 *
-	 * @return Tobion\TropaionBundle\Entity\Team $team2
+	 * @return Team
 	 */
 	public function getTeam2()
 	{
@@ -920,9 +955,9 @@ class Teammatch
 	/**
 	 * Set Submitted_By
 	 *
-	 * @param Tobion\TropaionBundle\Entity\User $submittedBy
+	 * @param User $submittedBy
 	 */
-	public function setSubmittedBy(\Tobion\TropaionBundle\Entity\User $submittedBy)
+	public function setSubmittedBy(User $submittedBy)
 	{
 		$this->Submitted_By = $submittedBy;
 	}
@@ -930,7 +965,7 @@ class Teammatch
 	/**
 	 * Get Submitted_By
 	 *
-	 * @return Tobion\TropaionBundle\Entity\User $submittedBy
+	 * @return User
 	 */
 	public function getSubmittedBy()
 	{
@@ -940,9 +975,9 @@ class Teammatch
 	/**
 	 * Set Confirmed_By
 	 *
-	 * @param Tobion\TropaionBundle\Entity\User $confirmedBy
+	 * @param User $confirmedBy
 	 */
-	public function setConfirmedBy(\Tobion\TropaionBundle\Entity\User $confirmedBy)
+	public function setConfirmedBy(User $confirmedBy)
 	{
 		$this->Confirmed_By = $confirmedBy;
 	}
@@ -950,7 +985,7 @@ class Teammatch
 	/**
 	 * Get Confirmed_By
 	 *
-	 * @return Tobion\TropaionBundle\Entity\User $confirmedBy
+	 * @return User
 	 */
 	public function getConfirmedBy()
 	{
@@ -960,9 +995,9 @@ class Teammatch
 	/**
 	 * Set Approved_By
 	 *
-	 * @param Tobion\TropaionBundle\Entity\User $approvedBy
+	 * @param User $approvedBy
 	 */
-	public function setApprovedBy(\Tobion\TropaionBundle\Entity\User $approvedBy)
+	public function setApprovedBy(User $approvedBy)
 	{
 		$this->Approved_By = $approvedBy;
 	}
@@ -970,7 +1005,7 @@ class Teammatch
 	/**
 	 * Get Approved_By
 	 *
-	 * @return Tobion\TropaionBundle\Entity\User $approvedBy
+	 * @return User
 	 */
 	public function getApprovedBy()
 	{
@@ -980,17 +1015,17 @@ class Teammatch
 	/**
 	 * Add Matches
 	 *
-	 * @param Tobion\TropaionBundle\Entity\Match $matches
+	 * @param Match $match
 	 */
-	public function addMatches(\Tobion\TropaionBundle\Entity\Match $matches)
+	public function addMatches(Match $match)
 	{
-		$this->Matches[] = $matches;
+		$this->Matches[] = $match;
 	}
 
 	/**
 	 * Get Matches
 	 *
-	 * @return Doctrine\Common\Collections\Collection $matches
+	 * @return \Doctrine\Common\Collections\Collection[Match]
 	 */
 	public function getMatches()
 	{
@@ -1016,22 +1051,30 @@ class Teammatch
 	 * that is not evaluated in this call for performance reasons. So it's enough to 
 	 * join Team1 with its league.
 	 *
-	 * @return Tobion\TropaionBundle\Entity\League 	The league that this teammatch is part of.
+	 * @return League 	The league that this teammatch is part of.
 	 */
 	public function getLeague()
 	{
 		return !is_null($this->getTeam1()->getLeague()) ? $this->getTeam1()->getLeague() : $this->getTeam2()->getLeague();
 	}
 
-	public function setLeague(\Tobion\TropaionBundle\Entity\League $league)
+	/**
+	 * Set League
+	 *
+	 * @param League $league
+	 */
+	public function setLeague(League $league)
 	{
 		$this->getTeam1()->setLeague($league);
 		$this->getTeam2()->setLeague($league);
 	}
 
 	/**
-	* Only unique in the right context (per league).
-	*/
+	 * Gets the slug
+	 * Only unique in the right context (per league).
+	 *
+	 * @return string
+	 */
 	public function getSlug()
 	{
 		return 
@@ -1040,6 +1083,12 @@ class Teammatch
 			$this->getTeam2()->getClub()->getCode() . '-' . $this->getTeam2()->getTeamNumber() ;
 	}
 
+	/**
+	 * Splits the slug into its components
+	 *
+	 * @param string $slug
+	 * @return array|false
+	 */
 	public static function parseSlug($slug)
 	{
 		$params = array();
@@ -1112,6 +1161,10 @@ class Teammatch
 		return $this->hasResult() && ($this->getTeam1Score() == 0 && $this->getTeam2Score() == 0);
 	}
 
+	/**
+	 *
+	 * @return Team|false|null
+	 */
 	public function getWinnerTeam()
 	{
 		if (!$this->hasResult()) return false;
@@ -1209,57 +1262,86 @@ class Teammatch
 
 
 	/**
-	 * Summe aller gewonnenen Saetze von Team 1 ueber alle Individualspiele des Teamspiels
+	 * Anzahl der gewonnenen Matches von Team 2
 	 *
-	 * @return integer
+	 * @return integer|float|null
 	 */
-	public function sumTeam1WonGames()
+	public function calcTeam1Matches()
 	{
-		$sum = 0;
+		$sum = null;
 		foreach ($this->Matches as $match) {
-			$sum += $match->numberTeam1WonGames();
+			$sum += $match->isDraw() ? 0.5 : $match->isTeam1Winner();
 		}
 		return $sum;
 	}
 
 	/**
-	 * Summe aller gewonnenen Saetze von Team 2 ueber alle Individualspiele des Teamspiels
+	 * Anzahl der gewonnenen Matches von Team 2
 	 *
-	 * @return integer
+	 * @return integer|float|null
 	 */
-	public function sumTeam2WonGames()
+	public function calcTeam2Matches()
 	{
-		$sum = 0;
+		$sum = null;
 		foreach ($this->Matches as $match) {
-			$sum += $match->numberTeam2WonGames();
+			$sum += $match->isDraw() ? 0.5 : $match->isTeam2Winner();
+		}
+		return $sum;
+	}
+
+
+	/**
+	 * Summe aller gewonnenen Sätze von Team 1 über alle Individualspiele des Teamspiels
+	 *
+	 * @return integer|float|null
+	 */
+	public function calcTeam1Games()
+	{
+		$sum = null;
+		foreach ($this->Matches as $match) {
+			$sum += $match->calcTeam1Games();
 		}
 		return $sum;
 	}
 
 	/**
-	 * Summe aller gewonnenen Punkte von Team 1 ueber alle Individualspiele und Saetze des Teamspiels
+	 * Summe aller gewonnenen Sätze von Team 2 über alle Individualspiele des Teamspiels
 	 *
-	 * @return integer
+	 * @return integer|float|null
 	 */
-	public function sumTeam1Score()
+	public function calcTeam2Games()
 	{
-		$sum = 0;
+		$sum = null;
 		foreach ($this->Matches as $match) {
-			$sum += $match->sumTeam1Score();
+			$sum += $match->calcTeam2Games();
 		}
 		return $sum;
 	}
 
 	/**
-	 * Summe aller gewonnenen Punkte von Team 2 ueber alle Individualspiele und Saetze des Teamspiels
+	 * Summe aller gewonnenen Punkte von Team 1 über alle Individualspiele und Sätze des Teamspiels
 	 *
-	 * @return integer
+	 * @return integer|null
 	 */
-	public function sumTeam2Score()
+	public function calcTeam1Points()
 	{
-		$sum = 0;
+		$sum = null;
 		foreach ($this->Matches as $match) {
-			$sum += $match->sumTeam2Score();
+			$sum += $match->calcTeam1Points();
+		}
+		return $sum;
+	}
+
+	/**
+	 * Summe aller gewonnenen Punkte von Team 2 über alle Individualspiele und Sätze des Teamspiels
+	 *
+	 * @return integer|null
+	 */
+	public function calcTeam2Points()
+	{
+		$sum = null;
+		foreach ($this->Matches as $match) {
+			$sum += $match->calcTeam2Points();
 		}
 		return $sum;
 	}
@@ -1297,7 +1379,7 @@ class Teammatch
 	 * If both Teams belong to the Club the Teammatch will stay unmodified, thus be the home view for Team1.
 	 * If neither Team1 nor Team2 belongs to the Club do nothing.
 	 */
-	public function transformToClubView(\Tobion\TropaionBundle\Entity\Club $club)
+	public function transformToClubView(Club $club)
 	{
 		if ($this->getTeam1()->getClubId() != $club->getId() && $this->getTeam2()->getClubId() == $club->getId())
 		{
@@ -1310,7 +1392,7 @@ class Teammatch
 		}
 	}
 
-	public function transformToTeamView(\Tobion\TropaionBundle\Entity\Team $team)
+	public function transformToTeamView(Team $team)
 	{
 		if ($this->getTeam1Id() != $team->getId() && $this->getTeam2Id() == $team->getId())
 		{
@@ -1388,6 +1470,49 @@ class Teammatch
 	public function isTeam2RevaluatedAgainst()
 	{
 		return $this->getRevaluationWrongdoer() == 2 || $this->getRevaluationWrongdoer() == 3;
+	}
+	
+	public function getRevaluationAgainst()
+	{
+		switch ($this->getRevaluationWrongdoer()) {
+			case 1:
+				return 'team1';
+			case 2:
+				return 'team2';
+			case 3:
+				return 'both';
+		}
+
+		return '';
+	}
+	
+	public function setRevaluationAgainst($value)
+	{
+		// TODO (switch to RevaluationWrongdoer)
+	}
+
+	/**
+	 * Recalculates all statistics, like the score based on the matches and games
+	 */
+	public function updateStats()
+	{
+		foreach ($this->Matches as $match) {
+			/* @var $match Match */
+			$match->updateStats();
+		}
+
+		$this->setNoFight();
+		$this->setRevisedScore();
+		$this->setIncompleteLineup();
+
+		$this->setTeam1Score($this->calcTeam1Matches());
+		$this->setTeam1Games($this->calcTeam1Games());
+		$this->setTeam1Points($this->calcTeam1Points());
+
+		$this->setTeam2Score($this->calcTeam2Matches());
+		$this->setTeam2Games($this->calcTeam2Games());
+		$this->setTeam2Points($this->calcTeam2Points());
+
 	}
 
 

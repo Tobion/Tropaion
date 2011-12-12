@@ -33,7 +33,7 @@
 		<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Droid+Sans|Droid+Sans+Mono" />
 	{% endblock %}
 	{% block metas %}
-		<meta name="publisher" property="dc:publisher" content="{% if tournament is defined %}{{ tournament.owner }}{% else %}Badminton-Verband Berlin-Brandenburg e.V.{% endif %}" />
+		<meta name="publisher" property="dc:publisher" content="{% if tournament is defined %}{{ tournament.owner.fullName }}{% else %}Badminton-Verband Berlin-Brandenburg e.V.{% endif %}" />
 		<meta name="generator" property="dc:creator" content="Tropaion" />
 	{% endblock %}
 
@@ -78,7 +78,7 @@
 					<form action="{{ path('home_search') }}" id="main-search-form" method="get">      
 						<div>
 							<label for="main-search-field">{% trans %}Suche…{% endtrans %}</label>
-							<input type="text" id="main-search-field" name="q" placeholder="{% trans %}Suche Spieler / Mannschaften / Vereine / Turniere{% endtrans %}" /> 
+							<input type="search" id="main-search-field" name="q" placeholder="{% trans %}Suche Spieler / Mannschaften / Vereine / Turniere{% endtrans %}" /> 
 							<input type="submit" value="{% trans %}Suche{% endtrans %}" />
 						</div>
 						{% if tournament is defined %}

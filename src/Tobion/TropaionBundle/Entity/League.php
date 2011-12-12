@@ -4,8 +4,11 @@ namespace Tobion\TropaionBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Tobion\TropaionBundle\Entity\Team;
+use Tobion\TropaionBundle\Entity\Tournament;
+
 /**
- * Tobion\TropaionBundle\Entity\League
+ * Ligen und Staffeln
  *
  * @ORM\Table(name="leagues",uniqueConstraints={@ORM\UniqueConstraint(name="league_index", columns={"class_abbr", "division","tournament_id"})})
  * @ORM\Entity(repositoryClass="Tobion\TropaionBundle\Repository\LeagueRepository")
@@ -43,6 +46,8 @@ class League
 	private $class_name;
 
 	/**
+	 * Einteilung der Liga in eine hierarchische Pyramidenstruktur.
+	 * Je größer der Wert, desto schwächer die sportliche Leistung.
 	 * @var integer $class_level
 	 *
 	 * @ORM\Column(type="smallint")
@@ -57,6 +62,7 @@ class League
 	private $division;    
 
 	/**
+	 * Die wieviel bestplatzierten qualifizieren sich für den Aufstieg
 	 * @var integer $promoted_number
 	 *
 	 * @ORM\Column(type="smallint")
@@ -64,6 +70,7 @@ class League
 	private $promoted_number;
 
 	/**
+	 * Die wieviel letztplatzierten qualifizieren sich für den Abstieg
 	 * @var integer $relegated_number
 	 *
 	 * @ORM\Column(type="smallint")
@@ -95,7 +102,7 @@ class League
 	/**
 	 * Get id
 	 *
-	 * @return integer $id
+	 * @return integer
 	 */
 	public function getId()
 	{
@@ -115,7 +122,7 @@ class League
 	/**
 	 * Get tournament_id
 	 *
-	 * @return string $tournamentId
+	 * @return string
 	 */
 	public function getTournamentId()
 	{
@@ -135,7 +142,7 @@ class League
 	/**
 	 * Get class_abbr
 	 *
-	 * @return string $classAbbr
+	 * @return string
 	 */
 	public function getClassAbbr()
 	{
@@ -155,7 +162,7 @@ class League
 	/**
 	 * Get class_name
 	 *
-	 * @return string $className
+	 * @return string
 	 */
 	public function getClassName()
 	{
@@ -175,7 +182,7 @@ class League
 	/**
 	 * Get class_level
 	 *
-	 * @return smallint $classLevel
+	 * @return smallint
 	 */
 	public function getClassLevel()
 	{
@@ -195,7 +202,7 @@ class League
 	/**
 	 * Get division
 	 *
-	 * @return smallint $division
+	 * @return smallint
 	 */
 	public function getDivision()
 	{
@@ -215,7 +222,7 @@ class League
 	/**
 	 * Get promoted_number
 	 *
-	 * @return smallint $promotedNumber
+	 * @return smallint
 	 */
 	public function getPromotedNumber()
 	{
@@ -235,7 +242,7 @@ class League
 	/**
 	 * Get relegated_number
 	 *
-	 * @return smallint $relegatedNumber
+	 * @return smallint
 	 */
 	public function getRelegatedNumber()
 	{
@@ -245,9 +252,9 @@ class League
 	/**
 	 * Set Tournament
 	 *
-	 * @param Tobion\TropaionBundle\Entity\Tournament $tournament
+	 * @param Tournament $tournament
 	 */
-	public function setTournament(\Tobion\TropaionBundle\Entity\Tournament $tournament)
+	public function setTournament(Tournament $tournament)
 	{
 		$this->Tournament = $tournament;
 	}
@@ -255,7 +262,7 @@ class League
 	/**
 	 * Get Tournament
 	 *
-	 * @return Tobion\TropaionBundle\Entity\Tournament $tournament
+	 * @return Tournament
 	 */
 	public function getTournament()
 	{
@@ -265,17 +272,17 @@ class League
 	/**
 	 * Add Teams
 	 *
-	 * @param Tobion\TropaionBundle\Entity\Team $teams
+	 * @param Team $team
 	 */
-	public function addTeams(\Tobion\TropaionBundle\Entity\Team $teams)
+	public function addTeams(Team $team)
 	{
-		$this->Teams[] = $teams;
+		$this->Teams[] = $team;
 	}
 
 	/**
 	 * Get Teams
 	 *
-	 * @return Doctrine\Common\Collections\Collection $teams
+	 * @return Doctrine\Common\Collections\Collection
 	 */
 	public function getTeams()
 	{

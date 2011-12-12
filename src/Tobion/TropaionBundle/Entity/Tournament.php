@@ -4,8 +4,11 @@ namespace Tobion\TropaionBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Tobion\TropaionBundle\Entity\Club;
+use Tobion\TropaionBundle\Entity\User;
+
 /**
- * Tobion\TropaionBundle\Entity\Tournament
+ * Tournament
  *
  * Tournament -> Competition (Konkurrenz) or Event (Veranstaltung) -> Draw (Auslosung)
  *
@@ -24,16 +27,16 @@ class Tournament
 	private $id;
 
 	/**
-	 * @var integer $owner_id
 	 * Veranstalter
+	 * @var integer $owner_id
 	 *
 	 * @ORM\Column(type="integer")
 	 */
 	private $owner_id; // organizer_id
 
 	/**
-	 * @var integer $host_id
 	 * Ausrichter
+	 * @var integer $host_id
 	 *
 	 * @ORM\Column(type="integer", nullable=true)
 	 */
@@ -89,7 +92,7 @@ class Tournament
 	private $sport;
 
 	/**
-	 * @var Owner
+	 * @var User
 	 *
 	 * @ORM\ManyToOne(targetEntity="User")
 	 * @ORM\JoinColumn(name="owner_id", referencedColumnName="id")
@@ -97,7 +100,7 @@ class Tournament
 	private $Owner;
 
 	/**
-	 * @var Host
+	 * @var Club
 	 *
 	 * @ORM\ManyToOne(targetEntity="Club")
 	 * @ORM\JoinColumn(name="host_id", referencedColumnName="id")
@@ -108,7 +111,7 @@ class Tournament
 	/**
 	 * Get id
 	 *
-	 * @return integer $id
+	 * @return integer
 	 */
 	public function getId()
 	{
@@ -128,7 +131,7 @@ class Tournament
 	/**
 	 * Get owner_id
 	 *
-	 * @return integer $ownerId
+	 * @return integer
 	 */
 	public function getOwnerId()
 	{
@@ -148,7 +151,7 @@ class Tournament
 	/**
 	 * Get host_id
 	 *
-	 * @return integer $hostId
+	 * @return integer
 	 */
 	public function getHostId()
 	{
@@ -168,7 +171,7 @@ class Tournament
 	/**
 	 * Get short_name
 	 *
-	 * @return string $shortName
+	 * @return string
 	 */
 	public function getShortName()
 	{
@@ -188,7 +191,7 @@ class Tournament
 	/**
 	 * Get full_name
 	 *
-	 * @return string $fullName
+	 * @return string
 	 */
 	public function getFullName()
 	{
@@ -208,7 +211,7 @@ class Tournament
 	/**
 	 * Get season
 	 *
-	 * @return string $season
+	 * @return string
 	 */
 	public function getSeason()
 	{
@@ -228,7 +231,7 @@ class Tournament
 	/**
 	 * Get slug
 	 *
-	 * @return string $slug
+	 * @return string
 	 */
 	public function getSlug()
 	{
@@ -248,7 +251,7 @@ class Tournament
 	/**
 	 * Get start_date
 	 *
-	 * @return date $startDate
+	 * @return date
 	 */
 	public function getStartDate()
 	{
@@ -268,7 +271,7 @@ class Tournament
 	/**
 	 * Get end_date
 	 *
-	 * @return date $endDate
+	 * @return date
 	 */
 	public function getEndDate()
 	{
@@ -288,7 +291,7 @@ class Tournament
 	/**
 	 * Get sport
 	 *
-	 * @return string $sport
+	 * @return string
 	 */
 	public function getSport()
 	{
@@ -298,9 +301,9 @@ class Tournament
 	/**
 	 * Set Owner
 	 *
-	 * @param Tobion\TropaionBundle\Entity\User $owner
+	 * @param User $owner
 	 */
-	public function setOwner(\Tobion\TropaionBundle\Entity\User $owner)
+	public function setOwner(User $owner)
 	{
 		$this->Owner = $owner;
 	}
@@ -308,7 +311,7 @@ class Tournament
 	/**
 	 * Get Owner
 	 *
-	 * @return Tobion\TropaionBundle\Entity\User $owner
+	 * @return User
 	 */
 	public function getOwner()
 	{
@@ -318,9 +321,9 @@ class Tournament
 	/**
 	 * Set Host
 	 *
-	 * @param Tobion\TropaionBundle\Entity\Club $host
+	 * @param Club $host
 	 */
-	public function setHost(\Tobion\TropaionBundle\Entity\Club $host)
+	public function setHost(Club $host)
 	{
 		$this->Host = $host;
 	}
@@ -328,7 +331,7 @@ class Tournament
 	/**
 	 * Get Host
 	 *
-	 * @return Tobion\TropaionBundle\Entity\Club $host
+	 * @return Club
 	 */
 	public function getHost()
 	{

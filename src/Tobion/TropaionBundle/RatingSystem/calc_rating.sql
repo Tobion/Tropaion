@@ -159,6 +159,7 @@ IF (team1rating1 IS NOT NULL OR team1rating2 IS NOT NULL) AND (team2rating1 IS N
     END IF;
 	*/
 
+	# TODO bei Aufgabe gamediffadjustment auf max. 1 begrenzen
 	# Neue Anpassung mittels einer Normalverteilung mit Mittelwert = 63.9 und Standardabweichung = 23.2
 	SET gamediffadjustment = EXP(-0.5 * POW((losers_points_pct - 63.9) / 23.2, 2)); # Wertebereich zwischen 0 und 1
 	# Linke Seite (kleier als Mittelwert) der Normalverteilung spiegeln, denn besonders hohe Ergebnisse sollen zu einem erhöhten k-factor führen
@@ -515,8 +516,8 @@ ORDER BY created_at, athlete_id, discipline
         INNER JOIN teams t1 ON (tm.team1_id = t1.id)
         INNER JOIN teams t2 ON (tm.team2_id = t2.id)
         INNER JOIN leagues l ON (t1.league_id = l.id)
-        LEFT JOIN lineups u ON (m.team1_player_id = u.athlete_id AND t1.id = u.team_id AND u.season_round = 1)
-        LEFT JOIN lineups u2 ON (m.team1_player_id = u2.athlete_id AND u2.season_round = 1)
+        LEFT JOIN lineups u ON (m.team1_player_id = u.athlete_id AND t1.id = u.team_id AND u.stage = 1)
+        LEFT JOIN lineups u2 ON (m.team1_player_id = u2.athlete_id AND u2.stage = 1)
         WHERE NOT m.no_fight AND (
             (m.team1_score IS NOT NULL AND m.team2_score IS NOT NULL) OR 
             (m.team1_original_score IS NOT NULL AND m.team2_original_score IS NOT NULL)
@@ -530,8 +531,8 @@ ORDER BY created_at, athlete_id, discipline
         INNER JOIN teams t1 ON (tm.team1_id = t1.id)
         INNER JOIN teams t2 ON (tm.team2_id = t2.id)
         INNER JOIN leagues l ON (t1.league_id = l.id)
-        LEFT JOIN lineups u ON (m.team1_player_id = u.athlete_id AND t1.id = u.team_id AND u.season_round = 1)
-        LEFT JOIN lineups u2 ON (m.team1_player_id = u2.athlete_id AND u2.season_round = 1)
+        LEFT JOIN lineups u ON (m.team1_player_id = u.athlete_id AND t1.id = u.team_id AND u.stage = 1)
+        LEFT JOIN lineups u2 ON (m.team1_player_id = u2.athlete_id AND u2.stage = 1)
         WHERE NOT m.no_fight AND (
             (m.team1_score IS NOT NULL AND m.team2_score IS NOT NULL) OR 
             (m.team1_original_score IS NOT NULL AND m.team2_original_score IS NOT NULL)

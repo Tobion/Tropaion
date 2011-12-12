@@ -3,10 +3,14 @@
 namespace Tobion\TropaionBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+
+use Tobion\TropaionBundle\Entity\Club;
+use Tobion\TropaionBundle\Entity\League;
+use Tobion\TropaionBundle\Entity\Lineup;
 use Tobion\TropaionBundle\Util\RomanNumeral;
 
 /**
- * Tobion\TropaionBundle\Entity\Team
+ * Mannschaften zusammengesetzt aus Verein und Nummer
  *
  * @ORM\Table(name="teams",uniqueConstraints={@ORM\UniqueConstraint(name="team_index", columns={"team_number", "league_id", "club_id"})})
  * @ORM\Entity
@@ -104,7 +108,7 @@ class Team
 	/**
 	 * Get id
 	 *
-	 * @return integer $id
+	 * @return integer
 	 */
 	public function getId()
 	{
@@ -124,7 +128,7 @@ class Team
 	/**
 	 * Get club_id
 	 *
-	 * @return integer $clubId
+	 * @return integer
 	 */
 	public function getClubId()
 	{
@@ -144,7 +148,7 @@ class Team
 	/**
 	 * Get team_number
 	 *
-	 * @return smallint $teamNumber
+	 * @return smallint
 	 */
 	public function getTeamNumber()
 	{
@@ -164,7 +168,7 @@ class Team
 	/**
 	 * Get league_id
 	 *
-	 * @return integer $leagueId
+	 * @return integer
 	 */
 	public function getLeagueId()
 	{
@@ -184,7 +188,7 @@ class Team
 	/**
 	 * Get withdrawn
 	 *
-	 * @return boolean $withdrawn
+	 * @return boolean
 	 */
 	public function getWithdrawn()
 	{
@@ -204,7 +208,7 @@ class Team
 	/**
 	 * Get description
 	 *
-	 * @return text $description
+	 * @return text
 	 */
 	public function getDescription()
 	{
@@ -224,7 +228,7 @@ class Team
 	/**
 	 * Get updated_at
 	 *
-	 * @return datetime $updatedAt
+	 * @return datetime
 	 */
 	public function getUpdatedAt()
 	{
@@ -234,9 +238,9 @@ class Team
 	/**
 	 * Set Club
 	 *
-	 * @param Tobion\TropaionBundle\Entity\Club $club
+	 * @param Club $club
 	 */
-	public function setClub(\Tobion\TropaionBundle\Entity\Club $club)
+	public function setClub(Club $club)
 	{
 		$this->Club = $club;
 	}
@@ -244,7 +248,7 @@ class Team
 	/**
 	 * Get Club
 	 *
-	 * @return Tobion\TropaionBundle\Entity\Club $club
+	 * @return Club
 	 */
 	public function getClub()
 	{
@@ -254,9 +258,9 @@ class Team
 	/**
 	 * Set League
 	 *
-	 * @param Tobion\TropaionBundle\Entity\League $league
+	 * @param League $league
 	 */
-	public function setLeague(\Tobion\TropaionBundle\Entity\League $league)
+	public function setLeague(League $league)
 	{
 		$this->League = $league;
 	}
@@ -264,7 +268,7 @@ class Team
 	/**
 	 * Get League
 	 *
-	 * @return Tobion\TropaionBundle\Entity\League $league
+	 * @return League
 	 */
 	public function getLeague()
 	{
@@ -275,17 +279,17 @@ class Team
 	/**
 	 * Add Lineups
 	 *
-	 * @param Tobion\TropaionBundle\Entity\Lineup $lineups
+	 * @param Lineup $lineup
 	 */
-	public function addLineups(\Tobion\TropaionBundle\Entity\Lineup $lineups)
+	public function addLineups(Lineup $lineup)
 	{
-		$this->Lineups[] = $lineups;
+		$this->Lineups[] = $lineup;
 	}
 
 	/**
 	 * Get Lineups
 	 *
-	 * @return Doctrine\Common\Collections\Collection $lineups
+	 * @return Doctrine\Common\Collections\Collection
 	 */
 	public function getLineups()
 	{
@@ -293,11 +297,11 @@ class Team
 	}
 
 
-	private function filterLineups($seasonRound = null, $athleteGender = null)
+	private function filterLineups($stage = null, $athleteGender = null)
 	{
 		$lineups = array();
 		foreach ($this->Lineups as $lineup) {
-			if ((!$seasonRound || $lineup->getSeasonRound() == $seasonRound) && 
+			if ((!$stage || $lineup->getStage() == $stage) &&
 				(!$athleteGender || $lineup->getAthlete()->getGender() == $athleteGender)) {
 				$lineups[] = $lineup;
 			}
@@ -335,7 +339,7 @@ class Team
 		$firstRoundLineup = array();
 		$secondRoundLineup = array();
 		foreach ($this->Lineups as $lineup) {
-			if ($lineup->getSeasonRound() == 1) {
+			if ($lineup->getStage() == 1) {
 				$firstRoundLineup[$lineup->getAthleteId()] = $lineup->getPosition();
 			}
 			else {
@@ -361,22 +365,15 @@ class Team
 		);
 	}
 
-	public function getClubCodeWithTeamNumber($toRoman = true, $html = false)
-	{
-		return $this->getClub()->getCode() . 
-			($html ? '&#160;' /* '&nbsp;' */ : ' ') . 
-			($toRoman ? RomanNumeral::convertIntToRoman($this->getTeamNumber()) : $this->getTeamNumber());
-	}
-
 	function getTeamNumberAsRomanNumeral()
 	{
 		return RomanNumeral::convertIntToRoman($this->getTeamNumber());
 	}
 
-	public function isPositioned($seasonRound, $athleteId)
+	public function isPositioned($stage, $athleteId)
 	{
 		foreach ($this->Lineups as $lineup) {
-			if ($lineup->getSeasonRound() == $seasonRound && $lineup->getAthleteId() == $athleteId) {
+			if ($lineup->getStage() == $stage && $lineup->getAthleteId() == $athleteId) {
 				return true;
 			}
 		}
@@ -400,8 +397,7 @@ class Team
 
 	function __toString()
 	{
-		// return $this->getClubCodeWithTeamNumber() . ' (' . $this->getLeague() . ')';
-		return $this->getClubCodeWithTeamNumber();
+		return $this->getShortName();
 	} 
 
 }

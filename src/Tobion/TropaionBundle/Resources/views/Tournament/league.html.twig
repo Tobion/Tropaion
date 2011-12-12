@@ -240,8 +240,8 @@
 			<td class="crossover">
 				<a {{ {
 						'home': true, 
-						'first-half': hometeammatch.seasonRound == 1,
-						'second-half': hometeammatch.seasonRound == 2,
+						'first-half': hometeammatch.stage == 1,
+						'second-half': hometeammatch.stage == 2,
 						'nofight': hometeammatch.noFight,
 						'revised': hometeammatch.revisedScore,
 						'incomplete': hometeammatch.incompleteLineup
@@ -256,8 +256,8 @@
 				</a>
 				<a {{ {
 						'away': true, 
-						'first-half': awayteammatch.seasonRound == 1,
-						'second-half': awayteammatch.seasonRound == 2,
+						'first-half': awayteammatch.stage == 1,
+						'second-half': awayteammatch.stage == 2,
 						'nofight': awayteammatch.noFight,
 						'revised': awayteammatch.revisedScore,
 						'incomplete': awayteammatch.incompleteLineup

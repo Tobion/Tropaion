@@ -8,7 +8,7 @@ class TropaionExtension extends \Twig_Extension
 	{
 		return array(
 			'roman_numeral' => new \Twig_Filter_Function('\Tobion\TropaionBundle\Util\RomanNumeral::convertIntToRoman'),
-			'pad' => new \Twig_Filter_Method($this, 'padFilter', array('is_safe' => array('html'))),
+			'pad' => new \Twig_Filter_Method($this, 'padFilter', array('pre_escape' => 'html', 'is_safe' => array('html'))),
 			'class_attribute' => new \Twig_Filter_Method($this, 'classAttributeFilter', array('is_safe' => array('html'))),
 			'class_names' => new \Twig_Filter_Method($this, 'classNamesFilter', array('is_safe' => array('html'))),
 		);
@@ -50,7 +50,9 @@ class TropaionExtension extends \Twig_Extension
 
 	public function classNamesFilter($array)
 	{
-		return implode(' ', array_keys(array_filter($array))); // twig_get_array_keys_filter + twig_join_filter
+		// escape " and '
+		// article about allowed characters in id and class attribute: http://mathiasbynens.be/notes/html5-id-class
+		return htmlspecialchars(implode(' ', array_keys(array_filter($array))), ENT_QUOTES); // twig_get_array_keys_filter + twig_join_filter + twig_escape_filter
 	}
 
 	/**

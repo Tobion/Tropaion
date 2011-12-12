@@ -471,7 +471,9 @@ function manipulateNoPlayer(noPlayerNode) {
 			Spielerauswahl leeren und verstecken
 		*/
 		athletes.set('value', '');
-		athletes.hide();
+		athletes.each(function (athlete) {
+			athlete.ancestor().hide();
+		});
 		var match = noPlayerNode.ancestor('.match');
 		var matchEffectiveGamesNode = match.one('.effective');
 		
@@ -520,7 +522,9 @@ function manipulateNoPlayer(noPlayerNode) {
 		}
 	}
 	else {
-		athletes.show();
+		athletes.each(function (athlete) {
+			athlete.ancestor().show();
+		});
 	}
 }
 

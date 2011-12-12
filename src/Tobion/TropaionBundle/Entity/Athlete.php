@@ -4,8 +4,12 @@ namespace Tobion\TropaionBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Tobion\TropaionBundle\Entity\Club;
+use Tobion\TropaionBundle\Entity\User;
+use Tobion\TropaionBundle\Entity\Tournament;
+
 /**
- * Tobion\TropaionBundle\Entity\Athlete
+ * Athlete
  *
  * @ORM\Table(name="athletes",indexes={@ORM\index(name="is_active_index", columns={"is_active"})})
  * @ORM\Entity
@@ -178,7 +182,7 @@ class Athlete
 	/**
 	 * Get id
 	 *
-	 * @return integer $id
+	 * @return integer
 	 */
 	public function getId()
 	{
@@ -198,7 +202,7 @@ class Athlete
 	/**
 	 * Get last_name
 	 *
-	 * @return string $lastName
+	 * @return string
 	 */
 	public function getLastName()
 	{
@@ -218,7 +222,7 @@ class Athlete
 	/**
 	 * Get first_name
 	 *
-	 * @return string $firstName
+	 * @return string
 	 */
 	public function getFirstName()
 	{
@@ -238,7 +242,7 @@ class Athlete
 	/**
 	 * Get gender
 	 *
-	 * @return string $gender
+	 * @return string
 	 */
 	public function getGender()
 	{
@@ -258,7 +262,7 @@ class Athlete
 	/**
 	 * Get birthday
 	 *
-	 * @return date $birthday
+	 * @return date
 	 */
 	public function getBirthday()
 	{
@@ -278,7 +282,7 @@ class Athlete
 	/**
 	 * Get country
 	 *
-	 * @return string $country
+	 * @return string
 	 */
 	public function getCountry()
 	{
@@ -298,7 +302,7 @@ class Athlete
 	/**
 	 * Get club_id
 	 *
-	 * @return integer $clubId
+	 * @return integer
 	 */
 	public function getClubId()
 	{
@@ -318,7 +322,7 @@ class Athlete
 	/**
 	 * Get is_active
 	 *
-	 * @return boolean $isActive
+	 * @return boolean
 	 */
 	public function getIsActive()
 	{
@@ -338,7 +342,7 @@ class Athlete
 	/**
 	 * Get zip
 	 *
-	 * @return string $zip
+	 * @return string
 	 */
 	public function getZip()
 	{
@@ -358,7 +362,7 @@ class Athlete
 	/**
 	 * Get city
 	 *
-	 * @return string $city
+	 * @return string
 	 */
 	public function getCity()
 	{
@@ -378,7 +382,7 @@ class Athlete
 	/**
 	 * Get street
 	 *
-	 * @return string $street
+	 * @return string
 	 */
 	public function getStreet()
 	{
@@ -398,7 +402,7 @@ class Athlete
 	/**
 	 * Get singles_rating
 	 *
-	 * @return smallint $singlesRating
+	 * @return smallint
 	 */
 	public function getSinglesRating()
 	{
@@ -418,7 +422,7 @@ class Athlete
 	/**
 	 * Get doubles_rating
 	 *
-	 * @return smallint $doublesRating
+	 * @return smallint
 	 */
 	public function getDoublesRating()
 	{
@@ -438,7 +442,7 @@ class Athlete
 	/**
 	 * Get mixed_rating
 	 *
-	 * @return smallint $mixedRating
+	 * @return smallint
 	 */
 	public function getMixedRating()
 	{
@@ -458,7 +462,7 @@ class Athlete
 	/**
 	 * Get singles_matches
 	 *
-	 * @return smallint $singlesMatches
+	 * @return smallint
 	 */
 	public function getSinglesMatches()
 	{
@@ -478,7 +482,7 @@ class Athlete
 	/**
 	 * Get doubles_matches
 	 *
-	 * @return smallint $doublesMatches
+	 * @return smallint
 	 */
 	public function getDoublesMatches()
 	{
@@ -498,7 +502,7 @@ class Athlete
 	/**
 	 * Get mixed_matches
 	 *
-	 * @return smallint $mixedMatches
+	 * @return smallint
 	 */
 	public function getMixedMatches()
 	{
@@ -518,7 +522,7 @@ class Athlete
 	/**
 	 * Get created_at
 	 *
-	 * @return datetime $createdAt
+	 * @return datetime
 	 */
 	public function getCreatedAt()
 	{
@@ -538,7 +542,7 @@ class Athlete
 	/**
 	 * Get updated_at
 	 *
-	 * @return datetime $updatedAt
+	 * @return datetime
 	 */
 	public function getUpdatedAt()
 	{
@@ -548,9 +552,9 @@ class Athlete
 	/**
 	 * Set Club
 	 *
-	 * @param Tobion\TropaionBundle\Entity\Club $club
+	 * @param Club $club
 	 */
-	public function setClub(\Tobion\TropaionBundle\Entity\Club $club)
+	public function setClub(Club $club)
 	{
 		$this->Club = $club;
 	}
@@ -558,7 +562,7 @@ class Athlete
 	/**
 	 * Get Club
 	 *
-	 * @return Tobion\TropaionBundle\Entity\Club $club
+	 * @return Club
 	 */
 	public function getClub()
 	{
@@ -568,7 +572,7 @@ class Athlete
 	/**
 	 * Get User
 	 *
-	 * @return Tobion\TropaionBundle\Entity\User $user
+	 * @return User
 	 */
 	public function getUser()
 	{
@@ -576,7 +580,7 @@ class Athlete
 	}
 
 
-	public function routingParams(\Tobion\TropaionBundle\Entity\Tournament $tournament = null)
+	public function routingParams(Tournament $tournament = null)
 	{
 		$params = array(
 			'firstName' => $this->getFirstName(),

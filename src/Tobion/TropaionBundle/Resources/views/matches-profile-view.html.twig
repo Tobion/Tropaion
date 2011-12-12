@@ -116,7 +116,7 @@
 			{% if teammatch.annulled %}</del>{% endif %}
 		</td>
 		<td class="league"><a href="{{ path('tournament_league', teammatch.league.routingParams ) }}" data-level="{{ teammatch.league.classLevel }}" data-division="{{ teammatch.league.division }}">{{ teammatch.league.shortName }}</a></td>
-		<td class="stage"><span {% if teammatch.seasonRound == 1 %}data-stage="first-half">{% trans %}Hin{% endtrans %}{% else %}data-stage="second-half">{% trans %}Rück{% endtrans %}{% endif %}</span></td>
+		<td class="stage"><span {% if teammatch.stage == 1 %}data-stage="first-half">{% trans %}Hin{% endtrans %}{% else %}data-stage="second-half">{% trans %}Rück{% endtrans %}{% endif %}</span></td>
 		<td class="homeaway"><span data-homeaway="{{ teammatch.transformedViewHomeAway }}">{% if teammatch.transformedViewHomeAway == 'home' %}{% trans %}Heim{% endtrans %}{% else %}{% trans %}Ausw.{% endtrans %}{% endif %}</span></td>
 		<td class="matchtype partner">
 			{% spaceless %}

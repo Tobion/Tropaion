@@ -4,8 +4,10 @@ namespace Tobion\TropaionBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Tobion\TropaionBundle\Entity\Athlete;
+
 /**
- * Tobion\TropaionBundle\Entity\User
+ * User
  *
  * @ORM\Table(name="users")
  * @ORM\Entity
@@ -36,6 +38,13 @@ class User
 	private $slug;
 
 	/**
+	 * @var string $full_name
+	 *
+	 * @ORM\Column(type="string", length=100)
+	 */
+	private $full_name;
+
+	/**
 	 * @var string $email
 	 *
 	 * @ORM\Column(type="string", length=255)
@@ -43,6 +52,7 @@ class User
 	private $email;
 
 	/**
+	 * Verbindet registrierte Nutzer mit dessen Spielerprofil
 	 * @var integer $athlete_id
 	 *
 	 * @ORM\Column(type="integer", nullable=true)
@@ -85,7 +95,7 @@ class User
 	/**
 	 * Get id
 	 *
-	 * @return integer $id
+	 * @return integer
 	 */
 	public function getId()
 	{
@@ -105,7 +115,7 @@ class User
 	/**
 	 * Get username
 	 *
-	 * @return string $username
+	 * @return string
 	 */
 	public function getUsername()
 	{
@@ -125,11 +135,31 @@ class User
 	/**
 	 * Get slug
 	 *
-	 * @return string $slug
+	 * @return string
 	 */
 	public function getSlug()
 	{
 		return $this->slug;
+	}
+
+	/**
+	 * Set full_name
+	 *
+	 * @param string $fullName
+	 */
+	public function setFullName($fullName)
+	{
+		$this->full_name = $fullName;
+	}
+
+	/**
+	 * Get full_name
+	 *
+	 * @return string
+	 */
+	public function getFullName()
+	{
+		return $this->full_name;
 	}
 
 	/**
@@ -145,7 +175,7 @@ class User
 	/**
 	 * Get email
 	 *
-	 * @return string $email
+	 * @return string
 	 */
 	public function getEmail()
 	{
@@ -165,7 +195,7 @@ class User
 	/**
 	 * Get athlete_id
 	 *
-	 * @return integer $athleteId
+	 * @return integer
 	 */
 	public function getAthleteId()
 	{
@@ -185,7 +215,7 @@ class User
 	/**
 	 * Get created_at
 	 *
-	 * @return datetime $createdAt
+	 * @return datetime
 	 */
 	public function getCreatedAt()
 	{
@@ -205,7 +235,7 @@ class User
 	/**
 	 * Get updated_at
 	 *
-	 * @return datetime $updatedAt
+	 * @return datetime
 	 */
 	public function getUpdatedAt()
 	{
@@ -215,9 +245,9 @@ class User
 	/**
 	 * Set Athlete
 	 *
-	 * @param Tobion\TropaionBundle\Entity\Athlete $athlete
+	 * @param Athlete $athlete
 	 */
-	public function setAthlete(\Tobion\TropaionBundle\Entity\Athlete $athlete)
+	public function setAthlete(Athlete $athlete)
 	{
 		$this->Athlete = $athlete;
 	}
@@ -225,7 +255,7 @@ class User
 	/**
 	 * Get Athlete
 	 *
-	 * @return Tobion\TropaionBundle\Entity\Athlete $athlete
+	 * @return Athlete
 	 */
 	public function getAthlete()
 	{

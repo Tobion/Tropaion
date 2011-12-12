@@ -102,18 +102,22 @@ class TransformAthletesListener implements EventSubscriberInterface
 
 
 		//echo 'BINDNORM:';
-		//var_dump($match->team1_player_readable_id);		
+		//var_dump($match->team1_player_readable_id);
+		
+		//$form->get('games')->addError(new FormError('Invalid'));
 
 		try {
 			$match->setTeam1Player($this->findAthlete($match->team1_player_readable_id));
 		} catch (NotValidException $e) {
 			$form->get('team1_player_readable_id')->addError(new FormError($e->getMessage()));
+			$match->setTeam1Player(null);
 		}
 
 		try {
 			$match->setTeam2Player($this->findAthlete($match->team2_player_readable_id));
 		} catch (NotValidException $e) {
 			$form->get('team2_player_readable_id')->addError(new FormError($e->getMessage()));
+			$match->setTeam2Player(null);
 		}
 
 		if ($form->has('team1_partner_readable_id')) {
@@ -121,6 +125,7 @@ class TransformAthletesListener implements EventSubscriberInterface
 				$match->setTeam1Partner($this->findAthlete($match->team1_partner_readable_id));
 			} catch (NotValidException $e) {
 				$form->get('team1_partner_readable_id')->addError(new FormError($e->getMessage()));
+				$match->setTeam1Partner(null);
 			}
 		}
 
@@ -129,6 +134,7 @@ class TransformAthletesListener implements EventSubscriberInterface
 				$match->setTeam2Partner($this->findAthlete($match->team2_partner_readable_id));
 			} catch (NotValidException $e) {
 				$form->get('team2_partner_readable_id')->addError(new FormError($e->getMessage()));
+				$match->setTeam2Partner(null);
 			}
 		}
 

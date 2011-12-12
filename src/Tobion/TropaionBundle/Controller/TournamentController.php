@@ -582,14 +582,14 @@ class TournamentController extends Controller
 			->innerJoin('t.League', 'l')
 			->where($qb->expr()->eq('lu.athlete_id', ':athlete_id'))
 			->andWhere($qb->expr()->eq('l.tournament_id', ':tournament_id'))
-			->andWhere($qb->expr()->eq('lu.season_round', ':season_round'))
+			->andWhere($qb->expr()->eq('lu.stage', ':stage'))
 			->setParameter('athlete_id', $athlete->getId())
 			->setParameter('tournament_id', $tournament->getId());
 
-		$qb->setParameter('season_round', 1);
+		$qb->setParameter('stage', 1);
 		$lineupFirstRound = $qb->getQuery()->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
 
-		$qb->setParameter('season_round', 2);
+		$qb->setParameter('stage', 2);
 		$lineupSecondRound = $qb->getQuery()->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
 
 		$lineupChanged = $lineupSecondRound && 
@@ -623,6 +623,44 @@ class TournamentController extends Controller
 
 	}
 
+	/**
+	 * Adds all properties (e.g. matches and games) to the teammatch
+	 * that are required to enter a result
+	 *
+	 * @param Entity\Teammatch $teammatch
+	 */
+	private function prepareTeammatchResultProperties(Entity\Teammatch $teammatch)
+	{
+		if (count($teammatch->getMatches()) == 0)
+		{
+			$em = $this->getDoctrine()->getEntityManager();
+
+			$badmintonMatchTypes = array(1, 2, 3, 4, 5, 6, 7, 8);
+
+			foreach ($badmintonMatchTypes as $matchTypeId) {
+				$match = new Entity\Match();
+				$match->setMatchType($em->getReference('TobionTropaionBundle:MatchType', $matchTypeId));
+				$match->setTeammatch($teammatch);
+				$teammatch->addMatches($match);
+			}
+		}
+
+		foreach ($teammatch->getMatches() as $match) {
+			for ($count = count($match->getEffectiveGames()); $count < 3; $count++)
+			{
+				$g = new Entity\Game();
+				$g->setMatch($match);
+				$match->addGames($g);
+			}
+			for ($count = count($match->getAnnulledGames()); $count < 3; $count++)
+			{
+				$g = new Entity\Game();
+				$g->setAnnulled(1);
+				$g->setMatch($match);
+				$match->addGames($g);
+			}
+		}
+	}
 
 	/**
 	 * @Route("/{league}/{team1Club}-{team1Number}_{team2Club}-{team2Number}/edit", 
@@ -656,34 +694,7 @@ class TournamentController extends Controller
 			throw $this->createNotFoundException('Teammatch not found.');
 		}
 
-
-		if (!$teammatch->hasDetailedResult())
-		{
-			$badmintonMatchTypes = array(1, 2, 3, 4, 5, 6, 7, 8);
-
-			foreach ($badmintonMatchTypes as $matchTypeId) {
-				$match = new Entity\Match();
-				$match->setMatchType($em->getReference('TobionTropaionBundle:MatchType', $matchTypeId));
-				$match->setTeammatch($teammatch);
-				$teammatch->addMatches($match);
-			}
-		}
-
-		foreach ($teammatch->getMatches() as $match) { 	
-			for ($count = count($match->getEffectiveGames()); $count < 3; $count++)
-			{
-				$g = new Entity\Game();
-				$g->setMatch($match);
-				$match->addGames($g);
-			}
-			for ($count = count($match->getAnnulledGames()); $count < 3; $count++)
-			{
-				$g = new Entity\Game();
-				$g->setAnnulled(1);
-				$g->setMatch($match);
-				$match->addGames($g);
-			}
-		}
+		$this->prepareTeammatchResultProperties($teammatch);
 
 		$form = $this->createForm(new BadmintonTeammatchType($this->getDoctrine()), $teammatch);
 
@@ -691,9 +702,11 @@ class TournamentController extends Controller
 			$form->bindRequest($this->getRequest());
 
 			if ($form->isValid()) {
-				// perform some action, such as saving the task to the database
+				// save the teammatch to the database
 
 				return $this->redirect($this->generateUrl('tournament_teammatch', $teammatch->routingParams()));
+			} else {
+				// $this->prepareTeammatchResultProperties($teammatch);
 			}
 		}
 
@@ -736,7 +749,7 @@ class TournamentController extends Controller
 				) AS athlete_teammatches
 				GROUP BY athlete_id
 				) AS at ON lu.athlete_id = at.athlete_id
-			WHERE  t.club_id = :CLUB_ID AND lu.season_round = :SEASON_ROUND AND r.season = :SEASON
+			WHERE  t.club_id = :CLUB_ID AND lu.stage = :STAGE AND r.season = :SEASON
 			ORDER BY num_team_activity DESC, is_team_starter DESC, (t.team_number < :TEAM_NUMBER) ASC, t.team_number ASC, lu.position ASC';
 
 		// Zuerst nach Anzahl der Einsätze in dieser Mannschaft sortieren, da die aktivsten Spieler am wahrscheinlichsten auch beim neu-einzutragenden Mannschaftsspiel beteiligt waren
@@ -751,7 +764,7 @@ class TournamentController extends Controller
 		$sqlParams['TEAM_ID'] = $teammatch->getTeam1Id();
 		$sqlParams['TEAM_NUMBER'] = $teammatch->getTeam1()->getTeamNumber();
 		$sqlParams['CLUB_ID'] = $teammatch->getTeam1()->getClubId();
-		$sqlParams['SEASON_ROUND'] = $teammatch->getSeasonRound();
+		$sqlParams['STAGE'] = $teammatch->getStage();
 		$sqlParams['SEASON'] = $tournament->getSeason();
 
 		$club1_athletes = $conn->fetchAll($query, $sqlParams);
@@ -760,7 +773,7 @@ class TournamentController extends Controller
 		$sqlParams['TEAM_ID'] = $teammatch->getTeam2Id();
 		$sqlParams['TEAM_NUMBER'] = $teammatch->getTeam2()->getTeamNumber();
 		$sqlParams['CLUB_ID'] = $teammatch->getTeam2()->getClubId();
-		$sqlParams['SEASON_ROUND'] = $teammatch->getSeasonRound();
+		$sqlParams['STAGE'] = $teammatch->getStage();
 		$sqlParams['SEASON'] = $tournament->getSeason();
 
 		$club2_athletes = $conn->fetchAll($query, $sqlParams);

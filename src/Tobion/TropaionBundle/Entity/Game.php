@@ -4,8 +4,10 @@ namespace Tobion\TropaionBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Tobion\TropaionBundle\Entity\Match;
+
 /**
- * Tobion\TropaionBundle\Entity\Game
+ * Game
  *
  * @ORM\Table(name="games",uniqueConstraints={@ORM\UniqueConstraint(name="game_index", columns={"annulled", "game_sequence", "match_id"})})
  * @ORM\Entity
@@ -50,6 +52,8 @@ class Game
 	private $team2_score;
 
 	/**
+	 * Nachträglich annulliertes Ergebnis (z.B. durch formale Fehler)
+	 * oder Spielstand zum Zeitpunkt einer Aufgabe (dessen gewertetes Ergebnis anders ist)
 	 * @var boolean $annulled
 	 *
 	 * @ORM\Column(name="annulled", type="boolean")
@@ -69,7 +73,7 @@ class Game
 	/**
 	 * Get id
 	 *
-	 * @return integer $id
+	 * @return integer
 	 */
 	public function getId()
 	{
@@ -89,7 +93,7 @@ class Game
 	/**
 	 * Get match_id
 	 *
-	 * @return integer $matchId
+	 * @return integer
 	 */
 	public function getMatchId()
 	{
@@ -109,7 +113,7 @@ class Game
 	/**
 	 * Get game_sequence
 	 *
-	 * @return smallint $gameSequence
+	 * @return smallint
 	 */
 	public function getGameSequence()
 	{
@@ -129,7 +133,7 @@ class Game
 	/**
 	 * Get team1_score
 	 *
-	 * @return smallint $team1Score
+	 * @return smallint
 	 */
 	public function getTeam1Score()
 	{
@@ -149,7 +153,7 @@ class Game
 	/**
 	 * Get team2_score
 	 *
-	 * @return smallint $team2Score
+	 * @return smallint
 	 */
 	public function getTeam2Score()
 	{
@@ -169,7 +173,7 @@ class Game
 	/**
 	 * Get annulled
 	 *
-	 * @return boolean $annulled
+	 * @return boolean
 	 */
 	public function getAnnulled()
 	{
@@ -179,9 +183,9 @@ class Game
 	/**
 	 * Set Match
 	 *
-	 * @param Tobion\TropaionBundle\Entity\Match $match
+	 * @param Match $match
 	 */
-	public function setMatch(\Tobion\TropaionBundle\Entity\Match $match)
+	public function setMatch(Match $match)
 	{
 		$this->Match = $match;
 	}
@@ -189,11 +193,37 @@ class Game
 	/**
 	 * Get Match
 	 *
-	 * @return Tobion\TropaionBundle\Entity\Match $match
+	 * @return Match
 	 */
 	public function getMatch()
 	{
 		return $this->Match;
+	}
+
+
+	public function hasResult()
+	{
+		return !is_null($this->getTeam1Score()) && !is_null($this->getTeam2Score());
+	}
+
+	public function isDraw()
+	{
+		return $this->hasResult() && $this->getTeam1Score() == $this->getTeam2Score() && $this->getTeam1Score() != 0;
+	}
+
+	public function isBothTeamsLost()
+	{
+		return $this->hasResult() && $this->getTeam1Score() === 0 && $this->getTeam2Score() === 0;
+	}
+
+	public function isTeam1Winner()
+	{
+		return $this->hasResult() && $this->getTeam1Score() > $this->getTeam2Score();
+	}
+
+	public function isTeam2Winner()
+	{
+		return $this->hasResult() && $this->getTeam1Score() < $this->getTeam2Score();
 	}
 
 	/**

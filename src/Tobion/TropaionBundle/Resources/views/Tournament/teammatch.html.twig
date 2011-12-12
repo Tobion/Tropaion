@@ -27,7 +27,7 @@
 			'%tournament%': teammatch.league.tournament.fullName
 		} 
 	%}Mannschaftsspiel im %sport% zwischen %team1% und %team2% bei der %tournament%{% endtrans %}" />
-	{% if teammatch.submittedBy %}<meta name="author" property="dc:contributor" content="{{ teammatch.submittedBy }}" />{% endif %}
+	{% if teammatch.submittedBy %}<meta name="author" property="dc:contributor" content="{{ teammatch.submittedBy.fullName }}" />{% endif %}
 
 	<link rel="canonical" href="{{ teammatchRdfUri }}" />
 	<link rel="index up up" href="{{ path('tournament', teammatch.league.tournament.routingParams ) }}" />
@@ -142,8 +142,8 @@
 	<dd><img src="{{ asset('bundles/tobiontropaion/images/icons/status/revised.png') }}" width="16" height="16" alt="" /> {% trans %}Das Mannschaftsspiel enthält Individualspiele, deren Ergebnisse geändert wurden.{% endtrans %}</dd>
 	{% endif %}
 	<dt>{% trans %}Saisonabschnitt{% endtrans %}{# Season period: First round | Second round #}</dt> 
-	<dd>{% if teammatch.seasonRound == 1 %}{% trans %}Hinrunde{% endtrans %}{% else %}{% trans %}Rückrunde{% endtrans %}{% endif %}</dd>
-	<dt>{% if teammatch.seasonRound == 1 %}{% trans %}Rückspiel{% endtrans %}{% else %}{% trans %}Hinspiel{% endtrans %}{% endif %}{# Return match | First match: First round | Second round #}</dt>
+	<dd>{% if teammatch.stage == 1 %}{% trans %}Hinrunde{% endtrans %}{% else %}{% trans %}Rückrunde{% endtrans %}{% endif %}</dd>
+	<dt>{% if teammatch.stage == 1 %}{% trans %}Rückspiel{% endtrans %}{% else %}{% trans %}Hinspiel{% endtrans %}{% endif %}{# Return match | First match: First round | Second round #}</dt>
 	<dd>{% if returnTeammatch.annulled %}<del>{% endif %}
 		<a href="{{ path('tournament_teammatch', returnTeammatch.routingParams ) }}">
 		{% if returnTeammatch.hasResult %}
@@ -166,15 +166,38 @@
 	</dd>
 	{% if teammatch.submittedBy %}
 	<dt property="dc:dateSubmitted" datatype="xsd:dateTime" content="{{ teammatch.submittedAt | date('c') }}">{% trans %}Ergebniseingabe{% endtrans %}</dt>
-	<dd>von {{ teammatch.submittedBy }} am {{ teammatch.submittedAt | date('d.m.Y - H:i') }}</dd>
-	{% endif %}	
+	<dd>{% if teammatch.submittedAt %}{% trans with {
+			'%link%': path('profile_user', teammatch.submittedBy.routingParams ),
+			'%user%': teammatch.submittedBy.fullName,
+			'%date%': teammatch.submittedAt | date('d.m.Y - H:i')
+		} %}von <a href="%link%">%user%</a> am %date%{% endtrans %}{% else %}{% trans with {
+			'%link%': path('profile_user', teammatch.submittedBy.routingParams ),
+			'%user%': teammatch.submittedBy.fullName
+		} %}von <a href="%link%">%user%</a>{% endtrans %}{% endif %}</dd>
+	{% endif %}
 	{% if teammatch.confirmedBy %}
 	<dt property="dc:dateAccepted" datatype="xsd:dateTime" content="{{ teammatch.confirmedAt | date('c') }}">{% trans %}Ergebnis bestätigt{% endtrans %}</dt>
-	<dd><img src="{{ asset('bundles/tobiontropaion/images/icons/status/confirmed.png') }}" width="16" height="16" alt="" /> von {{ teammatch.confirmedBy }} am {{ teammatch.confirmedAt | date('d.m.Y - H:i') }}</dd>
+	<dd><img src="{{ asset('bundles/tobiontropaion/images/icons/status/confirmed.png') }}" width="16" height="16" alt="" />
+		{% if teammatch.confirmedAt %}{% trans with {
+			'%link%': path('profile_user', teammatch.confirmedBy.routingParams ),
+			'%user%': teammatch.confirmedBy.fullName,
+			'%date%': teammatch.confirmedAt | date('d.m.Y - H:i')
+		} %}von <a href="%link%">%user%</a> am %date%{% endtrans %}{% else %}{% trans with {
+			'%link%': path('profile_user', teammatch.confirmedBy.routingParams ),
+			'%user%': teammatch.confirmedBy.fullName
+		} %}von <a href="%link%">%user%</a>{% endtrans %}{% endif %}</dd>
 	{% endif %}
 	{% if teammatch.approvedBy %}
 	<dt>{% trans %}Ergebnis genehmigt{% endtrans %}</dt>
-	<dd><img src="{{ asset('bundles/tobiontropaion/images/icons/status/approved.png') }}" width="16" height="16" alt="" /> von {{ teammatch.approvedBy }} am {{ teammatch.approvedAt | date('d.m.Y - H:i') }}</dd>
+	<dd><img src="{{ asset('bundles/tobiontropaion/images/icons/status/approved.png') }}" width="16" height="16" alt="" />
+		{% if teammatch.approvedAt %}{% trans with {
+			'%link%': path('profile_user', teammatch.approvedBy.routingParams ),
+			'%user%': teammatch.approvedBy.username,
+			'%date%': teammatch.approvedAt | date('d.m.Y - H:i')
+		} %}von <a href="%link%">%user%</a> am %date%{% endtrans %}{% else %}{% trans with {
+			'%link%': path('profile_user', teammatch.approvedBy.routingParams ),
+			'%user%': teammatch.approvedBy.username
+		} %}von <a href="%link%">%user%</a>{% endtrans %}{% endif %}</dd>
 	{% endif %}
 	<dt>{% trans %}Editieren{% endtrans %}</dt> 
 	<dd><a rel="edit" href="{{ path('tournament_teammatch_edit', teammatch.routingParams) }}"><img src="{{ asset('bundles/tobiontropaion/images/icons/action/submit.png') }}" width="16" height="16" alt="" /> {% trans %}Ergebnis eingeben/bearbeiten{% endtrans %}</a></dd>

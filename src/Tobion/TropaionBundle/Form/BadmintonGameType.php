@@ -38,6 +38,7 @@ class BadmintonGameType extends AbstractType
 	{
 		return array(
 			'data_class' => 'Tobion\TropaionBundle\Entity\Game',
+			'error_bubbling'    => false
 		);
 	}
 

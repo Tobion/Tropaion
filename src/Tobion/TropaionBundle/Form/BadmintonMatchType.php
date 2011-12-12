@@ -67,6 +67,7 @@ class BadmintonMatchType extends AbstractType
 			'allow_delete' => false, 
 			'prototype' => false,
 			'by_reference' => true,
+			'error_bubbling' => false // so we can assign errors to this collection
 		));
 
 		$builder->addEventSubscriber(new TransformAthletesListener($this->registry));

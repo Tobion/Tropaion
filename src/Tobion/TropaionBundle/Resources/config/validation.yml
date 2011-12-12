@@ -7,5 +7,6 @@ Tobion\TropaionBundle\Entity\Teammatch:
 
 Tobion\TropaionBundle\Entity\Match:
     constraints:
-        - Callback:
-            methods:   [checkAthletesSpecified]
+        - Tobion\TropaionBundle\Validator\Constraints\AthletesSpecified: ~
+        - Tobion\TropaionBundle\Validator\Constraints\BadmintonResult: ~
+        - Tobion\TropaionBundle\Validator\Constraints\ResultIncidentRevaluation: ~

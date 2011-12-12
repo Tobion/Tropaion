@@ -66,7 +66,7 @@
 			{% if teammatch.annulled %}</del>{% endif %}
 		</td>
 		<td class="venue"><a href="{{ path('profile_venue', teammatch.venue.routingParams ) }}">{{ teammatch.venue.code }}</a></td>
-		<td class="stage"><span {% if teammatch.seasonRound == 1 %}data-stage="first-half">{% trans %}Hin{% endtrans %}</span>{% else %}data-stage="second-half">{% trans %}Rück{% endtrans %}{% endif %}</span></td>
+		<td class="stage"><span {% if teammatch.stage == 1 %}data-stage="first-half">{% trans %}Hin{% endtrans %}</span>{% else %}data-stage="second-half">{% trans %}Rück{% endtrans %}{% endif %}</span></td>
 		<td class="homeaway"><span data-homeaway="{{ teammatch.transformedViewHomeAway }}">{% if teammatch.transformedViewHomeAway == 'home' %}{% trans %}Heim{% endtrans %}{% else %}{% trans %}Ausw.{% endtrans %}{% endif %}</span></td>
 		{% if profileView == 'club' %}
 		<td class="team self"><a href="{{ path('tournament_team', teammatch.team1.routingParams ) }}"{% if teammatch.isSameClub %} data-sameclubopponentteam="{{ teammatch.team2.teamNumber }}"{% endif %}>{{ teammatch.team1.teamNumber }}</a></td>

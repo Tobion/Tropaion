@@ -387,11 +387,10 @@ th div.DataTables_sort_wrapper span {
 .scoresheet.edit .hometeam  {
 	text-align: left;
 }
-.scoresheet > thead .status {
+.scoresheet > thead .nofight {
 	font-weight: normal;
 	font-size: 0.86em;
 	margin-top: 4px;
-	list-style-type: none;
 }
 .scoresheet .noplayer {
 	margin-bottom: 5px;
@@ -402,7 +401,7 @@ th div.DataTables_sort_wrapper span {
 .scoresheet .result-incident {
 	margin-top: 5px;
 }
-.scoresheet .revaluation {
+.scoresheet .revaluation, .scoresheet > thead select {
 	margin-top: 3px;
 }
 .scoresheet .score select {

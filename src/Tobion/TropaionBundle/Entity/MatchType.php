@@ -5,7 +5,7 @@ namespace Tobion\TropaionBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Tobion\TropaionBundle\Entity\MatchType
+ * MatchType
  *
  * @ORM\Table(name="match_types")
  * @ORM\Entity
@@ -30,7 +30,8 @@ class MatchType
 
 	/**
 	 * @var smallint $x_on_x
-	 * 0 = Varierend (keine Beschränkung; z.B. 1 vs 2); 1 = 1 gegen 1 (Einzel); 2 = 2 gegen 2 (Doppel)
+	 * 0 = Varierend (keine Beschränkung; z.B. 1 vs 2)
+	 * 1 = 1 gegen 1 (Einzel); 2 = 2 gegen 2 (Doppel)
 	 *
 	 * @ORM\Column(type="smallint")
 	 */
@@ -38,7 +39,9 @@ class MatchType
 
 	/**
 	 * @var smallint $gender
-	 * 0 = Varierend (keine Beschränkung; z.B. Herren vs Damen); 1 = alles Herren; 2 = alles Frauen; 3 = Mixed Teams (Herr + Dame vs Herr + Dame)
+	 * 0 = Varierend (keine Beschränkung; z.B. Herren vs Damen)
+	 * 1 = alles Herren; 2 = alles Frauen
+	 * 3 = Mixed Teams (Herr + Dame vs Herr + Dame)
 	 *
 	 * @ORM\Column(type="smallint")
 	 */
@@ -48,7 +51,7 @@ class MatchType
 	/**
 	 * Get id
 	 *
-	 * @return integer $id
+	 * @return integer
 	 */
 	public function getId()
 	{
@@ -68,7 +71,7 @@ class MatchType
 	/**
 	 * Get name
 	 *
-	 * @return string $name
+	 * @return string
 	 */
 	public function getName()
 	{
@@ -88,7 +91,7 @@ class MatchType
 	/**
 	 * Get x_on_x
 	 *
-	 * @return smallint $xOnX
+	 * @return smallint
 	 */
 	public function getXOnX()
 	{
@@ -108,7 +111,7 @@ class MatchType
 	/**
 	 * Get gender
 	 *
-	 * @return smallint $gender
+	 * @return smallint
 	 */
 	public function getGender()
 	{

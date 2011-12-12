@@ -16,33 +16,24 @@ TODO:
 - Fehlende Ergebnisse in 2008-09?!
 - Statistik Caching: Berechnete Ligatabelle in teams Tabelle speichern
 - beiderseitige Niederlage nicht 0:0 sondern als z.B. -2:-2 speichern -> flexibler, da variabel in der Negativ-Wertung und auch konsistent mit Summenberechnung -> benötigt signed columns
-- Spielgemeinschaft (erledigt)
 - Verein-2-Verant
 - Spieler: Zeit-, Mannschafts- und Disziplinbegrenzung
     - M-Aufstellungen: M-S-frei-Datum-X
     - M-Spieler-Stamm: Spi-ab-Datum / Spi-hin-begrenzt / Spi-hin-nur-HE / Spi-hin-nur-HD
-- M-Spieltermine: selber-aus-Wertung / Gast-aus-Wertung -> annulled (erledigt)
--.Aufstellungsfehlerkommentare (erledigt)
 - Wie werden ausgetretene Mitglieder markiert? Mit-aktiv = 2 -> kaum vorhanden
 - Sortierung der Tabelle?: Punkte -> Spiele -> Sätze-Diff -> Spielpunkte-Diff (steht nicht explizit in der Satzung)
     - Was bei totalem Gleichstand?
-    - Was wenn mehrere Mannschaften zurückziehen? Nach Datum? (gibt kein entsprechendes Feld in der Datenbank)
+    - Was wenn mehrere Mannschaften zurückziehen? Nach Datum? (gibt kein entsprechendes Feld in der Datenbank) (Scheinbar bisher nach erzielten Punkten)
 - Spielberechtigung (eligible to play) von Spielern (Vereinswechsel, Abmeldung, Sperrfristen etc.) und Mannschaften (wird entzogen wenn mehr als 2 mal nicht angetreten) speichern
-- 3 Felder jeweils für Datum und Ort: Angesetzter Termin, Verlegter Termin und Gespielter Termin
+- 3 Felder jeweils für Datum und Ort: Angesetzter Termin, Verlegter Termin und Gespielter Termin (teilweise erledigt)
 	- scheduled_date, scheduled_location
 	- moved_date, moved_location
 	- performed_date, performed_location
 - Umbenennen: 
-matches.withdrawn_by -> matches.given_up_by
-wrongdoer -> revaluation_wrongdoer
-wrongdoing_reason -> revaluation_reason
 matches.revised_score -> revised_score + revaluation_wrongdoer und reason
-Location -> Venue (vor allem in der Ontologie)
+
 - clubs.contact_person_id = 0 ?! Integrity error
 - athletes.country = Integer like 0 instead of 'DE'
-- promoted_number / relegated_number = 1 by default, better 0
-- lineups.season_round -> lineups.stage
-- set submitted_by_id, confirmed_by_id, approved_by_id
 - set venues.lontitude, latitude
 
 
@@ -69,7 +60,7 @@ TRUNCATE TABLE `lineups`;
 TRUNCATE TABLE `teams`;
 TRUNCATE TABLE `clubs`;
 TRUNCATE TABLE `leagues`;
-TRUNCATE TABLE `locations`;
+TRUNCATE TABLE `venues`;
 TRUNCATE TABLE `athletes`;
 
 */
@@ -141,10 +132,10 @@ INSERT INTO `league_classes` (`class_abbr`, `class_name`) VALUES
 ('Ersatz', 'Ersatzspielerliga');
 
 
-REPLACE INTO `users` (`id`, `username`, `slug`, `email`) 
-    VALUES (1, 'BVBB', 'BVBB', 'info@bvbb.net');
-REPLACE INTO `users` (`id`, `username`, `slug`, `email`, `athlete_id`) 
-    VALUES (2, 'Schuch', '2_Schuch', 'wolfgang.schuch@steuerberater-schuch.de', 800847);
+REPLACE INTO `users` (`id`, `username`, `slug`, `full_name`, `email`)
+    VALUES (1, 'BVBB', 'BVBB', 'Badminton-Verband Berlin-Brandenburg e.V.', 'info@bvbb.net');
+REPLACE INTO `users` (`id`, `username`, `slug`, `full_name`, `email`, `athlete_id`)
+    VALUES (2, 'Schuch', 'Schuch', 'Wolfgang Schuch', 'wolfgang.schuch@steuerberater-schuch.de', 800847);
 
 	
 REPLACE INTO `tournaments` (`id`, `owner_id`, `host_id`, `short_name`, `full_name`, `season`, `slug`, `sport`) VALUES
@@ -233,7 +224,7 @@ BEGIN
             athlete_pos1_ms, athlete_pos2_ms, athlete_pos3_ms, athlete_pos4_ms, athlete_pos5_ms, 
             athlete_pos1_ws, athlete_pos2_ws, athlete_pos3_ws  
         INT UNSIGNED;
-    DECLARE season_round TINYINT;   
+    DECLARE stage TINYINT;
     
     DECLARE lineups_cursor CURSOR FOR 
         SELECT t.id, a.`M-S-Hin-Rück`, 
@@ -252,42 +243,42 @@ BEGIN
     
     REPEAT
         FETCH lineups_cursor INTO 
-            team_id, season_round,
+            team_id, stage,
             athlete_pos1_ms, athlete_pos2_ms, athlete_pos3_ms, athlete_pos4_ms, athlete_pos5_ms, 
             athlete_pos1_ws, athlete_pos2_ws, athlete_pos3_ws;
             
         IF NOT done THEN
             IF (athlete_pos1_ms <> 0) THEN   
-                INSERT INTO `lineups` (`team_id`, `season_round`, `athlete_id`, `position`) 
-                    VALUES (team_id, season_round, athlete_pos1_ms, 1);
+                INSERT INTO `lineups` (`team_id`, `stage`, `athlete_id`, `position`)
+                    VALUES (team_id, stage, athlete_pos1_ms, 1);
             END IF;
             IF (athlete_pos2_ms <> 0) THEN   
-                INSERT INTO `lineups` (`team_id`, `season_round`, `athlete_id`, `position`) 
-                    VALUES (team_id, season_round, athlete_pos2_ms, 2);
+                INSERT INTO `lineups` (`team_id`, `stage`, `athlete_id`, `position`)
+                    VALUES (team_id, stage, athlete_pos2_ms, 2);
             END IF;
             IF (athlete_pos3_ms <> 0) THEN   
-                INSERT INTO `lineups` (`team_id`, `season_round`, `athlete_id`, `position`) 
-                    VALUES (team_id, season_round, athlete_pos3_ms, 3);
+                INSERT INTO `lineups` (`team_id`, `stage`, `athlete_id`, `position`)
+                    VALUES (team_id, stage, athlete_pos3_ms, 3);
             END IF;
             IF (athlete_pos4_ms <> 0) THEN   
-                INSERT INTO `lineups` (`team_id`, `season_round`, `athlete_id`, `position`) 
-                    VALUES (team_id, season_round, athlete_pos4_ms, 4);
+                INSERT INTO `lineups` (`team_id`, `stage`, `athlete_id`, `position`)
+                    VALUES (team_id, stage, athlete_pos4_ms, 4);
             END IF;
             IF (athlete_pos5_ms <> 0) THEN   
-                INSERT INTO `lineups` (`team_id`, `season_round`, `athlete_id`, `position`) 
-                    VALUES (team_id, season_round, athlete_pos5_ms, 5);
+                INSERT INTO `lineups` (`team_id`, `stage`, `athlete_id`, `position`)
+                    VALUES (team_id, stage, athlete_pos5_ms, 5);
             END IF;
             IF (athlete_pos1_ws <> 0) THEN   
-                INSERT INTO `lineups` (`team_id`, `season_round`, `athlete_id`, `position`) 
-                    VALUES (team_id, season_round, athlete_pos1_ws, 1);
+                INSERT INTO `lineups` (`team_id`, `stage`, `athlete_id`, `position`)
+                    VALUES (team_id, stage, athlete_pos1_ws, 1);
             END IF;
             IF (athlete_pos2_ws <> 0) THEN   
-                INSERT INTO `lineups` (`team_id`, `season_round`, `athlete_id`, `position`) 
-                    VALUES (team_id, season_round, athlete_pos2_ws, 2);
+                INSERT INTO `lineups` (`team_id`, `stage`, `athlete_id`, `position`)
+                    VALUES (team_id, stage, athlete_pos2_ws, 2);
             END IF;
             IF (athlete_pos3_ws <> 0) THEN   
-                INSERT INTO `lineups` (`team_id`, `season_round`, `athlete_id`, `position`) 
-                    VALUES (team_id, season_round, athlete_pos3_ws, 3);
+                INSERT INTO `lineups` (`team_id`, `stage`, `athlete_id`, `position`)
+                    VALUES (team_id, stage, athlete_pos3_ws, 3);
             END IF;
 
         END IF;
@@ -298,7 +289,7 @@ BEGIN
     ### substitute athletes
     
     # first half
-    INSERT INTO `lineups` (`team_id`, `season_round`, `athlete_id`, `position`) 
+    INSERT INTO `lineups` (`team_id`, `stage`, `athlete_id`, `position`)
         SELECT t.`id`, 1, s.`Spi-Pass-Nr`, 0
         FROM `M-Spieler-Stamm` AS s
         INNER JOIN `teams` AS t ON ( s.`Spi-hin-Vereins-Nr` = t.`club_id` )
@@ -309,7 +300,7 @@ BEGIN
             #AND t.`league_id` = @substitute_league_id
         
     # second half
-    INSERT INTO `lineups` (`team_id`, `season_round`, `athlete_id`, `position`) 
+    INSERT INTO `lineups` (`team_id`, `stage`, `athlete_id`, `position`)
         SELECT t.`id`, 2, s.`Spi-Pass-Nr`, 0
         FROM `M-Spieler-Stamm` AS s
         INNER JOIN `teams` AS t ON ( s.`Spi-rue-Vereins-Nr` = t.`club_id` )
@@ -407,7 +398,7 @@ BEGIN
     DECLARE venue_id, team1_id, team2_id INT UNSIGNED; # team1_vereins_nr, team2_vereins_nr
     #DECLARE team1_team_nr, team2_team_nr SMALLINT UNSIGNED;
     DECLARE team1_score, team2_score SMALLINT UNSIGNED;
-	DECLARE season_round TINYINT UNSIGNED DEFAULT 1;
+	DECLARE stage TINYINT UNSIGNED DEFAULT 1;
     DECLARE score_available, no_fight TINYINT DEFAULT 0;
     DECLARE errormessage VARCHAR(255) DEFAULT NULL;
 	DECLARE revaluation_wrongdoer, revaluation_reason TINYINT UNSIGNED;
@@ -628,7 +619,7 @@ BEGIN
 
     REPEAT
         FETCH matches_cursor INTO 
-            venue_id, performed_at, season_round,
+            venue_id, performed_at, stage,
             team1_id, team2_id,
             team1_score, team2_score,
             score_available, no_fight,
@@ -708,11 +699,13 @@ BEGIN
         IF NOT done THEN
             IF NOT score_available THEN
                 # wenn kein Ergebnis vorliegt [(team1_score = 0 AND team2_score = 0) funktionierte nicht, da es sogar vorkommen kann]
-                INSERT INTO `teammatches` (`venue_id`, `scheduled_at`, `performed_at`, `season_round`, `team1_id`, `team2_id`, `team1_score`, `team2_score`, `no_fight`, `revaluation_wrongdoer`, `revaluation_reason`, `description`) 
-                    VALUES (venue_id, performed_at, performed_at, season_round, team1_id, team2_id, NULL, NULL, no_fight, revaluation_wrongdoer, revaluation_reason, errormessage);
+                INSERT INTO `teammatches` (`venue_id`, `scheduled_at`, `performed_at`, `stage`, `team1_id`, `team2_id`, `team1_score`, `team2_score`, `no_fight`, `revaluation_wrongdoer`, `revaluation_reason`, `description`)
+                    VALUES (venue_id, performed_at, performed_at, stage, team1_id, team2_id, NULL, NULL, no_fight, revaluation_wrongdoer, revaluation_reason, errormessage);
             ELSE
-                INSERT INTO `teammatches` (`venue_id`, `scheduled_at`, `performed_at`, `season_round`, `team1_id`, `team2_id`, `team1_score`, `team2_score`, `no_fight`, `wrongdoer`, `wrongdoing_reason`, `description`) 
-                    VALUES (venue_id, performed_at, performed_at, season_round, team1_id, team2_id, team1_score, team2_score, no_fight, revaluation_wrongdoer, revaluation_reason, errormessage);
+                INSERT INTO `teammatches` (`venue_id`, `scheduled_at`, `performed_at`, `stage`, `team1_id`, `team2_id`, `team1_score`, `team2_score`, `no_fight`, `revaluation_wrongdoer`, `revaluation_reason`, `description`,
+					`submitted_by_id`, `confirmed_by_id`, `approved_by_id`)
+                    VALUES (venue_id, performed_at, performed_at, stage, team1_id, team2_id, team1_score, team2_score, no_fight, revaluation_wrongdoer, revaluation_reason, errormessage,
+						2, 2, 1);
                 
                 SELECT LAST_INSERT_ID() INTO last_teammatch_id;
                 
@@ -1376,14 +1369,6 @@ WHERE l.level <> 255
 
 
 
-
-INSERT INTO `teammatches` (`location_id`, `performed_at`, `team1_id`, `team2_id`, `team1_score`, `team2_score`) 
-    SELECT `locations`.`id`, `Datum`, t1.`id`, 1, 5, 3
-    FROM `M-Spieltermine`
-    INNER JOIN `locations` ON (`M-Spieltermine`.`Halle` = `locations`.`code`) 
-    INNER JOIN `teams` AS t1 ON (`M-Spieltermine`.`Vereins-Nr` = t1.`club_id` AND `M-Spieltermine`.`Mannschaft` = t1.`team_number`) 
-    #INNER JOIN `leagues` ON 
-    #WHERE `leagues`.`season`  = @season;
 */    
 
 /*    

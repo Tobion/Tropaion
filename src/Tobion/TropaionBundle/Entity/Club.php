@@ -4,8 +4,12 @@ namespace Tobion\TropaionBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Tobion\TropaionBundle\Entity\Athlete;
+use Tobion\TropaionBundle\Entity\Team;
+use Tobion\TropaionBundle\Entity\Tournament;
+
 /**
- * Tobion\TropaionBundle\Entity\Club
+ * Sportvereine und Spielgemeinschaften zusammengesetzt aus mehreren Vereinen
  *
  * @ORM\Table(name="clubs")
  * @ORM\Entity
@@ -161,7 +165,7 @@ class Club
 	/**
 	 * Get id
 	 *
-	 * @return integer $id
+	 * @return integer
 	 */
 	public function getId()
 	{
@@ -181,7 +185,7 @@ class Club
 	/**
 	 * Get code
 	 *
-	 * @return string $code
+	 * @return string
 	 */
 	public function getCode()
 	{
@@ -201,7 +205,7 @@ class Club
 	/**
 	 * Get name
 	 *
-	 * @return string $name
+	 * @return string
 	 */
 	public function getName()
 	{
@@ -221,7 +225,7 @@ class Club
 	/**
 	 * Get contact_person_id
 	 *
-	 * @return integer $contactPersonId
+	 * @return integer
 	 */
 	public function getContactPersonId()
 	{
@@ -241,7 +245,7 @@ class Club
 	/**
 	 * Get club_syndicate_1
 	 *
-	 * @return integer $clubSyndicate1
+	 * @return integer
 	 */
 	public function getClubSyndicate1()
 	{
@@ -261,7 +265,7 @@ class Club
 	/**
 	 * Get club_syndicate_2
 	 *
-	 * @return integer $clubSyndicate2
+	 * @return integer
 	 */
 	public function getClubSyndicate2()
 	{
@@ -281,7 +285,7 @@ class Club
 	/**
 	 * Get club_syndicate_3
 	 *
-	 * @return integer $clubSyndicate3
+	 * @return integer
 	 */
 	public function getClubSyndicate3()
 	{
@@ -301,7 +305,7 @@ class Club
 	/**
 	 * Get club_syndicate_4
 	 *
-	 * @return integer $clubSyndicate4
+	 * @return integer
 	 */
 	public function getClubSyndicate4()
 	{
@@ -321,7 +325,7 @@ class Club
 	/**
 	 * Get website
 	 *
-	 * @return string $website
+	 * @return string
 	 */
 	public function getWebsite()
 	{
@@ -341,7 +345,7 @@ class Club
 	/**
 	 * Get logo
 	 *
-	 * @return string $logo
+	 * @return string
 	 */
 	public function getLogo()
 	{
@@ -361,7 +365,7 @@ class Club
 	/**
 	 * Get description
 	 *
-	 * @return text $description
+	 * @return text
 	 */
 	public function getDescription()
 	{
@@ -381,7 +385,7 @@ class Club
 	/**
 	 * Get updated_at
 	 *
-	 * @return datetime $updatedAt
+	 * @return datetime
 	 */
 	public function getUpdatedAt()
 	{
@@ -391,9 +395,9 @@ class Club
 	/**
 	 * Set Contact_Person
 	 *
-	 * @param Tobion\TropaionBundle\Entity\Athlete $contactPerson
+	 * @param Athlete $contactPerson
 	 */
-	public function setContactPerson(\Tobion\TropaionBundle\Entity\Athlete $contactPerson)
+	public function setContactPerson(Athlete $contactPerson)
 	{
 		$this->Contact_Person = $contactPerson;
 	}
@@ -401,7 +405,7 @@ class Club
 	/**
 	 * Get Contact_Person
 	 *
-	 * @return Tobion\TropaionBundle\Entity\Athlete $contactPerson
+	 * @return Athlete
 	 */
 	public function getContactPerson()
 	{
@@ -411,9 +415,9 @@ class Club
 	/**
 	 * Set Syndicate1
 	 *
-	 * @param Tobion\TropaionBundle\Entity\Club $syndicate1
+	 * @param Club $syndicate1
 	 */
-	public function setSyndicate1(\Tobion\TropaionBundle\Entity\Club $syndicate1)
+	public function setSyndicate1(Club $syndicate1)
 	{
 		$this->Syndicate1 = $syndicate1;
 	}
@@ -421,7 +425,7 @@ class Club
 	/**
 	 * Get Syndicate1
 	 *
-	 * @return Tobion\TropaionBundle\Entity\Club $syndicate1
+	 * @return Club
 	 */
 	public function getSyndicate1()
 	{
@@ -431,9 +435,9 @@ class Club
 	/**
 	 * Set Syndicate2
 	 *
-	 * @param Tobion\TropaionBundle\Entity\Club $syndicate2
+	 * @param Club $syndicate2
 	 */
-	public function setSyndicate2(\Tobion\TropaionBundle\Entity\Club $syndicate2)
+	public function setSyndicate2(Club $syndicate2)
 	{
 		$this->Syndicate2 = $syndicate2;
 	}
@@ -441,7 +445,7 @@ class Club
 	/**
 	 * Get Syndicate2
 	 *
-	 * @return Tobion\TropaionBundle\Entity\Club $syndicate2
+	 * @return Club
 	 */
 	public function getSyndicate2()
 	{
@@ -451,9 +455,9 @@ class Club
 	/**
 	 * Set Syndicate3
 	 *
-	 * @param Tobion\TropaionBundle\Entity\Club $syndicate3
+	 * @param Club $syndicate3
 	 */
-	public function setSyndicate3(\Tobion\TropaionBundle\Entity\Club $syndicate3)
+	public function setSyndicate3(Club $syndicate3)
 	{
 		$this->Syndicate3 = $syndicate3;
 	}
@@ -461,7 +465,7 @@ class Club
 	/**
 	 * Get Syndicate3
 	 *
-	 * @return Tobion\TropaionBundle\Entity\Club $syndicate3
+	 * @return Club
 	 */
 	public function getSyndicate3()
 	{
@@ -471,9 +475,9 @@ class Club
 	/**
 	 * Set Syndicate4
 	 *
-	 * @param Tobion\TropaionBundle\Entity\Club $syndicate4
+	 * @param Club $syndicate4
 	 */
-	public function setSyndicate4(\Tobion\TropaionBundle\Entity\Club $syndicate4)
+	public function setSyndicate4(Club $syndicate4)
 	{
 		$this->Syndicate4 = $syndicate4;
 	}
@@ -481,7 +485,7 @@ class Club
 	/**
 	 * Get Syndicate4
 	 *
-	 * @return Tobion\TropaionBundle\Entity\Club $syndicate4
+	 * @return Club
 	 */
 	public function getSyndicate4()
 	{
@@ -491,17 +495,17 @@ class Club
 	/**
 	 * Add Teams
 	 *
-	 * @param Tobion\TropaionBundle\Entity\Team $teams
+	 * @param Team $team
 	 */
-	public function addTeams(\Tobion\TropaionBundle\Entity\Team $teams)
+	public function addTeams(Team $team)
 	{
-		$this->Teams[] = $teams;
+		$this->Teams[] = $team;
 	}
 
 	/**
 	 * Get Teams
 	 *
-	 * @return Doctrine\Common\Collections\Collection $teams
+	 * @return Doctrine\Common\Collections\Collection
 	 */
 	public function getTeams()
 	{
@@ -510,7 +514,7 @@ class Club
 
 
 
-	public function routingParams(\Tobion\TropaionBundle\Entity\Tournament $tournament = null)
+	public function routingParams(Tournament $tournament = null)
 	{
 		$params = array(
 			'club' => $this->getCode()

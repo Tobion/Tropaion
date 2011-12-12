@@ -4,8 +4,11 @@ namespace Tobion\TropaionBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Tobion\TropaionBundle\Entity\Athlete;
+use Tobion\TropaionBundle\Entity\Team;
+
 /**
- * Tobion\TropaionBundle\Entity\Lineup
+ * Anfangsaufstellungen der Mannschaften
  *
  * @ORM\Table(name="lineups")
  * @ORM\Entity
@@ -22,13 +25,14 @@ class Lineup
 	private $team_id;
 
 	/**
-	 * @var integer $season_round
+	 * Hinrunde = 1, Rückrunde = 2
+	 * @var integer $stage
 	 *
 	 * @ORM\Column(type="smallint")
 	 * @ORM\Id
 	 * @ORM\GeneratedValue(strategy="NONE")
 	 */
-	private $season_round;
+	private $stage;
 
 	/**
 	 * @var integer $athlete_id
@@ -77,7 +81,7 @@ class Lineup
 	/**
 	 * Get team_id
 	 *
-	 * @return integer $teamId
+	 * @return integer
 	 */
 	public function getTeamId()
 	{
@@ -85,23 +89,23 @@ class Lineup
 	}
 
 	/**
-	 * Set season_round
+	 * Set stage
 	 *
-	 * @param smallint $seasonRound
+	 * @param smallint $stage
 	 */
-	public function setSeasonRound($seasonRound)
+	public function setStage($stage)
 	{
-		$this->season_round = $seasonRound;
+		$this->stage = $stage;
 	}
 
 	/**
-	 * Get season_round
+	 * Get stage
 	 *
-	 * @return smallint $seasonRound
+	 * @return smallint
 	 */
-	public function getSeasonRound()
+	public function getStage()
 	{
-		return $this->season_round;
+		return $this->stage;
 	}
 
 	/**
@@ -117,7 +121,7 @@ class Lineup
 	/**
 	 * Get athlete_id
 	 *
-	 * @return integer $athleteId
+	 * @return integer
 	 */
 	public function getAthleteId()
 	{
@@ -137,7 +141,7 @@ class Lineup
 	/**
 	 * Get position
 	 *
-	 * @return smallint $position
+	 * @return smallint
 	 */
 	public function getPosition()
 	{
@@ -147,9 +151,9 @@ class Lineup
 	/**
 	 * Set Team
 	 *
-	 * @param Tobion\TropaionBundle\Entity\Team $team
+	 * @param Team $team
 	 */
-	public function setTeam(\Tobion\TropaionBundle\Entity\Team $team)
+	public function setTeam(Team $team)
 	{
 		$this->Team = $team;
 	}
@@ -157,7 +161,7 @@ class Lineup
 	/**
 	 * Get Team
 	 *
-	 * @return Tobion\TropaionBundle\Entity\Team $team
+	 * @return Team
 	 */
 	public function getTeam()
 	{
@@ -167,9 +171,9 @@ class Lineup
 	/**
 	 * Set Athlete
 	 *
-	 * @param Tobion\TropaionBundle\Entity\Athlete $athlete
+	 * @param Athlete $athlete
 	 */
-	public function setAthlete(\Tobion\TropaionBundle\Entity\Athlete $athlete)
+	public function setAthlete(Athlete $athlete)
 	{
 		$this->Athlete = $athlete;
 	}
@@ -177,7 +181,7 @@ class Lineup
 	/**
 	 * Get Athlete
 	 *
-	 * @return Tobion\TropaionBundle\Entity\Athlete $athlete
+	 * @return Athlete
 	 */
 	public function getAthlete()
 	{
