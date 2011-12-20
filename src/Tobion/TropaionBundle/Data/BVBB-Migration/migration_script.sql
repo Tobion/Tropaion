@@ -35,6 +35,7 @@ matches.revised_score -> revised_score + revaluation_wrongdoer und reason
 - clubs.contact_person_id = 0 ?! Integrity error
 - athletes.country = Integer like 0 instead of 'DE'
 - set venues.lontitude, latitude
+- no_fight boolean -> smallint indicating the team that did not participate
 
 
 DBV-Statistik: 4.164 Mitglieder in Berlin-Brandenburg 2009

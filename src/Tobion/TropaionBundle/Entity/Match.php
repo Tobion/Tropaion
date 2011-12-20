@@ -72,6 +72,8 @@ class Match
 	private $team2_partner_id;
 
 	/**
+	 * Anzahl gewonnener Sätze von Team 1
+	 * NULL = kein Ergebnis
 	 * @var integer $team1_score
 	 *
 	 * @ORM\Column(type="smallint", nullable=true)
@@ -79,6 +81,8 @@ class Match
 	private $team1_score;
 
 	/**
+	 * Anzahl gewonnener Sätze von Team 2
+	 * NULL = kein Ergebnis
 	 * @var integer $team2_score
 	 *
 	 * @ORM\Column(type="smallint", nullable=true)
@@ -86,6 +90,7 @@ class Match
 	private $team2_score;
 
 	/**
+	 * Anzahl erzielter Spielpunkte von Team 1 über alle Sätze
 	 * @var integer $team1_points
 	 *
 	 * @ORM\Column(type="smallint")
@@ -93,6 +98,7 @@ class Match
 	private $team1_points = 0;
 
 	/**
+	 * Anzahl erzielter Spielpunkte von Team 2 über alle Sätze
 	 * @var integer $team2_points
 	 *
 	 * @ORM\Column(type="smallint")
@@ -101,6 +107,8 @@ class Match
 
 	/**
 	 * Kampflos beendetes Spiel, z.B. kein Gegner oder Aufgabe vor Spielbeginn
+	 * Bezieht sich bei Umwertung auf das Orginalergebnis soweit vorhanden,
+	 * da Umwertung per se kampflos
 	 * @var boolean $no_fight
 	 *
 	 * @ORM\Column(type="boolean")
@@ -110,6 +118,7 @@ class Match
 	/**
 	 * Ob und wer das Spiel aufgegeben/zurückgezogen hat
 	 * 0 = false, 1 = Aufgabe von Team1, 2 = Aufgabe von Team2
+	 * Bezieht sich bei Umwertung auf das Orginalergebnis soweit vorhanden
 	 * Spielstand zum Zeitpunkt der Aufgabe nachvollziehbar bei games.annulled = 1
 	 * @var integer $given_up_by
 	 *
@@ -233,11 +242,15 @@ class Match
 	/**
 	 * @var Game
 	 *
-	 * @ORM\OneToMany(targetEntity="Game", mappedBy="Match")
+	 * @ORM\OneToMany(targetEntity="Game", mappedBy="Match", cascade={"persist"}, orphanRemoval=true)
 	 * @ORM\JoinColumn(name="id", referencedColumnName="match_id")
 	 * @ORM\OrderBy({"game_sequence" = "ASC"})
 	 */
 	private $Games;
+	// Remember: When using the orphanRemoval=true option Doctrine makes
+	// the assumption that the entities are privately owned and will NOT be reused by other entities.
+	// If you neglect this assumption your entities will get deleted by Doctrine
+	// even if you assigned the orphaned entity to another one.
 
 	/**
 	 * @var Ratinghistory
@@ -275,7 +288,7 @@ class Match
 	 */
 	public function updated()
 	{
-		$this->updated_at = new DateTime('now');
+		$this->updated_at = new \DateTime('now');
 	}
 
 
@@ -636,7 +649,10 @@ class Match
 	 */
 	public function setAvgOrigSmallerDivBiggerGamescorePermil($val)
 	{
-		$this->avg_orig_smaller_div_bigger_gamescore_permil = $val;
+		// type cast to integer because doctrine considers the same value
+		// of type int and float to be different and thus updates the record
+		// in the database
+		$this->avg_orig_smaller_div_bigger_gamescore_permil = (int) $val;
 	}
 
 	/**
@@ -656,7 +672,7 @@ class Match
 	 */
 	public function setStdOrigSmallerDivBiggerGamescorePermil($val)
 	{
-		$this->std_orig_smaller_div_bigger_gamescore_permil = $val;
+		$this->std_orig_smaller_div_bigger_gamescore_permil = (int) $val;
 	}
 
 	/**
@@ -845,8 +861,8 @@ class Match
 	*/
 	public function isTeam1NoPlayer()
 	{
-		return is_null($this->getTeam1PlayerId()) && is_null($this->getTeam1PartnerId()) 
-				&& !is_null($this->getId());
+		return $this->getTeam1PlayerId() === null && $this->getTeam1PartnerId() === null
+			&& $this->getId() !== null;
 	}
 
 
@@ -855,8 +871,8 @@ class Match
 	*/
 	public function isTeam2NoPlayer()
 	{
-		return is_null($this->getTeam2PlayerId()) && is_null($this->getTeam2PartnerId()) 
-				&& !is_null($this->getId());
+		return $this->getTeam2PlayerId() === null && $this->getTeam2PartnerId() === null
+			&& $this->getId() !== null;
 	}
 
 	/**
@@ -866,8 +882,8 @@ class Match
 	public function isDoubles()
 	{
 		return !(
-			is_null($this->getTeam1PlayerId()) || is_null($this->getTeam1PartnerId()) || 
-			is_null($this->getTeam2PlayerId()) || is_null($this->getTeam2PartnerId())
+			$this->Team1_Player === null || $this->Team1_Partner === null ||
+			$this->Team2_Player === null || $this->Team2_Partner === null
 		);
 	}
 
@@ -877,7 +893,7 @@ class Match
 	 */
 	public function isTeam1Single()
 	{
-		return (is_null($this->getTeam1PlayerId()) XOR is_null($this->getTeam1PartnerId()));
+		return $this->getTeam1PlayerId() === null XOR $this->getTeam1PartnerId() === null;
 	}
 
 	/**
@@ -886,7 +902,7 @@ class Match
 	 */
 	public function isTeam2Single()
 	{
-		return (is_null($this->getTeam2PlayerId()) XOR is_null($this->getTeam2PartnerId()));
+		return $this->getTeam2PlayerId() === null XOR $this->getTeam2PartnerId() === null;
 	}
 
 	/**
@@ -895,7 +911,7 @@ class Match
 	 */
 	public function getTeam1SingleAthlete()
 	{
-		return is_null($this->getTeam1PlayerId()) ? $this->Team1_Partner : $this->Team1_Player;
+		return $this->getTeam1PlayerId() === null ? $this->Team1_Partner : $this->Team1_Player;
 	}
 
 	/**
@@ -904,17 +920,17 @@ class Match
 	 */
 	public function getTeam2SingleAthlete()
 	{
-		return is_null($this->getTeam2PlayerId()) ? $this->Team2_Partner : $this->Team2_Player;
+		return $this->getTeam2PlayerId() === null ? $this->Team2_Partner : $this->Team2_Player;
 	}
 
 	public function hasResult()
 	{
-		return !is_null($this->getTeam1Score()) && !is_null($this->getTeam2Score());
+		return $this->getTeam1Score() !== null && $this->getTeam2Score() !== null;
 	}
 
 	public function isNoResult()
 	{
-		return !$this->hasResult() && !is_null($this->getId());
+		return !$this->hasResult() && $this->getId() !== null;
 	}
 
 
@@ -935,9 +951,49 @@ class Match
 		return '';
 	}
 
+	/**
+	 *
+	 * @param string $resultIncident
+	 */
+	public function setResultIncident($resultIncident)
+	{
+		$this->result_incident = $resultIncident;
+
+		$this->inferNoFight();
+
+		switch ($resultIncident) {
+			case 'team1_givenup':
+				$this->setGivenUpBy(1);
+				break;
+			case 'team2_givenup':
+				$this->setGivenUpBy(2);
+				break;
+			default:
+				$this->setGivenUpBy(0);
+		}
+	}
+
+	/**
+	 * Updates no_fight flag based on some conditions that mean a match was not played:
+	 * - ein Team ohne Spieler oder
+	 * - kein Ergebnis vorhanden (sowohl kein gewertetes als auch
+	 *   kein ursprüngliches Ergebnis = kein einziger Satz) oder
+	 * - kampfloser Sieg (@see setResultIncident)
+	 */
+	public function inferNoFight()
+	{
+		$this->setNoFight(
+			$this->result_incident === 'team1_wonbydefault' ||
+			$this->result_incident === 'team2_wonbydefault' ||
+			$this->Team1_Player === null && $this->Team1_Partner === null ||
+			$this->Team2_Player === null && $this->Team2_Partner === null ||
+			count($this->Games) === 0
+		);
+	}
+
 	public function isDraw()
 	{
-		return $this->hasResult() && $this->getTeam1Score() == $this->getTeam2Score() && $this->getTeam1Score() != 0;
+		return $this->hasResult() && $this->getTeam1Score() == $this->getTeam2Score() && $this->getTeam1Score() !== 0;
 	}
 
 	public function isBothTeamsLost()
@@ -948,18 +1004,16 @@ class Match
 	public function isTeam1Winner()
 	{
 		return $this->hasResult() && $this->getTeam1Score() > $this->getTeam2Score();
-		// return ($this->calcTeam1Games() > $this->calcTeam2Games());
 	}
 
 	public function isTeam2Winner()
 	{
 		return $this->hasResult() && $this->getTeam1Score() < $this->getTeam2Score();
-		// return ($this->calcTeam1Games() < $this->calcTeam2Games());
 	}
 
 	public function hasOriginalResult()
 	{
-		return !is_null($this->getTeam1OriginalScore()) && !is_null($this->getTeam2OriginalScore());
+		return $this->getTeam1OriginalScore() !== null && $this->getTeam2OriginalScore() !== null;
 	}
 
 	public function hasOriginalFallbackEffectiveResult()
@@ -969,28 +1023,28 @@ class Match
 
 	public function getTeam1OriginalFallbackEffectiveScore()
 	{
-		return (!is_null($this->getTeam1OriginalScore()) && !is_null($this->getTeam2OriginalScore())) ? 
+		return ($this->getTeam1OriginalScore() !== null && $this->getTeam2OriginalScore() !== null) ?
 			$this->getTeam1OriginalScore() : 
 			$this->getTeam1Score();
 	}
 
 	public function getTeam2OriginalFallbackEffectiveScore()
 	{
-		return (!is_null($this->getTeam1OriginalScore()) && !is_null($this->getTeam2OriginalScore())) ? 
+		return ($this->getTeam1OriginalScore() !== null && $this->getTeam2OriginalScore() !== null) ?
 			$this->getTeam2OriginalScore() : 
 			$this->getTeam2Score();
 	}
 
 	public function getTeam1OriginalFallbackEffectivePoints()
 	{
-		return (!is_null($this->getTeam1OriginalPoints()) && !is_null($this->getTeam2OriginalPoints())) ? 
+		return ($this->getTeam1OriginalPoints() !== null && $this->getTeam2OriginalPoints() !== null) ?
 			$this->getTeam1OriginalPoints() : 
 			$this->getTeam1Points();
 	}
 
 	public function getTeam2OriginalFallbackEffectivePoints()
 	{
-		return (!is_null($this->getTeam1OriginalPoints()) && !is_null($this->getTeam2OriginalPoints())) ? 
+		return ($this->getTeam1OriginalPoints() !== null && $this->getTeam2OriginalPoints() !== null) ?
 			$this->getTeam2OriginalPoints() : 
 			$this->getTeam2Points();
 	}
@@ -998,8 +1052,8 @@ class Match
 	public function isOriginalFallbackEffectiveDraw()
 	{
 		return $this->getTeam1OriginalFallbackEffectiveScore() == $this->getTeam2OriginalFallbackEffectiveScore() 
-			&& !is_null($this->getTeam1OriginalFallbackEffectiveScore()) 
-			&& $this->getTeam1OriginalFallbackEffectiveScore() != 0;
+			&& $this->getTeam1OriginalFallbackEffectiveScore() !== null
+			&& $this->getTeam1OriginalFallbackEffectiveScore() !== 0;
 	}
 
 	public function isTeam1OriginalFallbackEffectiveWinner()
@@ -1096,7 +1150,7 @@ class Match
 			- ($this->getTeam1OriginalFallbackEffectivePoints() + $this->getTeam2OriginalFallbackEffectivePoints())
 			Also 21 : 16 , 21 : 15 should be a higher win than 21 : 11 , 26 : 24 but it is not
 		*/
-		else if ($this->getTeam1Player() === $athlete || $this->getTeam1Partner() === $athlete) {
+		else if ($this->Team1_Player === $athlete || $this->Team1_Partner === $athlete) {
 			if ($this->getTeam1OriginalFallbackEffectivePoints() || $this->getTeam2OriginalFallbackEffectivePoints()) {
 				$pointsQuotient = $this->getTeam1OriginalFallbackEffectivePoints() < $this->getTeam2OriginalFallbackEffectivePoints() ?
 					$this->getTeam1OriginalFallbackEffectivePoints() / $this->getTeam2OriginalFallbackEffectivePoints() :
@@ -1118,7 +1172,7 @@ class Match
 				array(2, 3, 4, 3)
 			);
 		}
-		else if ($this->getTeam2Player() === $athlete || $this->getTeam2Partner() === $athlete) {
+		else if ($this->Team2_Player === $athlete || $this->Team2_Partner === $athlete) {
 			/*
 			Another try:
 			$pointsQuotient = ($this->getTeam2OriginalFallbackEffectivePoints() ?: 1) / ($this->getTeam1OriginalFallbackEffectivePoints() ?: 1);
@@ -1154,7 +1208,7 @@ class Match
 	/**
 	 * Gibt die tatsächlich geltenden Sätze zurück
 	 * 
-	 * @return array
+	 * @return Game[]
 	 */
 	public function getEffectiveGames()
 	{
@@ -1170,7 +1224,7 @@ class Match
 	/**
 	 * Gibt die ursprünglichen, annullierten Sätze zurück
 	 * 
-	 * @return array
+	 * @return Game[]
 	 */
 	public function getAnnulledGames()
 	{
@@ -1183,62 +1237,6 @@ class Match
 		return $games;
 	}
 
-
-	/**
-	 * Anzahl gewonnener Sätze von Team 1
-	 *
-	 * @return integer|float|null
-	 */
-	public function calcTeam1Games()
-	{
-		$sum = null;
-		foreach ($this->getEffectiveGames() as $game) {
-			$sum += $game->isDraw() ? 0.5 : $game->isTeam1Winner();
-		}
-		return $sum;
-	}
-
-	/**
-	 * Anzahl gewonnener Sätze von Team 2
-	 *
-	 * @return integer|float|null
-	 */
-	public function calcTeam2Games()
-	{
-		$sum = null;
-		foreach ($this->getEffectiveGames() as $game) {
-			$sum += $game->isDraw() ? 0.5 : $game->isTeam2Winner();
-		}
-		return $sum;
-	}
-
-	/**
-	 * Summe der gewonnenen Punkte von Team 1 über alle Sätze
-	 *
-	 * @return integer|null
-	 */
-	public function calcTeam1Points()
-	{
-		$sum = null;
-		foreach ($this->getEffectiveGames() as $game) {
-			$sum += $game->getTeam1Score();
-		}
-		return $sum;
-	}
-
-	/**
-	 * Summe der gewonnenen Punkte von Team 2 über alle Sätze
-	 *
-	 * @return integer|null
-	 */
-	public function calcTeam2Points()
-	{
-		$sum = null;
-		foreach ($this->getEffectiveGames() as $game) {
-			$sum += $game->getTeam2Score();
-		}
-		return $sum;
-	}
 
 
 	/**
@@ -1304,7 +1302,7 @@ class Match
 		*/
 
 		if ($transformGames) {
-			foreach ($this->getGames() as $game) {
+			foreach ($this->Games as $game) {
 				if ($this->getTeam2PlayerId() == $athlete->getId() || $this->getTeam2PartnerId() == $athlete->getId())
 				{
 					$game->swapTeamData();
@@ -1448,46 +1446,121 @@ class Match
 	 */
 	public function updateStats()
 	{
-		// TODO
-		$this->setAvgOrigSmallerDivBiggerGamescorePermil();
-		$this->setStdOrigSmallerDivBiggerGamescorePermil();
+		$this->inferNoFight();
 
-		$this->setNoFight();
-		$this->setRevisedScore(count($this->getAnnulledGames()) > 0);
-		$this->setGivenUpBy();
+		$hasOriginalGames = count($this->getAnnulledGames()) > 0;
 
-		$this->setTeam1Score($this->calcTeam1Games());
-		$this->setTeam2Score($this->calcTeam2Games());
+		// TODO fixme: fälschlicherweise auch aufgegebene Spiele
+		$this->setRevisedScore($hasOriginalGames);
 
-		$this->setTeam1Points($this->calcTeam1Points() ?: 0);
-		$this->setTeam2Points($this->calcTeam2Points() ?: 0);
+		$gamescoreQuotients = array();
 
+		// update effective result
+		$team1Games = $team2Games = null;
+		$team1Points = $team2Points = null;
 
-		$this->setTeam1OriginalScore($this->calcTeam1Games());
-		$this->setTeam1OriginalPoints($this->calcTeam1Points());
+		foreach ($this->getEffectiveGames() as $game) {
+			$team1Games += $game->isDraw() ? 0.5 : $game->isTeam1Winner();
+			$team2Games += $game->isDraw() ? 0.5 : $game->isTeam2Winner();
+			$team1Points += $game->getTeam1Score();
+			$team2Points += $game->getTeam2Score();
 
-		$this->setTeam2OriginalScore($this->calcTeam2Games());
-		$this->setTeam2OriginalPoints($this->calcTeam2Points());
+			if (!$hasOriginalGames && ($game->getTeam1Score() != 0 || $game->getTeam2Score() != 0)) {
+				$gamescoreQuotients[] =
+					$game->getTeam1Score() < $game->getTeam2Score() ?
+						$game->getTeam1Score() / $game->getTeam2Score() :
+						$game->getTeam2Score() / $game->getTeam1Score();
+			}
+		}
+
+		$this->setTeam1Score($team1Games);
+		$this->setTeam2Score($team2Games);
+
+		$this->setTeam1Points($team1Points ?: 0);
+		$this->setTeam2Points($team2Points ?: 0);
+
+		// update original result
+		$team1Games = $team2Games = null;
+		$team1Points = $team2Points = null;
+
+		foreach ($this->getAnnulledGames() as $game) {
+			$team1Games += $game->isDraw() ? 0.5 : $game->isTeam1Winner();
+			$team2Games += $game->isDraw() ? 0.5 : $game->isTeam2Winner();
+			$team1Points += $game->getTeam1Score();
+			$team2Points += $game->getTeam2Score();
+
+			if ($game->getTeam1Score() != 0 || $game->getTeam2Score() != 0) {
+				$gamescoreQuotients[] =
+					$game->getTeam1Score() < $game->getTeam2Score() ?
+						$game->getTeam1Score() / $game->getTeam2Score() :
+						$game->getTeam2Score() / $game->getTeam1Score();
+			}
+		}
+
+		$this->setTeam1OriginalScore($team1Games);
+		$this->setTeam2OriginalScore($team2Games);
+
+		$this->setTeam1OriginalPoints($team1Points);
+		$this->setTeam2OriginalPoints($team2Points);
+
+		// update average and standard deviation of smaller div bigger gamescore
+		if ($count = count($gamescoreQuotients)) {
+			$avg = array_sum($gamescoreQuotients) / $count;
+			$var = 0.0;
+			foreach ($gamescoreQuotients as $val)
+			{
+				$var += pow($val - $avg, 2);
+			}
+			$var /= $count;
+			$std = sqrt($var);
+
+			$this->setAvgOrigSmallerDivBiggerGamescorePermil(round($avg * 1000));
+			$this->setStdOrigSmallerDivBiggerGamescorePermil(round($std * 1000));
+		} else {
+			$this->setAvgOrigSmallerDivBiggerGamescorePermil(null);
+			$this->setStdOrigSmallerDivBiggerGamescorePermil(null);
+		}
 
 	}
 
 
+	function getTeam1String()
+	{
+		if ($this->Team1_Player && $this->Team1_Partner) {
+			return sprintf('%s / %s',
+				$this->Team1_Player->getLastName(), $this->Team1_Partner->getLastName()
+			);
+		} else if ($this->Team1_Player) {
+			return $this->Team1_Player->getFullName();
+		} else if ($this->Team1_Partner) {
+			return $this->Team1_Partner->getFullName();
+		} else {
+			return '--';
+		}
+	}
+
+	function getTeam2String()
+	{
+		if ($this->Team2_Player && $this->Team2_Partner) {
+			return sprintf('%s / %s',
+				$this->Team2_Player->getLastName(), $this->Team2_Partner->getLastName()
+			);
+		} else if ($this->Team2_Player) {
+			return $this->Team2_Player->getFullName();
+		} else if ($this->Team2_Partner) {
+			return $this->Team2_Partner->getFullName();
+		} else {
+			return '--';
+		}
+	}
+
 	function __toString()
 	{
-		if ($this->isDoubles()) {
-			return sprintf('%s / %s vs %s / %s [%s @ %s]', 
-				$this->Team1_Player->getLastName(), $this->Team1_Partner->getLastName(),
-				$this->Team2_Player->getLastName(), $this->Team2_Partner->getLastName(),
-				$this->MatchType, $this->Teammatch 
-			);
-		}
-		else {
-			return sprintf('%s vs %s [%s @ %s]', 
-				$this->Team1_Player,
-				$this->Team2_Player,
-				$this->MatchType, $this->Teammatch 
-			);
-		}
+		return sprintf('%s vs %s [%s @ %s]',
+			$this->getTeam1String(),
+			$this->getTeam2String(),
+			$this->MatchType, $this->Teammatch
+		);
 	}
 
 }

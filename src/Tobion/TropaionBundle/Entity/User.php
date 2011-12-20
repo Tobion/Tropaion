@@ -80,7 +80,7 @@ class User
 
 	public function __construct()
 	{
-		$this->created_at = new DateTime('now');
+		$this->created_at = new \DateTime('now');
 	}
 
 	/**
@@ -88,7 +88,7 @@ class User
 	 */
 	public function updated()
 	{
-		$this->updated_at = new DateTime('now');
+		$this->updated_at = new \DateTime('now');
 	}
 
 

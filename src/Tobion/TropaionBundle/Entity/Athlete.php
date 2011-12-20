@@ -167,7 +167,7 @@ class Athlete
 
 	public function __construct()
 	{
-		$this->created_at = new DateTime('now');
+		$this->created_at = new \DateTime('now');
 	}
 
 	/**
@@ -175,7 +175,7 @@ class Athlete
 	 */
 	public function updated()
 	{
-		$this->updated_at = new DateTime('now');
+		$this->updated_at = new \DateTime('now');
 	}
 
 

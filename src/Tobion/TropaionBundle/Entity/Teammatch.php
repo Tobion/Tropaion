@@ -88,6 +88,7 @@ class Teammatch
 
 	/**
 	 * Resultat für Team 1 (z.B. gewonnene Spiele oder erzielte Tore)
+	 * D.h. Anzahl der gewonnenen Matches von Team 1
 	 * @var integer $team1_score
 	 *
 	 * @ORM\Column(type="smallint", nullable=true)
@@ -96,6 +97,7 @@ class Teammatch
 
 	/**
 	 * Resultat für Team 2 (z.B. gewonnene Spiele oder erzielte Tore)
+	 * D.h. Anzahl der gewonnenen Matches von Team 2
 	 * @var integer $team2_score
 	 *
 	 * @ORM\Column(type="smallint", nullable=true)
@@ -103,7 +105,7 @@ class Teammatch
 	private $team2_score;
 
 	/**
-	 * Gewonnene Sätze von Team 1
+	 * Anzahl der gewonnenen Sätze von Team 1
 	 * @var integer $team1_games
 	 *
 	 * @ORM\Column(type="smallint", nullable=true)
@@ -111,7 +113,7 @@ class Teammatch
 	private $team1_games;
 
 	/**
-	 * Gewonnene Sätze von Team 2
+	 * Anzahl der gewonnenen Sätze von Team 2
 	 * @var integer $team2_games
 	 *
 	 * @ORM\Column(type="smallint", nullable=true)
@@ -120,6 +122,8 @@ class Teammatch
 
 	/**
 	 * Gewonnene Spielpunkte von Team 1
+	 * D.h. Summe aller gewonnenen Punkte von Team 1 über alle Individualspiele
+	 * und Sätze des Teamspiels
 	 * @var integer $team1_points
 	 *
 	 * @ORM\Column(type="smallint", nullable=true)
@@ -128,6 +132,8 @@ class Teammatch
 
 	/**
 	 * Gewonnene Spielpunkte von Team 2
+	 * D.h. Summe aller gewonnenen Punkte von Team 2 über alle Individualspiele
+	 * und Sätze des Teamspiels
 	 * @var integer $team2_points
 	 *
 	 * @ORM\Column(type="smallint", nullable=true)
@@ -301,7 +307,7 @@ class Teammatch
 	/**
 	 * @var Match[]
 	 *
-	 * @ORM\OneToMany(targetEntity="Match", mappedBy="Teammatch")
+	 * @ORM\OneToMany(targetEntity="Match", mappedBy="Teammatch", cascade={"persist"})
 	 * @ORM\JoinColumn(name="id", referencedColumnName="teammatch_id")
 	 */
 	private $Matches;
@@ -309,7 +315,7 @@ class Teammatch
 
 	public function __construct()
 	{
-		$this->created_at = $this->updated_at = new DateTime('now');
+		$this->created_at = $this->updated_at = new \DateTime('now');
 		$this->Matches = new \Doctrine\Common\Collections\ArrayCollection();
 	}
 
@@ -318,7 +324,7 @@ class Teammatch
 	 */
 	public function updated()
 	{
-		$this->updated_at = new DateTime('now');
+		$this->updated_at = new \DateTime('now');
 	}
 
 
@@ -1055,7 +1061,8 @@ class Teammatch
 	 */
 	public function getLeague()
 	{
-		return !is_null($this->getTeam1()->getLeague()) ? $this->getTeam1()->getLeague() : $this->getTeam2()->getLeague();
+		return $this->getTeam1()->getLeague() !== null ?
+			$this->getTeam1()->getLeague() : $this->getTeam2()->getLeague();
 	}
 
 	/**
@@ -1142,23 +1149,23 @@ class Teammatch
 
 	public function hasResult()
 	{
-		return !is_null($this->getTeam1Score()) && !is_null($this->getTeam2Score());
+		return $this->getTeam1Score() !== null && $this->getTeam2Score() !== null;
 	}
 
 	public function hasDetailedResult()
 	{
-		return !is_null($this->getTeam1Games()) && !is_null($this->getTeam2Games());
+		return $this->getTeam1Games() !== null && $this->getTeam2Games() !== null;
 		//return count($this->Matches) > 0;
 	}
 
 	public function isDraw()
 	{
-		return $this->hasResult() && $this->getTeam1Score() == $this->getTeam2Score() && $this->getTeam1Score() != 0;
+		return $this->hasResult() && $this->getTeam1Score() == $this->getTeam2Score() && $this->getTeam1Score() !== 0;
 	}
 
 	public function isBothTeamsLost()
 	{
-		return $this->hasResult() && ($this->getTeam1Score() == 0 && $this->getTeam2Score() == 0);
+		return $this->hasResult() && $this->getTeam1Score() === 0 && $this->getTeam2Score() === 0;
 	}
 
 	/**
@@ -1257,93 +1264,7 @@ class Teammatch
 	public function isSubmissionDue()
 	{
 		$now = new \DateTime('now');
-		return is_null($this->getSubmittedById()) && !$this->hasResult() && $this->getPerformedAt() < $now;
-	}
-
-
-	/**
-	 * Anzahl der gewonnenen Matches von Team 2
-	 *
-	 * @return integer|float|null
-	 */
-	public function calcTeam1Matches()
-	{
-		$sum = null;
-		foreach ($this->Matches as $match) {
-			$sum += $match->isDraw() ? 0.5 : $match->isTeam1Winner();
-		}
-		return $sum;
-	}
-
-	/**
-	 * Anzahl der gewonnenen Matches von Team 2
-	 *
-	 * @return integer|float|null
-	 */
-	public function calcTeam2Matches()
-	{
-		$sum = null;
-		foreach ($this->Matches as $match) {
-			$sum += $match->isDraw() ? 0.5 : $match->isTeam2Winner();
-		}
-		return $sum;
-	}
-
-
-	/**
-	 * Summe aller gewonnenen Sätze von Team 1 über alle Individualspiele des Teamspiels
-	 *
-	 * @return integer|float|null
-	 */
-	public function calcTeam1Games()
-	{
-		$sum = null;
-		foreach ($this->Matches as $match) {
-			$sum += $match->calcTeam1Games();
-		}
-		return $sum;
-	}
-
-	/**
-	 * Summe aller gewonnenen Sätze von Team 2 über alle Individualspiele des Teamspiels
-	 *
-	 * @return integer|float|null
-	 */
-	public function calcTeam2Games()
-	{
-		$sum = null;
-		foreach ($this->Matches as $match) {
-			$sum += $match->calcTeam2Games();
-		}
-		return $sum;
-	}
-
-	/**
-	 * Summe aller gewonnenen Punkte von Team 1 über alle Individualspiele und Sätze des Teamspiels
-	 *
-	 * @return integer|null
-	 */
-	public function calcTeam1Points()
-	{
-		$sum = null;
-		foreach ($this->Matches as $match) {
-			$sum += $match->calcTeam1Points();
-		}
-		return $sum;
-	}
-
-	/**
-	 * Summe aller gewonnenen Punkte von Team 2 über alle Individualspiele und Sätze des Teamspiels
-	 *
-	 * @return integer|null
-	 */
-	public function calcTeam2Points()
-	{
-		$sum = null;
-		foreach ($this->Matches as $match) {
-			$sum += $match->calcTeam2Points();
-		}
-		return $sum;
+		return $this->getSubmittedById() === null && !$this->hasResult() && $this->getPerformedAt() < $now;
 	}
 
 
@@ -1359,17 +1280,21 @@ class Teammatch
 
 	public function getTeam1ScoreVisibly()
 	{
-		return is_null($this->getTeam1Score()) ? '?' : $this->getTeam1Score();
+		return $this->getTeam1Score() === null ?
+			($this->getSubmittedById() === null ? '‒' : '?') :
+			$this->getTeam1Score();
 	}
 
 	public function getTeam2ScoreVisibly()
 	{
-		return is_null($this->getTeam2Score()) ? '?' : $this->getTeam2Score();
+		return $this->getTeam2Score() === null ?
+			($this->getSubmittedById() === null ? '‒' : '?') :
+			$this->getTeam2Score();
 	}
 
 	public function getResultVisible()
 	{
-		return $this->getTeam1ScoreVisibly() . ' : ' . $this->getTeam2ScoreVisibly(); 
+		return $this->getTeam1ScoreVisibly() . ':' . $this->getTeam2ScoreVisibly(); 
 	}
 
 
@@ -1496,36 +1421,55 @@ class Teammatch
 	 */
 	public function updateStats()
 	{
+		$team1Matches = $team2Matches = null;
+		$team1Games = $team2Games = null;
+		$team1Points = $team2Points = null;
+
+		$incompleteLineup = false;
+		$revisedScore = false;
+
 		foreach ($this->Matches as $match) {
-			/* @var $match Match */
+			/** @var $match Match */
 			$match->updateStats();
+
+			$incompleteLineup = $incompleteLineup ||
+				$match->getTeam1Player() === null || $match->getTeam2Player() === null;
+
+			$revisedScore = $revisedScore || $match->getRevisedScore();
+			
+			$team1Matches += $match->isDraw() ? 0.5 : $match->isTeam1Winner();
+			$team2Matches += $match->isDraw() ? 0.5 : $match->isTeam2Winner();
+
+			$team1Games += $match->getTeam1Score();
+			$team2Games += $match->getTeam2Score();
+
+			$team1Points += $match->getTeam1Points();
+			$team2Points += $match->getTeam2Points();
 		}
 
-		$this->setNoFight();
-		$this->setRevisedScore();
-		$this->setIncompleteLineup();
+		$this->setTeam1Score($team1Matches);
+		$this->setTeam2Score($team2Matches);
 
-		$this->setTeam1Score($this->calcTeam1Matches());
-		$this->setTeam1Games($this->calcTeam1Games());
-		$this->setTeam1Points($this->calcTeam1Points());
+		$this->setTeam1Games($team1Games);
+		$this->setTeam2Games($team2Games);
 
-		$this->setTeam2Score($this->calcTeam2Matches());
-		$this->setTeam2Games($this->calcTeam2Games());
-		$this->setTeam2Points($this->calcTeam2Points());
+		$this->setTeam1Points($team1Points);
+		$this->setTeam2Points($team2Points);
 
+		// TODO
+//		$this->setNoFight(); // bei Nicht-Antreten einer Mannschaft
+		$this->setRevisedScore($revisedScore);
+		$this->setIncompleteLineup($incompleteLineup);
+		
 	}
 
 
 	function __toString()
 	{
-		if ($this->hasResult()) {
-			return sprintf('%s – %s = %s:%s',
+		if ($this->hasResult() || $this->getSubmittedById() !== null) {
+			return sprintf('%s – %s = %s',
 				$this->getTeam1(), $this->getTeam2(), 
-				$this->getTeam1Score(), $this->getTeam2Score()
-			);
-		} elseif ($this->getSubmittedById()) {
-			return sprintf('%s – %s = ‒:‒',
-				$this->getTeam1(), $this->getTeam2()
+				$this->getResultVisible()
 			);
 		} else {
 			return sprintf('%s – %s @ %s',
@@ -1533,12 +1477,6 @@ class Teammatch
 				$this->getPerformedAt()->format('d.m.Y H:i')
 			);
 		}
-		/*
-		return sprintf('%s – %s = %s',
-			$this->getTeam1(), $this->getTeam2(), 
-			$this->getResultVisible()
-		);
-		*/
 	}
 
 

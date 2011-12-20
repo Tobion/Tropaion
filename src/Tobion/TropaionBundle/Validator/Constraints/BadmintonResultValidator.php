@@ -22,24 +22,19 @@ class BadmintonResultValidator extends ConstraintValidator
 
 		if ($match->noresult) {
 			// wenn noresult -> gewert. Ergebnis muss leer sein
-			if (!$this->isNoResult($match)) {
+			if (count($match->getEffectiveGames()) > 0) {
 				$this->addError('.noresult', $constraint->contradictoryNoResult, $this->context->getPropertyPath());
 			}
 		} else {
 			
 			$basePath = strstr($this->context->getPropertyPath(), '.', true);
 			
-			if (!($matchResultValid = $this->isBadmintonMatchResultValid($match))) {
+			if (!$this->isBadmintonMatchResultValid($match)) {
 				$this->addError('[games]', $constraint->invalidMatchResult, $basePath);
 			}
 
 			foreach ($match->getGames() as $index => $game) {
 				if (!$game->getAnnulled()) { // do not validate annulled / given-up game
-					if ($matchResultValid && $game->getTeam1Score() === null && $game->getTeam2Score() === null) {
-						// do not validate empty third game as long as the match result is valid
-						// drawback: this way also empty first/second set is ignored (e.g. ?:? 21:16 21:9)
-						continue; 
-					}
 					if (!$this->isBadmintonGameResultValid($game)) {
 						$this->addError("[games][$index]", $constraint->invalidGameResult, $basePath);
 					}
@@ -55,22 +50,6 @@ class BadmintonResultValidator extends ConstraintValidator
 	{
 		$this->context->setPropertyPath($basePath . $propertyPath);
 		$this->context->addViolation($message, array(), null);
-	}
-	
-	/**
-	 * Whether the match has no result (i.e. effective games are empty)
-	 *
-	 * @param Match $match 
-	 */
-	private function isNoResult(Match $match)
-	{
-		foreach ($match->getEffectiveGames() as $game) {
-			if ($game->getTeam1Score() !== null || $game->getTeam2Score() !== null) {
-				return false;
-			}
-		}
-		
-		return true;
 	}
 
 	private function isBadmintonGameResultValid(Game $game)
@@ -95,34 +74,59 @@ class BadmintonResultValidator extends ConstraintValidator
 	 * Überprüfen auf korrektes Satzergebnis eines Badmintonspiels (z.B. kein 3:0)
 	 * Nicht nur das Ergebnis, sondern auch die Reihenfolge ist wichtig. 
 	 * D.h. bei 2:0 Führung sollte es keinen 3. Satz geben.
+	 * @see isGameSequenceValid
 	 *
 	 * @param Match $match
 	 * @return boolean 
 	 */
 	private function isBadmintonMatchResultValid(Match $match)
 	{
-		$team1Games = 0;
-		$team2Games = 0;
-		$bestOfThreeOver = false;
-		$wrongGameSequence = false;
-		
-		//$match->calcTeam1Games();
+		$numberGames = count($match->getEffectiveGames());
 
-		foreach ($match->getEffectiveGames() as $game) {
-			$wrongGameSequence = $bestOfThreeOver && ($game->getTeam1Score() !== null || $game->getTeam2Score() !== null);
-			
-			if ($game->getTeam1Score() !== null && $game->getTeam2Score() !== null) {
-				$team1Games += $game->getTeam1Score() === $game->getTeam2Score() ? 0.5 : $game->getTeam1Score() > $game->getTeam2Score();
-				$team2Games += $game->getTeam1Score() === $game->getTeam2Score() ? 0.5 : $game->getTeam1Score() < $game->getTeam2Score();
-				$bestOfThreeOver = $bestOfThreeOver || $team1Games === 2 || $team2Games === 2;
-			}			
+		if ($numberGames === 2) {
+			return ($match->getTeam1Score() === 2 && $match->getTeam2Score() === 0)
+				|| ($match->getTeam1Score() === 0 && $match->getTeam2Score() === 2);
+
+		} else if ($numberGames === 3) {
+			return (($match->getTeam1Score() === 2 && $match->getTeam2Score() === 1)
+					|| ($match->getTeam1Score() === 1 && $match->getTeam2Score() === 2))
+				&& $this->isGameSequenceValid($match->getEffectiveGames(), 3);
+		} else {
+			return false;
 		}
 		
-		return !($wrongGameSequence ||
-			($team1Games !== 2 || $team2Games !== 0) && 
-			($team1Games !== 0 || $team2Games !== 2) &&
-			($team1Games !== 2 || $team2Games !== 1) &&
-			($team1Games !== 1 || $team2Games !== 2)
-		);
+	}
+
+	/**
+	 * Validates whether the games results are in correct sequence in a best-of competition
+	 * The "best-of" format refers to a head-to-head competition where the
+	 * two competitors compete to first win the majority of the games allotted to win the "series".
+	 * If a competitor wins a majority of the games, the remaining games are discarded.
+	 * Example: In a best-of-three playoff there should not be a third game when one team
+	 * already won the first two games.
+	 *
+	 * @param array $games array of Games
+	 * @param integer $bestOf best-of format
+	 * @return boolean
+	 */
+	private function isGameSequenceValid($games, $bestOf = 3)
+	{
+		$team1Games = 0;
+		$team2Games = 0;
+		$bestOfOver = $bestOf == 0;
+		$firstTo = floor($bestOf / 2) + 1;
+
+		foreach ($games as $game) {
+			if ($bestOfOver) {
+				return false;
+			}
+
+			$team1Games += $game->isDraw() ? 0.5 : $game->isTeam1Winner();
+			$team2Games += $game->isDraw() ? 0.5 : $game->isTeam2Winner();
+
+			$bestOfOver = $bestOfOver || $team1Games === $firstTo || $team2Games === $firstTo;
+		}
+
+		return true;
 	}
 }

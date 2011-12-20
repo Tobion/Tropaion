@@ -7,6 +7,7 @@ use Symfony\Component\Form\FormBuilder;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Tobion\TropaionBundle\Form\EventListener\AddAthletesListener;
 use Tobion\TropaionBundle\Form\EventListener\TransformAthletesListener;
+use Tobion\TropaionBundle\Form\EventListener\RemoveEmptyGamesListener;
 
 class BadmintonMatchType extends AbstractType
 {
@@ -25,15 +26,12 @@ class BadmintonMatchType extends AbstractType
 			'required' => false
 		));
 
-		$builder->addEventSubscriber(new AddAthletesListener($builder->getFormFactory()));
-
 		$builder->add('team1_noplayer', 'checkbox', array(
 			'required' => false
 		));
 		$builder->add('team2_noplayer', 'checkbox', array(
 			'required' => false
 		));
-
 
 		$builder->add('revaluation_against', 'choice', array(
 			'required' => false,
@@ -70,7 +68,9 @@ class BadmintonMatchType extends AbstractType
 			'error_bubbling' => false // so we can assign errors to this collection
 		));
 
+		$builder->addEventSubscriber(new AddAthletesListener($builder->getFormFactory()));
 		$builder->addEventSubscriber(new TransformAthletesListener($this->registry));
+		$builder->addEventSubscriber(new RemoveEmptyGamesListener());
 
 	}
 

@@ -159,7 +159,7 @@ class Club
 	 */
 	public function updated()
 	{
-		$this->updated_at = new DateTime('now');
+		$this->updated_at = new \DateTime('now');
 	}
 
 	/**

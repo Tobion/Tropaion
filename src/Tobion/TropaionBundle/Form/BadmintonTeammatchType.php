@@ -5,6 +5,7 @@ namespace Tobion\TropaionBundle\Form;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Tobion\TropaionBundle\Form\EventListener\CalculateTeammatchStatisticsListener;
 
 class BadmintonTeammatchType extends AbstractType
 {
@@ -60,6 +61,8 @@ class BadmintonTeammatchType extends AbstractType
 			'prototype' => false,
 			'by_reference' => true,
 		));
+
+		$builder->addEventSubscriber(new CalculateTeammatchStatisticsListener());
 	}
 
 	public function getDefaultOptions(array $options)

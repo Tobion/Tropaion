@@ -9,9 +9,15 @@ use Tobion\TropaionBundle\Entity\Match;
 /**
  * Game
  *
- * @ORM\Table(name="games",uniqueConstraints={@ORM\UniqueConstraint(name="game_index", columns={"annulled", "game_sequence", "match_id"})})
+ * @ORM\Table(name="games")
  * @ORM\Entity
  */
+// uniqueConstraints={@ORM\UniqueConstraint(name="game_index", columns={"annulled", "game_sequence", "match_id"})}
+// This unique index raises a duplicate key error because doctrine 
+// updates records of a collection with cascade=persist
+// before it removes records with orphanRemoval=true.
+// So the entities are in valid state but doctrine propages the database changes in the wrong order.
+// Anyway the index is not needed because it does not enhance query execution for our use-cases.
 class Game
 {
 	/**
@@ -58,7 +64,7 @@ class Game
 	 *
 	 * @ORM\Column(name="annulled", type="boolean")
 	 */
-	private $annulled;
+	private $annulled = false;
 
 	/**
 	 * @var Match
@@ -167,7 +173,7 @@ class Game
 	 */
 	public function setAnnulled($annulled)
 	{
-		$this->annulled = $annulled;
+		$this->annulled = (bool) $annulled;
 	}
 
 	/**
@@ -203,12 +209,12 @@ class Game
 
 	public function hasResult()
 	{
-		return !is_null($this->getTeam1Score()) && !is_null($this->getTeam2Score());
+		return $this->getTeam1Score() !== null && $this->getTeam2Score() !== null;
 	}
 
 	public function isDraw()
 	{
-		return $this->hasResult() && $this->getTeam1Score() == $this->getTeam2Score() && $this->getTeam1Score() != 0;
+		return $this->hasResult() && $this->getTeam1Score() == $this->getTeam2Score() && $this->getTeam1Score() !== 0;
 	}
 
 	public function isBothTeamsLost()
@@ -251,10 +257,12 @@ class Game
 
 	function __toString()
 	{
-		return sprintf('Game %s of %s [%s : %s]', 
-			$this->getGameSequence(), $this->Match,
+		return sprintf('Game %s%s [%s:%s] of %s',
+			$this->getGameSequence() === null ? '?' : $this->getGameSequence(),
+			$this->getAnnulled() ? ' (annulled)' : '',
 			$this->getTeam1Score(),
-			$this->getTeam2Score()
+			$this->getTeam2Score(),
+			$this->Match
 		);
 	}
 }

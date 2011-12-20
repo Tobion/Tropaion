@@ -655,7 +655,7 @@ class TournamentController extends Controller
 			for ($count = count($match->getAnnulledGames()); $count < 3; $count++)
 			{
 				$g = new Entity\Game();
-				$g->setAnnulled(1);
+				$g->setAnnulled(true);
 				$g->setMatch($match);
 				$match->addGames($g);
 			}
@@ -673,10 +673,9 @@ class TournamentController extends Controller
 	{
 		$tournament = $this->getTournament();
 
-		$em = $this->getDoctrine()->getEntityManager();
-		$rep = $this->getDoctrine()->getRepository('TobionTropaionBundle:Teammatch');
+		$leagueParts = Entity\League::parseSlug($this->getRequest()->get('league'));
 
-		$leagueParts = Entity\League::parseSlug($this->getRequest()->get('league'));	
+		$rep = $this->getDoctrine()->getRepository('TobionTropaionBundle:Teammatch');
 
 		$teammatch = $rep->findByParamsJoinedAll(
 			$this->getRequest()->get('owner'),
@@ -701,8 +700,15 @@ class TournamentController extends Controller
 		if ($this->getRequest()->getMethod() == 'POST') {
 			$form->bindRequest($this->getRequest());
 
+			// TODO
+			//$teammatch->setSubmittedBy();
+
 			if ($form->isValid()) {
 				// save the teammatch to the database
+				$em = $this->getDoctrine()->getEntityManager();
+
+				$em->persist($teammatch);
+				$em->flush();
 
 				return $this->redirect($this->generateUrl('tournament_teammatch', $teammatch->routingParams()));
 			} else {

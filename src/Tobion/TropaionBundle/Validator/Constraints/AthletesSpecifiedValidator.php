@@ -27,6 +27,8 @@ class AthletesSpecifiedValidator extends ConstraintValidator
 		// otherwise 2 errors will be raised for an incorret athlete readable id:
 		// 'blank' and 'athlete could not be retrieved'
 
+		// TODO validate athlete gender based on matchtype
+
 		if (!$match->team1_noplayer) {
 			if ($match->team1_player_readable_id === null || $match->team1_player_readable_id === '') {
 				$this->addError('.team1_player_readable_id', $constraint->invalidBlankAthlete, $basePath);
