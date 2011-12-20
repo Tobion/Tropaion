@@ -4,8 +4,6 @@ namespace Tobion\TropaionBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-use Tobion\TropaionBundle\Entity\Match;
-
 /**
  * Game
  *
@@ -70,7 +68,7 @@ class Game
 	 * @var Match
 	 *
 	 * @ORM\ManyToOne(targetEntity="Match", inversedBy="Games")
-	 * @ORM\JoinColumn(name="match_id", referencedColumnName="id", onDelete="CASCADE")
+	 * @ORM\JoinColumn(name="match_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
 	 */
 	private $Match;
 

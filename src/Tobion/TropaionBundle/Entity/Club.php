@@ -80,21 +80,21 @@ class Club
 	 *
 	 * @ORM\Column(name="website", type="string", length=255)
 	 */
-	private $website;
+	private $website = '';
 
 	/**
 	 * @var string $logo
 	 *
 	 * @ORM\Column(name="logo", type="string", length=100)
 	 */
-	private $logo;
+	private $logo = '';
 
 	/**
 	 * @var text $description
 	 *
 	 * @ORM\Column(name="description", type="text")
 	 */
-	private $description;
+	private $description = '';
 
 	/**
 	 * @ORM\Column(type="datetime")
@@ -105,7 +105,7 @@ class Club
 	 * @var Athlete
 	 *
 	 * @ORM\ManyToOne(targetEntity="Athlete")
-	 * @ORM\JoinColumn(name="contact_person_id", referencedColumnName="id")
+	 * @ORM\JoinColumn(name="contact_person_id", referencedColumnName="id", nullable=true)
 	 */
 	private $Contact_Person;
 
@@ -113,7 +113,7 @@ class Club
 	 * @var Club
 	 *
 	 * @ORM\ManyToOne(targetEntity="Club")
-	 * @ORM\JoinColumn(name="club_syndicate_1", referencedColumnName="id")
+	 * @ORM\JoinColumn(name="club_syndicate_1", referencedColumnName="id", nullable=true)
 	 */
 	private $Syndicate1;
 
@@ -121,7 +121,7 @@ class Club
 	 * @var Club
 	 *
 	 * @ORM\ManyToOne(targetEntity="Club")
-	 * @ORM\JoinColumn(name="club_syndicate_2", referencedColumnName="id")
+	 * @ORM\JoinColumn(name="club_syndicate_2", referencedColumnName="id", nullable=true)
 	 */
 	private $Syndicate2;
 
@@ -129,7 +129,7 @@ class Club
 	 * @var Club
 	 *
 	 * @ORM\ManyToOne(targetEntity="Club")
-	 * @ORM\JoinColumn(name="club_syndicate_3", referencedColumnName="id")
+	 * @ORM\JoinColumn(name="club_syndicate_3", referencedColumnName="id", nullable=true)
 	 */
 	private $Syndicate3;
 
@@ -137,12 +137,12 @@ class Club
 	 * @var Club
 	 *
 	 * @ORM\ManyToOne(targetEntity="Club")
-	 * @ORM\JoinColumn(name="club_syndicate_4", referencedColumnName="id")
+	 * @ORM\JoinColumn(name="club_syndicate_4", referencedColumnName="id", nullable=true)
 	 */
 	private $Syndicate4;
 
 	/**
-	 * @var Team
+	 * @var Team[]
 	 *
 	 * @ORM\OneToMany(targetEntity="Team", mappedBy="Club")
 	 * @ORM\JoinColumn(name="id", referencedColumnName="club_id")

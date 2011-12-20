@@ -4,9 +4,6 @@ namespace Tobion\TropaionBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-use Tobion\TropaionBundle\Entity\Club;
-use Tobion\TropaionBundle\Entity\League;
-use Tobion\TropaionBundle\Entity\Lineup;
 use Tobion\TropaionBundle\Util\RomanNumeral;
 
 /**
@@ -53,14 +50,14 @@ class Team
 	 *
 	 * @ORM\Column(type="boolean")
 	 */
-	private $withdrawn;
+	private $withdrawn = false;
 
 	/**
 	 * @var text $description
 	 *
 	 * @ORM\Column(type="text")
 	 */
-	private $description;
+	private $description = '';
 
 	/**
 	 * @ORM\Column(type="datetime")
@@ -71,7 +68,7 @@ class Team
 	 * @var Club
 	 *
 	 * @ORM\ManyToOne(targetEntity="Club", inversedBy="Teams")
-	 * @ORM\JoinColumn(name="club_id", referencedColumnName="id")
+	 * @ORM\JoinColumn(name="club_id", referencedColumnName="id", nullable=false)
 	 */
 	private $Club;
 
@@ -79,12 +76,12 @@ class Team
 	 * @var League
 	 *
 	 * @ORM\ManyToOne(targetEntity="League", inversedBy="Teams")
-	 * @ORM\JoinColumn(name="league_id", referencedColumnName="id")
+	 * @ORM\JoinColumn(name="league_id", referencedColumnName="id", nullable=false)
 	 */
 	private $League;
 
 	/**
-	 * @var Lineups
+	 * @var Lineup[]
 	 *
 	 * @ORM\OneToMany(targetEntity="Lineup", mappedBy="Team")
 	 * @ORM\JoinColumn(name="id", referencedColumnName="team_id")

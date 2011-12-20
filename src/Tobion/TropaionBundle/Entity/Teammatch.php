@@ -4,11 +4,6 @@ namespace Tobion\TropaionBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-use Tobion\TropaionBundle\Entity\Club;
-use Tobion\TropaionBundle\Entity\Match;
-use Tobion\TropaionBundle\Entity\Team;
-use Tobion\TropaionBundle\Entity\User;
-use Tobion\TropaionBundle\Entity\Venue;
 use Tobion\TropaionBundle\Util\SignedIntToSortableStringConverter;
 
 /**
@@ -244,7 +239,7 @@ class Teammatch
 	 *
 	 * @ORM\Column(type="text")
 	 */
-	private $description;
+	private $description = '';
 
 	/**
 	 * @ORM\Column(type="datetime")
@@ -260,7 +255,7 @@ class Teammatch
 	 * @var Venue
 	 *
 	 * @ORM\ManyToOne(targetEntity="Venue")
-	 * @ORM\JoinColumn(name="venue_id", referencedColumnName="id", onDelete="SET NULL", onUpdate="CASCADE")
+	 * @ORM\JoinColumn(name="venue_id", referencedColumnName="id", nullable=true, onDelete="SET NULL", onUpdate="CASCADE")
 	 */
 	private $Venue;
 
@@ -268,7 +263,7 @@ class Teammatch
 	 * @var Team
 	 *
 	 * @ORM\ManyToOne(targetEntity="Team")
-	 * @ORM\JoinColumn(name="team1_id", referencedColumnName="id")
+	 * @ORM\JoinColumn(name="team1_id", referencedColumnName="id", nullable=false)
 	 */
 	private $Team1;
 
@@ -276,7 +271,7 @@ class Teammatch
 	 * @var Team
 	 *
 	 * @ORM\ManyToOne(targetEntity="Team")
-	 * @ORM\JoinColumn(name="team2_id", referencedColumnName="id")
+	 * @ORM\JoinColumn(name="team2_id", referencedColumnName="id", nullable=false)
 	 */
 	private $Team2;
 
@@ -284,7 +279,7 @@ class Teammatch
 	 * @var User
 	 *
 	 * @ORM\ManyToOne(targetEntity="User")
-	 * @ORM\JoinColumn(name="submitted_by_id", referencedColumnName="id")
+	 * @ORM\JoinColumn(name="submitted_by_id", referencedColumnName="id", nullable=true)
 	 */
 	private $Submitted_By;
 
@@ -292,7 +287,7 @@ class Teammatch
 	 * @var User
 	 *
 	 * @ORM\ManyToOne(targetEntity="User")
-	 * @ORM\JoinColumn(name="confirmed_by_id", referencedColumnName="id")
+	 * @ORM\JoinColumn(name="confirmed_by_id", referencedColumnName="id", nullable=true)
 	 */
 	private $Confirmed_By;
 
@@ -300,7 +295,7 @@ class Teammatch
 	 * @var User
 	 *
 	 * @ORM\ManyToOne(targetEntity="User")
-	 * @ORM\JoinColumn(name="approved_by_id", referencedColumnName="id")
+	 * @ORM\JoinColumn(name="approved_by_id", referencedColumnName="id", nullable=true)
 	 */
 	private $Approved_By;
 

@@ -4,8 +4,6 @@ namespace Tobion\TropaionBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-use Tobion\TropaionBundle\Entity\Athlete;
-
 /**
  * User
  *
@@ -52,14 +50,6 @@ class User
 	private $email;
 
 	/**
-	 * Verbindet registrierte Nutzer mit dessen Spielerprofil
-	 * @var integer $athlete_id
-	 *
-	 * @ORM\Column(type="integer", nullable=true)
-	 */
-	private $athlete_id;
-
-	/**
 	 * @ORM\Column(type="datetime")
 	 */
 	private $created_at;
@@ -70,17 +60,18 @@ class User
 	private $updated_at;
 
 	/**
+	 * Verbindet registrierte Nutzer mit dessen Spielerprofil
 	 * @var Athlete
 	 *
-	 * @ORM\OneToOne(targetEntity="Athlete", inversedBy="User")
-	 * @ORM\JoinColumn(name="athlete_id", referencedColumnName="id", unique=true)
+	 * @ORM\OneToOne(targetEntity="Athlete")
+	 * @ORM\JoinColumn(name="athlete_id", referencedColumnName="id", nullable=true, unique=true)
 	 */
 	private $Athlete;
 
 
 	public function __construct()
 	{
-		$this->created_at = new \DateTime('now');
+		$this->created_at = $this->updated_at = new \DateTime('now');
 	}
 
 	/**
@@ -183,26 +174,6 @@ class User
 	}
 
 	/**
-	 * Set athlete_id
-	 *
-	 * @param integer $athleteId
-	 */
-	public function setAthleteId($athleteId)
-	{
-		$this->athlete_id = $athleteId;
-	}
-
-	/**
-	 * Get athlete_id
-	 *
-	 * @return integer
-	 */
-	public function getAthleteId()
-	{
-		return $this->athlete_id;
-	}
-
-	/**
 	 * Set created_at
 	 *
 	 * @param datetime $createdAt
@@ -247,7 +218,7 @@ class User
 	 *
 	 * @param Athlete $athlete
 	 */
-	public function setAthlete(Athlete $athlete)
+	public function setAthlete(Athlete $athlete = null)
 	{
 		$this->Athlete = $athlete;
 	}

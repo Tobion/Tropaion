@@ -4,9 +4,6 @@ namespace Tobion\TropaionBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-use Tobion\TropaionBundle\Entity\Team;
-use Tobion\TropaionBundle\Entity\Tournament;
-
 /**
  * Ligen und Staffeln
  *
@@ -67,7 +64,7 @@ class League
 	 *
 	 * @ORM\Column(type="smallint")
 	 */
-	private $promoted_number;
+	private $promoted_number = 0;
 
 	/**
 	 * Die wieviel letztplatzierten qualifizieren sich für den Abstieg
@@ -75,18 +72,18 @@ class League
 	 *
 	 * @ORM\Column(type="smallint")
 	 */
-	private $relegated_number;
+	private $relegated_number = 0;
 
 	/**
 	 * @var Tournament
 	 *
 	 * @ORM\ManyToOne(targetEntity="Tournament")
-	 * @ORM\JoinColumn(name="tournament_id", referencedColumnName="id")
+	 * @ORM\JoinColumn(name="tournament_id", referencedColumnName="id", nullable=false)
 	 */
 	private $Tournament;
 
 	/**
-	 * @var Team
+	 * @var Team[]
 	 *
 	 * @ORM\OneToMany(targetEntity="Team", mappedBy="League")
 	 * @ORM\JoinColumn(name="id", referencedColumnName="league_id")

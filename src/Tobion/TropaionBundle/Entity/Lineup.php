@@ -54,7 +54,7 @@ class Lineup
 	 * @var Team
 	 *
 	 * @ORM\ManyToOne(targetEntity="Team", inversedBy="Lineups")
-	 * @ORM\JoinColumn(name="team_id", referencedColumnName="id")
+	 * @ORM\JoinColumn(name="team_id", referencedColumnName="id", nullable=false)
 	 */
 	private $Team;
 
@@ -62,7 +62,7 @@ class Lineup
 	 * @var Athlete
 	 *
 	 * @ORM\ManyToOne(targetEntity="Athlete")
-	 * @ORM\JoinColumn(name="athlete_id", referencedColumnName="id")
+	 * @ORM\JoinColumn(name="athlete_id", referencedColumnName="id", nullable=false)
 	 */
 	private $Athlete;
 

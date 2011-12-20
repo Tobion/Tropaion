@@ -4,10 +4,6 @@ namespace Tobion\TropaionBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-use Tobion\TropaionBundle\Entity\Athlete;
-use Tobion\TropaionBundle\Entity\MatchType;
-use Tobion\TropaionBundle\Entity\Ratinghistory;
-use Tobion\TropaionBundle\Entity\Teammatch;
 use Tobion\TropaionBundle\Util\SignedIntToSortableStringConverter;
 
 
@@ -195,7 +191,7 @@ class Match
 	 * @var Teammatch
 	 *
 	 * @ORM\ManyToOne(targetEntity="Teammatch", inversedBy="Matches")
-	 * @ORM\JoinColumn(name="teammatch_id", referencedColumnName="id", onDelete="CASCADE")
+	 * @ORM\JoinColumn(name="teammatch_id", referencedColumnName="id", nullable=true, onDelete="CASCADE")
 	 */
 	private $Teammatch;
 
@@ -203,7 +199,7 @@ class Match
 	 * @var MatchType
 	 *
 	 * @ORM\ManyToOne(targetEntity="MatchType")
-	 * @ORM\JoinColumn(name="match_type_id", referencedColumnName="id")
+	 * @ORM\JoinColumn(name="match_type_id", referencedColumnName="id", nullable=false)
 	 */
 	private $MatchType;
 
@@ -211,7 +207,7 @@ class Match
 	 * @var Athlete
 	 *
 	 * @ORM\ManyToOne(targetEntity="Athlete")
-	 * @ORM\JoinColumn(name="team1_player_id", referencedColumnName="id")
+	 * @ORM\JoinColumn(name="team1_player_id", referencedColumnName="id", nullable=true)
 	 */
 	private $Team1_Player;
 
@@ -219,7 +215,7 @@ class Match
 	 * @var Athlete
 	 *
 	 * @ORM\ManyToOne(targetEntity="Athlete")
-	 * @ORM\JoinColumn(name="team1_partner_id", referencedColumnName="id")
+	 * @ORM\JoinColumn(name="team1_partner_id", referencedColumnName="id", nullable=true)
 	 */
 	private $Team1_Partner;
 
@@ -227,7 +223,7 @@ class Match
 	 * @var Athlete
 	 *
 	 * @ORM\ManyToOne(targetEntity="Athlete")
-	 * @ORM\JoinColumn(name="team2_player_id", referencedColumnName="id")
+	 * @ORM\JoinColumn(name="team2_player_id", referencedColumnName="id", nullable=true)
 	 */
 	private $Team2_Player;
 
@@ -235,12 +231,12 @@ class Match
 	 * @var Athlete
 	 *
 	 * @ORM\ManyToOne(targetEntity="Athlete")
-	 * @ORM\JoinColumn(name="team2_partner_id", referencedColumnName="id")
+	 * @ORM\JoinColumn(name="team2_partner_id", referencedColumnName="id", nullable=true)
 	 */
 	private $Team2_Partner;
 
 	/**
-	 * @var Game
+	 * @var Game[]
 	 *
 	 * @ORM\OneToMany(targetEntity="Game", mappedBy="Match", cascade={"persist"}, orphanRemoval=true)
 	 * @ORM\JoinColumn(name="id", referencedColumnName="match_id")
@@ -793,6 +789,7 @@ class Match
 	public function setTeam2Player(Athlete $team2Player = null)
 	{
 		$this->Team2_Player = $team2Player;
+		$this->setTeam2PlayerId($this->Team2_Player ? $this->Team2_Player->getId() : null);
 	}
 
 	/**
@@ -861,8 +858,12 @@ class Match
 	*/
 	public function isTeam1NoPlayer()
 	{
-		return $this->getTeam1PlayerId() === null && $this->getTeam1PartnerId() === null
-			&& $this->getId() !== null;
+		// set the property on the getter because the form does not set the value on submission
+		// when it did not change
+		// $this->getId() !== null makes sure it is not true when the entity is new
+		return $this->team1_noplayer =
+			($this->Team1_Player === null && $this->Team1_Partner === null
+				&& $this->getId() !== null);
 	}
 
 
@@ -871,8 +872,9 @@ class Match
 	*/
 	public function isTeam2NoPlayer()
 	{
-		return $this->getTeam2PlayerId() === null && $this->getTeam2PartnerId() === null
-			&& $this->getId() !== null;
+		return $this->team2_noplayer =
+			($this->Team2_Player === null && $this->Team2_Partner === null
+				&& $this->getId() !== null);
 	}
 
 	/**
@@ -937,18 +939,18 @@ class Match
 	public function getResultIncident()
 	{
 		if ($this->hasTeam1WonByDefault()) {
-			return 'team1_wonbydefault';
+			return $this->result_incident = 'team1_wonbydefault';
 		}
 		if ($this->hasTeam1GivenUp()) {
-			return 'team1_givenup';
+			return $this->result_incident = 'team1_givenup';
 		}
 		if ($this->hasTeam2WonByDefault()) {
-			return 'team2_wonbydefault';
+			return $this->result_incident = 'team2_wonbydefault';
 		}
 		if ($this->hasTeam2GivenUp()) {
-			return 'team2_givenup';
+			return $this->result_incident = 'team2_givenup';
 		}
-		return '';
+		return $this->result_incident = '';
 	}
 
 	/**

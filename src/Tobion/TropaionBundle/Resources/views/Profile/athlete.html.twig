@@ -132,8 +132,8 @@
 
 <h1>{{ athlete.fullName }}</h1>
 
-{% if athlete.user %}
-	<p>Registriertes Nutzerprofil: <a href="{{ path('profile_user', athlete.user.routingParams ) }}">{{ athlete.user }}</a></p>
+{% if user %}
+	<p>Registriertes Nutzerprofil: <a href="{{ path('profile_user', user.routingParams ) }}">{{ user }}</a></p>
 {% endif %}
 
 <p>Aktueller Verein: <a href="{{ path('profile_club', athlete.club.routingParams ) }}">{{ athlete.club }}</a></p>

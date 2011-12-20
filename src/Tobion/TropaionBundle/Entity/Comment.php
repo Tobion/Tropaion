@@ -4,10 +4,6 @@ namespace Tobion\TropaionBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-use Tobion\TropaionBundle\Entity\Match;
-use Tobion\TropaionBundle\Entity\Teammatch;
-use Tobion\TropaionBundle\Entity\User;
-
 /**
  * Kommentare zu Spielen
  *
@@ -64,7 +60,7 @@ class Comment
 	 * @var User
 	 *
 	 * @ORM\ManyToOne(targetEntity="User", inversedBy="Comments")
-	 * @ORM\JoinColumn(name="author_id", referencedColumnName="id")
+	 * @ORM\JoinColumn(name="author_id", referencedColumnName="id", nullable=false)
 	 */
 	private $Author;
 
@@ -72,7 +68,7 @@ class Comment
 	 * @var Teammatch
 	 *
 	 * @ORM\ManyToOne(targetEntity="Teammatch", inversedBy="Comments")
-	 * @ORM\JoinColumn(name="teammatch_id", referencedColumnName="id")
+	 * @ORM\JoinColumn(name="teammatch_id", referencedColumnName="id", nullable=false)
 	 */
 	private $Teammatch;
 

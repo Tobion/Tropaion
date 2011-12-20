@@ -702,6 +702,13 @@ class TournamentController extends Controller
 
 			// TODO
 			//$teammatch->setSubmittedBy();
+			//
+			// fixme
+			// performed_at of teammatch always updated ?!
+
+			// var_dump($form->getErrorsAsString());
+
+			echo 'SSS'.$teammatch->getMatches()->get(1)->getTeam2Player();
 
 			if ($form->isValid()) {
 				// save the teammatch to the database

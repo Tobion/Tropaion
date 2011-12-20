@@ -4,10 +4,6 @@ namespace Tobion\TropaionBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-use Tobion\TropaionBundle\Entity\Club;
-use Tobion\TropaionBundle\Entity\User;
-use Tobion\TropaionBundle\Entity\Tournament;
-
 /**
  * Athlete
  *
@@ -45,7 +41,7 @@ class Athlete
 	 *
 	 * @ORM\Column(type="string", length=6)
 	 */
-	private $gender;
+	private $gender = 'male';
 
 	/**
 	 * @var date $birthday
@@ -59,7 +55,7 @@ class Athlete
 	 *
 	 * @ORM\Column(type="string", length=2)
 	 */
-	private $country;
+	private $country = '';
 
 	/**
 	 * @var integer $club_id
@@ -73,28 +69,28 @@ class Athlete
 	 *
 	 * @ORM\Column(type="boolean")
 	 */
-	private $is_active;
+	private $is_active = true;
 
 	/**
 	 * @var string $zip
 	 *
 	 * @ORM\Column(type="string", length=10)
 	 */
-	private $zip;
+	private $zip = '';
 
 	/**
 	 * @var string $city
 	 *
 	 * @ORM\Column(type="string", length=70)
 	 */
-	private $city;
+	private $city = '';
 
 	/**
 	 * @var string $street
 	 *
 	 * @ORM\Column(type="string", length=70)
 	 */
-	private $street;
+	private $street = '';
 
 	/**
 	 * @var integer $singles_rating
@@ -122,21 +118,21 @@ class Athlete
 	 *
 	 * @ORM\Column(type="smallint")
 	 */
-	private $singles_matches;
+	private $singles_matches = 0;
 
 	/**
 	 * @var integer $doubles_matches
 	 *
 	 * @ORM\Column(type="smallint")
 	 */
-	private $doubles_matches;
+	private $doubles_matches = 0;
 
 	/**
 	 * @var integer $mixed_matches
 	 *
 	 * @ORM\Column(type="smallint")
 	 */
-	private $mixed_matches;
+	private $mixed_matches = 0;
 
 	/**
 	 * @ORM\Column(type="datetime")
@@ -152,22 +148,19 @@ class Athlete
 	 * @var Club
 	 *
 	 * @ORM\ManyToOne(targetEntity="Club")
-	 * @ORM\JoinColumn(name="club_id", referencedColumnName="id")
+	 * @ORM\JoinColumn(name="club_id", referencedColumnName="id", nullable=false)
 	 */
 	private $Club;
 
-	/**
-	 * @var User
-	 *
-	 * @ORM\OneToOne(targetEntity="User", mappedBy="Athlete")
-	 * @ORM\JoinColumn(name="id", referencedColumnName="athlete_id")
-	 */
-	private $User;
+	// OneToOne(targetEntity="User", mappedBy="Athlete")
+	// private $User;
+	// Do not specify inverse side of a one-to-one relation because
+	// http://www.doctrine-project.org/docs/orm/2.1/en/reference/faq.html#why-is-an-extra-sql-query-executed-every-time-i-fetch-an-entity-with-a-one-to-one-relation
 
 
 	public function __construct()
 	{
-		$this->created_at = new \DateTime('now');
+		$this->created_at = $this->updated_at = new \DateTime('now');
 	}
 
 	/**
@@ -569,16 +562,6 @@ class Athlete
 		return $this->Club;
 	}
 
-	/**
-	 * Get User
-	 *
-	 * @return User
-	 */
-	public function getUser()
-	{
-		return $this->User;
-	}
-
 
 	public function routingParams(Tournament $tournament = null)
 	{
@@ -605,8 +588,8 @@ class Athlete
 
 	function getReadableId()
 	{
-		return sprintf('%s %s [%s]', 
-			$this->getFirstName(), $this->getLastName(),
+		return sprintf('%s [%s]', 
+			$this->getFullName(),
 			$this->getId()
 		);
 	}

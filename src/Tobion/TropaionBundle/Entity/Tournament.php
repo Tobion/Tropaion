@@ -4,9 +4,6 @@ namespace Tobion\TropaionBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-use Tobion\TropaionBundle\Entity\Club;
-use Tobion\TropaionBundle\Entity\User;
-
 /**
  * Tournament
  *
@@ -28,11 +25,12 @@ class Tournament
 
 	/**
 	 * Veranstalter
+	 * Organizer that owns this tournament
 	 * @var integer $owner_id
 	 *
 	 * @ORM\Column(type="integer")
 	 */
-	private $owner_id; // organizer_id
+	private $owner_id;
 
 	/**
 	 * Ausrichter
@@ -89,13 +87,13 @@ class Tournament
 	 *
 	 * @ORM\Column(type="string", length=20)
 	 */
-	private $sport;
+	private $sport = '';
 
 	/**
 	 * @var User
 	 *
 	 * @ORM\ManyToOne(targetEntity="User")
-	 * @ORM\JoinColumn(name="owner_id", referencedColumnName="id")
+	 * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", nullable=false)
 	 */
 	private $Owner;
 
@@ -103,7 +101,7 @@ class Tournament
 	 * @var Club
 	 *
 	 * @ORM\ManyToOne(targetEntity="Club")
-	 * @ORM\JoinColumn(name="host_id", referencedColumnName="id")
+	 * @ORM\JoinColumn(name="host_id", referencedColumnName="id", nullable=true)
 	 */
 	private $Host;
 

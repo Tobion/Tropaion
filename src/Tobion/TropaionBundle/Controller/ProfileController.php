@@ -24,13 +24,11 @@ class ProfileController extends Controller
 	public function athleteAction($firstName, $lastName, $id)
 	{
 		$em = $this->getDoctrine()->getEntityManager();
-		$rep = $this->getDoctrine()->getRepository('TobionTropaionBundle:Ratinghistory');
 
 		$qb = $em->createQueryBuilder();
-		$qb->select(array('a', 'c', 'u'))
+		$qb->select(array('a', 'c'))
 			->from('TobionTropaionBundle:Athlete', 'a')
 			->leftJoin('a.Club', 'c')
-			->leftJoin('a.User', 'u')
 			->where('a.id = :id')
 			->setParameter('id', $id);
 
@@ -44,6 +42,10 @@ class ProfileController extends Controller
 		if ($athlete->getFirstName() != $firstName || $athlete->getLastName() != $lastName) {
 			return $this->redirect($this->generateUrl('profile_athlete', $athlete->routingParams()), 301);
 		}
+
+		$user = $em->getRepository('TobionTropaionBundle:User')->findOneBy(
+			array('Athlete' => $athlete->getId())
+		);
 
 
 		/*
@@ -211,6 +213,7 @@ class ProfileController extends Controller
 
 		return array(
 			'athlete' => $athlete,
+			'user' => $user,
 			'singlesRatings' => $singlesRatings,
 			'doublesRatings' => $doublesRatings,
 			'mixedRatings' => $mixedRatings,

@@ -137,7 +137,7 @@ class TransformAthletesListener implements EventSubscriberInterface
 			}
 		}
 
-		//echo 'Player:'.$match->getTeam1Player();
+		echo 'Player:'.$match->getTeam2Player();
 
 		$event->setData($match);
 

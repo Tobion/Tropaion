@@ -4,9 +4,6 @@ namespace Tobion\TropaionBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-use Tobion\TropaionBundle\Entity\Athlete;
-use Tobion\TropaionBundle\Entity\Match;
-
 /**
  * Rating der Spieler über die Zeit
  *
@@ -69,7 +66,7 @@ class Ratinghistory
 	 * @var Athlete
 	 *
 	 * @ORM\ManyToOne(targetEntity="Athlete", inversedBy="Ratinghistory")
-	 * @ORM\JoinColumn(name="athlete_id", referencedColumnName="id")
+	 * @ORM\JoinColumn(name="athlete_id", referencedColumnName="id", nullable=false)
 	 */
 	private $Athlete;
 
@@ -77,7 +74,7 @@ class Ratinghistory
 	 * @var Match
 	 *
 	 * @ORM\ManyToOne(targetEntity="Match", inversedBy="Ratinghistory")
-	 * @ORM\JoinColumn(name="match_id", referencedColumnName="id")
+	 * @ORM\JoinColumn(name="match_id", referencedColumnName="id", nullable=false)
 	 */
 	private $Match;
 

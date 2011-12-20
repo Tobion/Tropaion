@@ -55,21 +55,21 @@ class Venue
 	 *
 	 * @ORM\Column(type="string", length=10)
 	 */
-	private $latitude;
+	private $latitude = '';
 
 	/**
 	 * @var string $longitude
 	 *
 	 * @ORM\Column(type="string", length=10)
 	 */
-	private $longitude;
+	private $longitude = '';
 
 	/**
 	 * @var text $description
 	 *
 	 * @ORM\Column(type="text")
 	 */
-	private $description;
+	private $description = '';
 
 	/**
 	 * @ORM\Column(type="datetime")

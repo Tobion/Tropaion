@@ -35,7 +35,7 @@ class MatchType
 	 *
 	 * @ORM\Column(type="smallint")
 	 */
-	private $x_on_x;
+	private $x_on_x = 0;
 
 	/**
 	 * @var smallint $gender
@@ -45,7 +45,7 @@ class MatchType
 	 *
 	 * @ORM\Column(type="smallint")
 	 */
-	private $gender;
+	private $gender = 0;
 
 
 	/**
