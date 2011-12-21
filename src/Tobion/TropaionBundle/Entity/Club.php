@@ -20,7 +20,7 @@ class Club
 	/**
 	 * @var integer $id
 	 *
-	 * @ORM\Column(name="id", type="integer")
+	 * @ORM\Column(type="integer")
 	 * @ORM\Id
 	 * @ORM\GeneratedValue(strategy="AUTO")
 	 */
@@ -29,70 +29,35 @@ class Club
 	/**
 	 * @var string $code
 	 *
-	 * @ORM\Column(name="code", type="string", length=10, unique=true)
+	 * @ORM\Column(type="string", length=10, unique=true)
 	 */
 	private $code;
 
 	/**
 	 * @var string $name
 	 *
-	 * @ORM\Column(name="name", type="string", length=100)
+	 * @ORM\Column(type="string", length=100)
 	 */
 	private $name;
 
 	/**
-	 * @var integer $contact_person_id
-	 *
-	 * @ORM\Column(name="contact_person_id", type="integer", nullable=true)
-	 */
-	private $contact_person_id;
-
-	/**
-	 * @var integer $club_syndicate_1
-	 *
-	 * @ORM\Column(name="club_syndicate_1", type="integer", nullable=true)
-	 */
-	private $club_syndicate_1;
-
-	/**
-	 * @var integer $club_syndicate_2
-	 *
-	 * @ORM\Column(name="club_syndicate_2", type="integer", nullable=true)
-	 */
-	private $club_syndicate_2;
-
-	/**
-	 * @var integer $club_syndicate_3
-	 *
-	 * @ORM\Column(name="club_syndicate_3", type="integer", nullable=true)
-	 */
-	private $club_syndicate_3;
-
-	/**
-	 * @var integer $club_syndicate_4
-	 *
-	 * @ORM\Column(name="club_syndicate_4", type="integer", nullable=true)
-	 */
-	private $club_syndicate_4;
-
-	/**
 	 * @var string $website
 	 *
-	 * @ORM\Column(name="website", type="string", length=255)
+	 * @ORM\Column(type="string", length=255)
 	 */
 	private $website = '';
 
 	/**
 	 * @var string $logo
 	 *
-	 * @ORM\Column(name="logo", type="string", length=100)
+	 * @ORM\Column(type="string", length=100)
 	 */
 	private $logo = '';
 
 	/**
 	 * @var text $description
 	 *
-	 * @ORM\Column(name="description", type="text")
+	 * @ORM\Column(type="text")
 	 */
 	private $description = '';
 
@@ -145,9 +110,9 @@ class Club
 	 * @var Team[]
 	 *
 	 * @ORM\OneToMany(targetEntity="Team", mappedBy="Club")
-	 * @ORM\JoinColumn(name="id", referencedColumnName="club_id")
 	 */
 	private $Teams;
+
 
 	public function __construct()
 	{
@@ -210,106 +175,6 @@ class Club
 	public function getName()
 	{
 		return $this->name;
-	}
-
-	/**
-	 * Set contact_person_id
-	 *
-	 * @param integer $contactPersonId
-	 */
-	public function setContactPersonId($contactPersonId)
-	{
-		$this->contact_person_id = $contactPersonId;
-	}
-
-	/**
-	 * Get contact_person_id
-	 *
-	 * @return integer
-	 */
-	public function getContactPersonId()
-	{
-		return $this->contact_person_id;
-	}
-
-	/**
-	 * Set club_syndicate_1
-	 *
-	 * @param integer $clubSyndicate1
-	 */
-	public function setClubSyndicate1($clubSyndicate1)
-	{
-		$this->club_syndicate_1 = $clubSyndicate1;
-	}
-
-	/**
-	 * Get club_syndicate_1
-	 *
-	 * @return integer
-	 */
-	public function getClubSyndicate1()
-	{
-		return $this->club_syndicate_1;
-	}
-
-	/**
-	 * Set club_syndicate_2
-	 *
-	 * @param integer $clubSyndicate2
-	 */
-	public function setClubSyndicate2($clubSyndicate2)
-	{
-		$this->club_syndicate_2 = $clubSyndicate2;
-	}
-
-	/**
-	 * Get club_syndicate_2
-	 *
-	 * @return integer
-	 */
-	public function getClubSyndicate2()
-	{
-		return $this->club_syndicate_2;
-	}
-
-	/**
-	 * Set club_syndicate_3
-	 *
-	 * @param integer $clubSyndicate3
-	 */
-	public function setClubSyndicate3($clubSyndicate3)
-	{
-		$this->club_syndicate_3 = $clubSyndicate3;
-	}
-
-	/**
-	 * Get club_syndicate_3
-	 *
-	 * @return integer
-	 */
-	public function getClubSyndicate3()
-	{
-		return $this->club_syndicate_3;
-	}
-
-	/**
-	 * Set club_syndicate_4
-	 *
-	 * @param integer $clubSyndicate4
-	 */
-	public function setClubSyndicate4($clubSyndicate4)
-	{
-		$this->club_syndicate_4 = $clubSyndicate4;
-	}
-
-	/**
-	 * Get club_syndicate_4
-	 *
-	 * @return integer
-	 */
-	public function getClubSyndicate4()
-	{
-		return $this->club_syndicate_4;
 	}
 
 	/**
@@ -397,7 +262,7 @@ class Club
 	 *
 	 * @param Athlete $contactPerson
 	 */
-	public function setContactPerson(Athlete $contactPerson)
+	public function setContactPerson(Athlete $contactPerson = null)
 	{
 		$this->Contact_Person = $contactPerson;
 	}
@@ -417,7 +282,7 @@ class Club
 	 *
 	 * @param Club $syndicate1
 	 */
-	public function setSyndicate1(Club $syndicate1)
+	public function setSyndicate1(Club $syndicate1 = null)
 	{
 		$this->Syndicate1 = $syndicate1;
 	}
@@ -437,7 +302,7 @@ class Club
 	 *
 	 * @param Club $syndicate2
 	 */
-	public function setSyndicate2(Club $syndicate2)
+	public function setSyndicate2(Club $syndicate2 = null)
 	{
 		$this->Syndicate2 = $syndicate2;
 	}
@@ -457,7 +322,7 @@ class Club
 	 *
 	 * @param Club $syndicate3
 	 */
-	public function setSyndicate3(Club $syndicate3)
+	public function setSyndicate3(Club $syndicate3 = null)
 	{
 		$this->Syndicate3 = $syndicate3;
 	}
@@ -477,7 +342,7 @@ class Club
 	 *
 	 * @param Club $syndicate4
 	 */
-	public function setSyndicate4(Club $syndicate4)
+	public function setSyndicate4(Club $syndicate4 = null)
 	{
 		$this->Syndicate4 = $syndicate4;
 	}

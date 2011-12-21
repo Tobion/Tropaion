@@ -95,7 +95,7 @@ class TeammatchRepository extends EntityRepository
 			->innerJoin('t1.League', 'l')
 			->innerJoin('l.Tournament', 'r')
 			->innerJoin('r.Owner', 'o')
-			->where($qb->expr()->eq('t1.league_id', ':league_id'))
+			->where($qb->expr()->eq('t1.League', ':league_id'))
 			->andWhere('tm.performed_at <= :performed_at')
 			// das ist wichtig, um sowohl sich selber als auch circulären Referenzen (a has next b und b has next a) auszuschließen
 			->andWhere('NOT (tm.performed_at = :performed_at AND tm.id >= :id)')
@@ -124,7 +124,7 @@ class TeammatchRepository extends EntityRepository
 			->innerJoin('t1.League', 'l')
 			->innerJoin('l.Tournament', 'r')
 			->innerJoin('r.Owner', 'o')
-			->where($qb->expr()->eq('t1.league_id', ':league_id'))
+			->where($qb->expr()->eq('t1.League', ':league_id'))
 			->andWhere('tm.performed_at >= :performed_at')
 			// das ist wichtig, um sowohl sich selber als auch circulären Referenzen (a has next b und b has next a) auszuschließen
 			->andWhere('NOT (tm.performed_at = :performed_at AND tm.id <= :id)')
@@ -153,10 +153,10 @@ class TeammatchRepository extends EntityRepository
 			->innerJoin('t1.League', 'l')
 			->innerJoin('l.Tournament', 'r')
 			->innerJoin('r.Owner', 'o')
-			->where($qb->expr()->eq('tm.team1_id', ':team1_id'))
-			->andWhere($qb->expr()->eq('tm.team2_id', ':team2_id'))
-			->setParameter('team1_id', $teammatch->getTeam2Id())
-			->setParameter('team2_id', $teammatch->getTeam1Id())
+			->where($qb->expr()->eq('tm.Team1', ':team1_id'))
+			->andWhere($qb->expr()->eq('tm.Team2', ':team2_id'))
+			->setParameter('team1_id', $teammatch->getTeam2()->getId())
+			->setParameter('team2_id', $teammatch->getTeam1()->getId())
 			->setMaxResults(1);
 
 		try {

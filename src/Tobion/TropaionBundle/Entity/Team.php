@@ -25,25 +25,11 @@ class Team
 	private $id;
 
 	/**
-	 * @var integer $club_id
-	 *
-	 * @ORM\Column(type="integer")
-	 */
-	private $club_id;
-
-	/**
 	 * @var integer $team_number
 	 *
 	 * @ORM\Column(type="smallint")
 	 */
 	private $team_number;
-
-	/**
-	 * @var integer $league_id
-	 *
-	 * @ORM\Column(type="integer")
-	 */
-	private $league_id;
 
 	/**
 	 * @var boolean $withdrawn
@@ -84,7 +70,6 @@ class Team
 	 * @var Lineup[]
 	 *
 	 * @ORM\OneToMany(targetEntity="Lineup", mappedBy="Team")
-	 * @ORM\JoinColumn(name="id", referencedColumnName="team_id")
 	 * @ORM\OrderBy({"position" = "ASC"})
 	 */
 	private $Lineups;
@@ -113,26 +98,6 @@ class Team
 	}
 
 	/**
-	 * Set club_id
-	 *
-	 * @param integer $clubId
-	 */
-	public function setClubId($clubId)
-	{
-		$this->club_id = $clubId;
-	}
-
-	/**
-	 * Get club_id
-	 *
-	 * @return integer
-	 */
-	public function getClubId()
-	{
-		return $this->club_id;
-	}
-
-	/**
 	 * Set team_number
 	 *
 	 * @param smallint $teamNumber
@@ -150,26 +115,6 @@ class Team
 	public function getTeamNumber()
 	{
 		return $this->team_number;
-	}
-
-	/**
-	 * Set league_id
-	 *
-	 * @param integer $leagueId
-	 */
-	public function setLeagueId($leagueId)
-	{
-		$this->league_id = $leagueId;
-	}
-
-	/**
-	 * Get league_id
-	 *
-	 * @return integer
-	 */
-	public function getLeagueId()
-	{
-		return $this->league_id;
 	}
 
 	/**
@@ -337,10 +282,10 @@ class Team
 		$secondRoundLineup = array();
 		foreach ($this->Lineups as $lineup) {
 			if ($lineup->getStage() == 1) {
-				$firstRoundLineup[$lineup->getAthleteId()] = $lineup->getPosition();
+				$firstRoundLineup[$lineup->getAthlete()->getId()] = $lineup->getPosition();
 			}
 			else {
-				$secondRoundLineup[$lineup->getAthleteId()] = $lineup->getPosition();
+				$secondRoundLineup[$lineup->getAthlete()->getId()] = $lineup->getPosition();
 			}
 		}
 
@@ -355,9 +300,9 @@ class Team
 	public function routingParams()
 	{
 		return array(
-			'owner' => $this->getLeague()->getTournament()->getOwner()->getSlug(),
-			'tournament' => $this->getLeague()->getTournament()->getSlug(),
-			'club' => $this->getClub()->getCode(),
+			'owner' => $this->League->getTournament()->getOwner()->getSlug(),
+			'tournament' => $this->League->getTournament()->getSlug(),
+			'club' => $this->Club->getCode(),
 			'teamNumber' => $this->getTeamNumber(),
 		);
 	}
@@ -367,10 +312,10 @@ class Team
 		return RomanNumeral::convertIntToRoman($this->getTeamNumber());
 	}
 
-	public function isPositioned($stage, $athleteId)
+	public function isPositioned(Athlete $athlete, $stage)
 	{
 		foreach ($this->Lineups as $lineup) {
-			if ($lineup->getStage() == $stage && $lineup->getAthleteId() == $athleteId) {
+			if ($lineup->getStage() == $stage && $lineup->getAthlete() === $athlete) {
 				return true;
 			}
 		}
@@ -379,14 +324,14 @@ class Team
 
 	public function getShortName($toRoman = true, $html = false)
 	{
-		return $this->getClub()->getCode() . 
+		return $this->Club->getCode() . 
 			($html ? '&#160;' /* '&nbsp;' */ : ' ') . 
 			($toRoman ? RomanNumeral::convertIntToRoman($this->getTeamNumber()) : $this->getTeamNumber());
 	}
 
 	public function getFullName($toRoman = true, $html = false)
 	{
-		return $this->getClub()->getName() . 
+		return $this->Club->getName() . 
 			($html ? '&#160;' /* '&nbsp;' */ : ' ') . 
 			($toRoman ? RomanNumeral::convertIntToRoman($this->getTeamNumber()) : $this->getTeamNumber());
 	}

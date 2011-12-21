@@ -86,7 +86,6 @@ class League
 	 * @var Team[]
 	 *
 	 * @ORM\OneToMany(targetEntity="Team", mappedBy="League")
-	 * @ORM\JoinColumn(name="id", referencedColumnName="league_id")
 	 */
 	private $Teams;
 

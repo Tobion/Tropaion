@@ -26,48 +26,6 @@ class Match
 	private $id;
 
 	/**
-	 * @var integer $teammatch_id
-	 *
-	 * @ORM\Column(type="integer")
-	 */
-	private $teammatch_id;
-
-	/**
-	 * @var string $match_type_id
-	 *
-	 * @ORM\Column(type="integer")
-	 */
-	private $match_type_id;
-
-	/**
-	 * @var integer $team1_player_id
-	 *
-	 * @ORM\Column(type="integer", nullable=true)
-	 */
-	private $team1_player_id;
-
-	/**
-	 * @var integer $team1_partner_id
-	 *
-	 * @ORM\Column(type="integer", nullable=true)
-	 */
-	private $team1_partner_id;
-
-	/**
-	 * @var integer $team2_player_id
-	 *
-	 * @ORM\Column(type="integer", nullable=true)
-	 */
-	private $team2_player_id;
-
-	/**
-	 * @var integer $team2_partner_id
-	 *
-	 * @ORM\Column(type="integer", nullable=true)
-	 */
-	private $team2_partner_id;
-
-	/**
 	 * Anzahl gewonnener Sätze von Team 1
 	 * NULL = kein Ergebnis
 	 * @var integer $team1_score
@@ -191,7 +149,7 @@ class Match
 	 * @var Teammatch
 	 *
 	 * @ORM\ManyToOne(targetEntity="Teammatch", inversedBy="Matches")
-	 * @ORM\JoinColumn(name="teammatch_id", referencedColumnName="id", nullable=true, onDelete="CASCADE")
+	 * @ORM\JoinColumn(name="teammatch_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
 	 */
 	private $Teammatch;
 
@@ -239,7 +197,6 @@ class Match
 	 * @var Game[]
 	 *
 	 * @ORM\OneToMany(targetEntity="Game", mappedBy="Match", cascade={"persist"}, orphanRemoval=true)
-	 * @ORM\JoinColumn(name="id", referencedColumnName="match_id")
 	 * @ORM\OrderBy({"game_sequence" = "ASC"})
 	 */
 	private $Games;
@@ -252,7 +209,6 @@ class Match
 	 * @var Ratinghistory
 	 *
 	 * @ORM\OneToMany(targetEntity="Ratinghistory", mappedBy="Match")
-	 * @ORM\JoinColumn(name="id", referencedColumnName="match_id")
 	 */
 	private $Ratinghistory;
 
@@ -277,6 +233,7 @@ class Match
 	public function __construct()
 	{
 		$this->Games = new \Doctrine\Common\Collections\ArrayCollection();
+		$this->Ratinghistory = new \Doctrine\Common\Collections\ArrayCollection();
 	}
 
 	/**
@@ -296,126 +253,6 @@ class Match
 	public function getId()
 	{
 		return $this->id;
-	}
-
-	/**
-	 * Set teammatch_id
-	 *
-	 * @param integer $teammatchId
-	 */
-	public function setTeammatchId($teammatchId)
-	{
-		$this->teammatch_id = $teammatchId;
-	}
-
-	/**
-	 * Get teammatch_id
-	 *
-	 * @return integer
-	 */
-	public function getTeammatchId()
-	{
-		return $this->teammatch_id;
-	}
-
-	/**
-	 * Set match_type_id
-	 *
-	 * @param string $matchTypeId
-	 */
-	public function setMatchTypeId($matchTypeId)
-	{
-		$this->match_type_id = $matchTypeId;
-	}
-
-	/**
-	 * Get match_type_id
-	 *
-	 * @return string
-	 */
-	public function getMatchTypeId()
-	{
-		return $this->match_type_id;
-	}
-
-	/**
-	 * Set team1_player_id
-	 *
-	 * @param integer $team1PlayerId
-	 */
-	public function setTeam1PlayerId($team1PlayerId)
-	{
-		$this->team1_player_id = $team1PlayerId;
-	}
-
-	/**
-	 * Get team1_player_id
-	 *
-	 * @return integer
-	 */
-	public function getTeam1PlayerId()
-	{
-		return $this->team1_player_id;
-	}
-
-	/**
-	 * Set team1_partner_id
-	 *
-	 * @param integer $team1PartnerId
-	 */
-	public function setTeam1PartnerId($team1PartnerId)
-	{
-		$this->team1_partner_id = $team1PartnerId;
-	}
-
-	/**
-	 * Get team1_partner_id
-	 *
-	 * @return integer
-	 */
-	public function getTeam1PartnerId()
-	{
-		return $this->team1_partner_id;
-	}
-
-	/**
-	 * Set team2_player_id
-	 *
-	 * @param integer $team2PlayerId
-	 */
-	public function setTeam2PlayerId($team2PlayerId)
-	{
-		$this->team2_player_id = $team2PlayerId;
-	}
-
-	/**
-	 * Get team2_player_id
-	 *
-	 * @return integer
-	 */
-	public function getTeam2PlayerId()
-	{
-		return $this->team2_player_id;
-	}
-
-	/**
-	 * Set team2_partner_id
-	 *
-	 * @param integer $team2PartnerId
-	 */
-	public function setTeam2PartnerId($team2PartnerId)
-	{
-		$this->team2_partner_id = $team2PartnerId;
-	}
-
-	/**
-	 * Get team2_partner_id
-	 *
-	 * @return integer
-	 */
-	public function getTeam2PartnerId()
-	{
-		return $this->team2_partner_id;
 	}
 
 	/**
@@ -789,7 +626,6 @@ class Match
 	public function setTeam2Player(Athlete $team2Player = null)
 	{
 		$this->Team2_Player = $team2Player;
-		$this->setTeam2PlayerId($this->Team2_Player ? $this->Team2_Player->getId() : null);
 	}
 
 	/**
@@ -895,7 +731,7 @@ class Match
 	 */
 	public function isTeam1Single()
 	{
-		return $this->getTeam1PlayerId() === null XOR $this->getTeam1PartnerId() === null;
+		return $this->Team1_Player === null XOR $this->Team1_Partner === null;
 	}
 
 	/**
@@ -904,16 +740,16 @@ class Match
 	 */
 	public function isTeam2Single()
 	{
-		return $this->getTeam2PlayerId() === null XOR $this->getTeam2PartnerId() === null;
+		return $this->Team2_Player === null XOR $this->Team2_Partner === null;
 	}
 
 	/**
 	 * Gibt einzelnen teilgenommenen Athlete von Team1 zurück
-	 * @return Athlete
+	 * @return Athlete|null
 	 */
 	public function getTeam1SingleAthlete()
 	{
-		return $this->getTeam1PlayerId() === null ? $this->Team1_Partner : $this->Team1_Player;
+		return $this->Team1_Player === null ? $this->Team1_Partner : $this->Team1_Player;
 	}
 
 	/**
@@ -922,7 +758,7 @@ class Match
 	 */
 	public function getTeam2SingleAthlete()
 	{
-		return $this->getTeam2PlayerId() === null ? $this->Team2_Partner : $this->Team2_Player;
+		return $this->Team2_Player === null ? $this->Team2_Partner : $this->Team2_Player;
 	}
 
 	public function hasResult()
@@ -1249,8 +1085,8 @@ class Match
 	public function isTeam1PlayerSubstitute()
 	{
 		return !$this->getTeammatch()->getTeam1()->isPositioned(
-			$this->getTeammatch()->getStage(),
-			$this->getTeam1PlayerId()
+			$this->Team1_Player,
+			$this->getTeammatch()->getStage()
 		);
 	}
 
@@ -1262,8 +1098,8 @@ class Match
 	public function isTeam1PartnerSubstitute()
 	{
 		return !$this->getTeammatch()->getTeam1()->isPositioned(
-			$this->getTeammatch()->getStage(),
-			$this->getTeam1PartnerId()
+			$this->Team1_Partner,
+			$this->getTeammatch()->getStage()
 		);
 	}
 
@@ -1276,8 +1112,8 @@ class Match
 	public function isTeam2PlayerSubstitute()
 	{
 		return !$this->getTeammatch()->getTeam2()->isPositioned(
-			$this->getTeammatch()->getStage(),
-			$this->getTeam2PlayerId()
+			$this->Team2_Player,
+			$this->getTeammatch()->getStage()
 		);	
 	}
 
@@ -1289,23 +1125,17 @@ class Match
 	public function isTeam2PartnerSubstitute()
 	{
 		return !$this->getTeammatch()->getTeam2()->isPositioned( 
-			$this->getTeammatch()->getStage(),
-			$this->getTeam2PartnerId()
+			$this->Team2_Partner,
+			$this->getTeammatch()->getStage()
 		);
 	}
 
 
 	public function transformToAthleteView(Athlete $athlete, $transformTeammatch = true, $transformGames = true)
 	{
-		/* Observed strange behavior of Doctrine:
-			$this->getTeam1PlayerId() returns string
-			$athlete->getId() returns integer
-			So cannot use === comparison
-		*/
-
 		if ($transformGames) {
 			foreach ($this->Games as $game) {
-				if ($this->getTeam2PlayerId() == $athlete->getId() || $this->getTeam2PartnerId() == $athlete->getId())
+				if ($this->Team2_Player === $athlete || $this->Team2_Partner === $athlete)
 				{
 					$game->swapTeamData();
 				}
@@ -1317,14 +1147,14 @@ class Match
 			to make sure it does not get transformed multiple times back and forth 
 			because the same Teammatch can be referenced in memory by several Matches
 		*/
-		if ($this->getTeam1PlayerId() == $athlete->getId())
+		if ($this->Team1_Player === $athlete)
 		{
 			$this->homeaway = 'home';
 			if ($transformTeammatch && !$this->getTeammatch()->getTransformedViewHomeAway()) {
 				$this->getTeammatch()->transformToTeamView($this->getTeammatch()->getTeam1());
 			}
 		}
-		else if ($this->getTeam1PartnerId() == $athlete->getId())
+		else if ($this->Team1_Partner === $athlete)
 		{
 			$this->homeaway = 'home';
 			$this->swapAthleteData(1);
@@ -1332,7 +1162,7 @@ class Match
 				$this->getTeammatch()->transformToTeamView($this->getTeammatch()->getTeam1());
 			}
 		}
-		else if ($this->getTeam2PlayerId() == $athlete->getId())
+		else if ($this->Team2_Player === $athlete)
 		{
 			$this->homeaway = 'away';
 			$this->swapTeamData();
@@ -1340,7 +1170,7 @@ class Match
 				$this->getTeammatch()->transformToTeamView($this->getTeammatch()->getTeam2());
 			}
 		}
-		else if ($this->getTeam2PartnerId() == $athlete->getId())
+		else if ($this->Team2_Partner === $athlete)
 		{
 			$this->homeaway = 'away';
 			$this->swapAthleteData(2);
@@ -1360,17 +1190,9 @@ class Match
 
 	private function swapTeamData()
 	{
-		$tmp = $this->team1_player_id;
-		$this->team1_player_id = $this->team2_player_id;
-		$this->team2_player_id = $tmp;
-
 		$tmp = $this->Team1_Player;
 		$this->Team1_Player = $this->Team2_Player;
 		$this->Team2_Player = $tmp;
-
-		$tmp = $this->team1_partner_id;
-		$this->team1_partner_id = $this->team2_partner_id;
-		$this->team2_partner_id = $tmp;
 
 		$tmp = $this->Team1_Partner;
 		$this->Team1_Partner = $this->Team2_Partner;
@@ -1408,19 +1230,11 @@ class Match
 	private function swapAthleteData($team = 0)
 	{
 		if (!$team || $team === 1) {
-			$tmp = $this->team1_player_id;
-			$this->team1_player_id = $this->team1_partner_id;
-			$this->team1_partner_id = $tmp;
-
 			$tmp = $this->Team1_Player;
 			$this->Team1_Player = $this->Team1_Partner;
 			$this->Team1_Partner = $tmp;
 		} 
 		if (!$team || $team === 2) {
-			$tmp = $this->team2_player_id;
-			$this->team2_player_id = $this->team2_partner_id;
-			$this->team2_partner_id = $tmp;
-
 			$tmp = $this->Team2_Player;
 			$this->Team2_Player = $this->Team2_Partner;
 			$this->Team2_Partner = $tmp;
@@ -1433,8 +1247,8 @@ class Match
 	public function getAthleteRatinghistory(Athlete $athlete)
 	{
 
-		foreach ($this->getRatinghistory() as $ratinghistory) {
-			if ($ratinghistory->getAthleteId() == $athlete->getId())
+		foreach ($this->Ratinghistory as $ratinghistory) {
+			if ($ratinghistory->getAthlete() === $athlete)
 			{
 				return $ratinghistory;
 			}

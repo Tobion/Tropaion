@@ -97,7 +97,7 @@ class ProfileController extends Controller
 			->leftJoin('m.Team1_Partner', 't1p2')
 			->leftJoin('m.Team2_Player', 't2p1')
 			->leftJoin('m.Team2_Partner', 't2p2')
-			->where('h.athlete_id = :id')
+			->where('h.Athlete = :id')
 			->orderBy('tm.performed_at', 'ASC')
 			->addOrderBy('m.id', 'ASC') // needed for building the ratings array
 			->addOrderBy('g.game_sequence', 'ASC')

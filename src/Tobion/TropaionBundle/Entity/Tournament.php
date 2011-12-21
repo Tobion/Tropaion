@@ -24,23 +24,6 @@ class Tournament
 	private $id;
 
 	/**
-	 * Veranstalter
-	 * Organizer that owns this tournament
-	 * @var integer $owner_id
-	 *
-	 * @ORM\Column(type="integer")
-	 */
-	private $owner_id;
-
-	/**
-	 * Ausrichter
-	 * @var integer $host_id
-	 *
-	 * @ORM\Column(type="integer", nullable=true)
-	 */
-	private $host_id;
-
-	/**
 	 * @var string $short_name
 	 *
 	 * @ORM\Column(type="string", length=40)
@@ -90,6 +73,8 @@ class Tournament
 	private $sport = '';
 
 	/**
+	 * Veranstalter
+	 * Organizer that owns this tournament
 	 * @var User
 	 *
 	 * @ORM\ManyToOne(targetEntity="User")
@@ -98,6 +83,7 @@ class Tournament
 	private $Owner;
 
 	/**
+	 * Ausrichter
 	 * @var Club
 	 *
 	 * @ORM\ManyToOne(targetEntity="Club")
@@ -114,46 +100,6 @@ class Tournament
 	public function getId()
 	{
 		return $this->id;
-	}
-
-	/**
-	 * Set owner_id
-	 *
-	 * @param integer $ownerId
-	 */
-	public function setOwnerId($ownerId)
-	{
-		$this->owner_id = $ownerId;
-	}
-
-	/**
-	 * Get owner_id
-	 *
-	 * @return integer
-	 */
-	public function getOwnerId()
-	{
-		return $this->owner_id;
-	}
-
-	/**
-	 * Set host_id
-	 *
-	 * @param integer $hostId
-	 */
-	public function setHostId($hostId)
-	{
-		$this->host_id = $hostId;
-	}
-
-	/**
-	 * Get host_id
-	 *
-	 * @return integer
-	 */
-	public function getHostId()
-	{
-		return $this->host_id;
 	}
 
 	/**
@@ -321,7 +267,7 @@ class Tournament
 	 *
 	 * @param Club $host
 	 */
-	public function setHost(Club $host)
+	public function setHost(Club $host = null)
 	{
 		$this->Host = $host;
 	}
@@ -341,7 +287,7 @@ class Tournament
 	public function routingParams()
 	{
 		return array(
-			'owner' => $this->getOwner()->getSlug(),
+			'owner' => $this->Owner->getSlug(),
 			'tournament' => $this->getSlug()
 		);
 	}

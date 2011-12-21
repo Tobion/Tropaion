@@ -27,13 +27,6 @@ class Teammatch
 	private $id;
 
 	/**
-	 * @var integer $venue_id
-	 *
-	 * @ORM\Column(type="integer", nullable=true)
-	 */
-	private $venue_id;
-
-	/**
 	 * Ursprünglich geplantes Datum des Spiels, wenn abweichend von performed_at
 	 * @var datetime $scheduled_at
 	 *
@@ -64,22 +57,6 @@ class Teammatch
 	 * @ORM\Column(type="smallint")
 	 */
 	private $stage;
-
-	/**
-	 * Heimmannschaft bzw. erstes Team bei Spielen auf neutralem Grund
-	 * @var integer $team1_id
-	 *
-	 * @ORM\Column(type="integer")
-	 */
-	private $team1_id;
-
-	/**
-	 * Auswärtsmannschaft bzw. zweites Team bei Spielen auf neutralem Grund
-	 * @var integer $team2_id
-	 *
-	 * @ORM\Column(type="integer")
-	 */
-	private $team2_id;
 
 	/**
 	 * Resultat für Team 1 (z.B. gewonnene Spiele oder erzielte Tore)
@@ -190,14 +167,6 @@ class Teammatch
 	private $incomplete_lineup;
 
 	/**
-	 * Ergebnis eingegeben von welchem Nutzer
-	 * @var integer $submitted_by_id
-	 *
-	 * @ORM\Column(type="integer", nullable=true)
-	 */
-	private $submitted_by_id;
-
-	/**
 	 * @var datetime $submitted_at
 	 *
 	 * @ORM\Column(type="datetime", nullable=true)
@@ -205,27 +174,11 @@ class Teammatch
 	private $submitted_at;
 
 	/**
-	 * Ergebnis bestätigt von welchem Nutzer
-	 * @var integer $confirmed_by_id
-	 *
-	 * @ORM\Column(type="integer", nullable=true)
-	 */
-	private $confirmed_by_id;
-
-	/**
 	 * @var datetime $confirmed_at
 	 *
 	 * @ORM\Column(type="datetime", nullable=true)
 	 */
 	private $confirmed_at;
-
-	/**
-	 * Ergebnis genehmigt von welchem Nutzer
-	 * @var integer $approved_by_id
-	 *
-	 * @ORM\Column(type="integer", nullable=true)
-	 */
-	private $approved_by_id;
 
 	/**
 	 * @var datetime $approved_at
@@ -260,6 +213,7 @@ class Teammatch
 	private $Venue;
 
 	/**
+	 * Heimmannschaft bzw. erstes Team bei Spielen auf neutralem Grund
 	 * @var Team
 	 *
 	 * @ORM\ManyToOne(targetEntity="Team")
@@ -268,6 +222,7 @@ class Teammatch
 	private $Team1;
 
 	/**
+	 * Auswärtsmannschaft bzw. zweites Team bei Spielen auf neutralem Grund
 	 * @var Team
 	 *
 	 * @ORM\ManyToOne(targetEntity="Team")
@@ -276,6 +231,7 @@ class Teammatch
 	private $Team2;
 
 	/**
+	 * Ergebnis eingegeben von welchem Nutzer
 	 * @var User
 	 *
 	 * @ORM\ManyToOne(targetEntity="User")
@@ -284,6 +240,7 @@ class Teammatch
 	private $Submitted_By;
 
 	/**
+	 * Ergebnis bestätigt von welchem Nutzer
 	 * @var User
 	 *
 	 * @ORM\ManyToOne(targetEntity="User")
@@ -292,6 +249,7 @@ class Teammatch
 	private $Confirmed_By;
 
 	/**
+	 * Ergebnis genehmigt von welchem Nutzer
 	 * @var User
 	 *
 	 * @ORM\ManyToOne(targetEntity="User")
@@ -303,7 +261,6 @@ class Teammatch
 	 * @var Match[]
 	 *
 	 * @ORM\OneToMany(targetEntity="Match", mappedBy="Teammatch", cascade={"persist"})
-	 * @ORM\JoinColumn(name="id", referencedColumnName="teammatch_id")
 	 */
 	private $Matches;
 
@@ -331,26 +288,6 @@ class Teammatch
 	public function getId()
 	{
 		return $this->id;
-	}
-
-	/**
-	 * Set venue_id
-	 *
-	 * @param integer $venueId
-	 */
-	public function setVenueId($venueId)
-	{
-		$this->venue_id = $venueId;
-	}
-
-	/**
-	 * Get venue_id
-	 *
-	 * @return integer
-	 */
-	public function getVenueId()
-	{
-		return $this->venue_id;
 	}
 
 	/**
@@ -431,46 +368,6 @@ class Teammatch
 	public function getStage()
 	{
 		return $this->stage;
-	}
-
-	/**
-	 * Set team1_id
-	 *
-	 * @param integer $team1Id
-	 */
-	public function setTeam1Id($team1Id)
-	{
-		$this->team1_id = $team1Id;
-	}
-
-	/**
-	 * Get team1_id
-	 *
-	 * @return integer
-	 */
-	public function getTeam1Id()
-	{
-		return $this->team1_id;
-	}
-
-	/**
-	 * Set team2_id
-	 *
-	 * @param integer $team2Id
-	 */
-	public function setTeam2Id($team2Id)
-	{
-		$this->team2_id = $team2Id;
-	}
-
-	/**
-	 * Get team2_id
-	 *
-	 * @return integer
-	 */
-	public function getTeam2Id()
-	{
-		return $this->team2_id;
 	}
 
 	/**
@@ -714,26 +611,6 @@ class Teammatch
 	}
 
 	/**
-	 * Set submitted_by_id
-	 *
-	 * @param integer $submittedById
-	 */
-	public function setSubmittedById($submittedById)
-	{
-		$this->submitted_by_id = $submittedById;
-	}
-
-	/**
-	 * Get submitted_by_id
-	 *
-	 * @return integer
-	 */
-	public function getSubmittedById()
-	{
-		return $this->submitted_by_id;
-	}
-
-	/**
 	 * Set submitted_at
 	 *
 	 * @param datetime $submittedAt
@@ -754,26 +631,6 @@ class Teammatch
 	}
 
 	/**
-	 * Set confirmed_by_id
-	 *
-	 * @param integer $confirmedById
-	 */
-	public function setConfirmedById($confirmedById)
-	{
-		$this->confirmed_by_id = $confirmedById;
-	}
-
-	/**
-	 * Get confirmed_by_id
-	 *
-	 * @return integer
-	 */
-	public function getConfirmedById()
-	{
-		return $this->confirmed_by_id;
-	}
-
-	/**
 	 * Set confirmed_at
 	 *
 	 * @param datetime $confirmedAt
@@ -791,26 +648,6 @@ class Teammatch
 	public function getConfirmedAt()
 	{
 		return $this->confirmed_at;
-	}
-
-	/**
-	 * Set approved_by_id
-	 *
-	 * @param integer $approvedById
-	 */
-	public function setApprovedById($approvedById)
-	{
-		$this->approved_by_id = $approvedById;
-	}
-
-	/**
-	 * Get approved_by_id
-	 *
-	 * @return integer
-	 */
-	public function getApprovedById()
-	{
-		return $this->approved_by_id;
 	}
 
 	/**
@@ -958,7 +795,7 @@ class Teammatch
 	 *
 	 * @param User $submittedBy
 	 */
-	public function setSubmittedBy(User $submittedBy)
+	public function setSubmittedBy(User $submittedBy = null)
 	{
 		$this->Submitted_By = $submittedBy;
 	}
@@ -978,7 +815,7 @@ class Teammatch
 	 *
 	 * @param User $confirmedBy
 	 */
-	public function setConfirmedBy(User $confirmedBy)
+	public function setConfirmedBy(User $confirmedBy = null)
 	{
 		$this->Confirmed_By = $confirmedBy;
 	}
@@ -998,7 +835,7 @@ class Teammatch
 	 *
 	 * @param User $approvedBy
 	 */
-	public function setApprovedBy(User $approvedBy)
+	public function setApprovedBy(User $approvedBy = null)
 	{
 		$this->Approved_By = $approvedBy;
 	}
@@ -1056,8 +893,8 @@ class Teammatch
 	 */
 	public function getLeague()
 	{
-		return $this->getTeam1()->getLeague() !== null ?
-			$this->getTeam1()->getLeague() : $this->getTeam2()->getLeague();
+		return $this->Team1->getLeague() !== null ?
+			$this->Team1->getLeague() : $this->Team2->getLeague();
 	}
 
 	/**
@@ -1067,8 +904,8 @@ class Teammatch
 	 */
 	public function setLeague(League $league)
 	{
-		$this->getTeam1()->setLeague($league);
-		$this->getTeam2()->setLeague($league);
+		$this->Team1->setLeague($league);
+		$this->Team2->setLeague($league);
 	}
 
 	/**
@@ -1080,9 +917,9 @@ class Teammatch
 	public function getSlug()
 	{
 		return 
-			$this->getTeam1()->getClub()->getCode() . '-' . $this->getTeam1()->getTeamNumber() . 
+			$this->Team1->getClub()->getCode() . '-' . $this->Team1->getTeamNumber() .
 			'_' .
-			$this->getTeam2()->getClub()->getCode() . '-' . $this->getTeam2()->getTeamNumber() ;
+			$this->Team2->getClub()->getCode() . '-' . $this->Team2->getTeamNumber() ;
 	}
 
 	/**
@@ -1120,10 +957,10 @@ class Teammatch
 				'owner' => $this->getLeague()->getTournament()->getOwner()->getSlug(),
 				'tournament' => $this->getLeague()->getTournament()->getSlug(),
 				'league' => $this->getLeague()->getSlug(),
-				'team1Club' => $this->getTeam2()->getClub()->getCode(),
-				'team1Number' => $this->getTeam2()->getTeamNumber(),
-				'team2Club' => $this->getTeam1()->getClub()->getCode(),
-				'team2Number' => $this->getTeam1()->getTeamNumber()
+				'team1Club' => $this->Team2->getClub()->getCode(),
+				'team1Number' => $this->Team2->getTeamNumber(),
+				'team2Club' => $this->Team1->getClub()->getCode(),
+				'team2Number' => $this->Team1->getTeamNumber()
 				// 'teammatch' => $this->getSlug()
 			);
 		}
@@ -1132,10 +969,10 @@ class Teammatch
 				'owner' => $this->getLeague()->getTournament()->getOwner()->getSlug(),
 				'tournament' => $this->getLeague()->getTournament()->getSlug(),
 				'league' => $this->getLeague()->getSlug(),
-				'team1Club' => $this->getTeam1()->getClub()->getCode(),
-				'team1Number' => $this->getTeam1()->getTeamNumber(),
-				'team2Club' => $this->getTeam2()->getClub()->getCode(),
-				'team2Number' => $this->getTeam2()->getTeamNumber()
+				'team1Club' => $this->Team1->getClub()->getCode(),
+				'team1Number' => $this->Team1->getTeamNumber(),
+				'team2Club' => $this->Team2->getClub()->getCode(),
+				'team2Number' => $this->Team2->getTeamNumber()
 				// 'teammatch' => $this->getSlug()
 			);
 		}
@@ -1225,7 +1062,7 @@ class Teammatch
 				$chars
 			);
 		}
-		else if ($this->getTeam1() === $team) {
+		else if ($this->Team1 === $team) {
 			return SignedIntToSortableStringConverter::convertArray(
 				array(
 					$this->getTeam1Score() - $this->getTeam2Score(),
@@ -1236,7 +1073,7 @@ class Teammatch
 				$chars
 			);
 		}
-		else if ($this->getTeam2() === $team) {
+		else if ($this->Team2 === $team) {
 			return SignedIntToSortableStringConverter::convertArray(
 				array(
 					$this->getTeam2Score() - $this->getTeam1Score(),
@@ -1259,7 +1096,7 @@ class Teammatch
 	public function isSubmissionDue()
 	{
 		$now = new \DateTime('now');
-		return $this->getSubmittedById() === null && !$this->hasResult() && $this->getPerformedAt() < $now;
+		return $this->Submitted_By === null && !$this->hasResult() && $this->getPerformedAt() < $now;
 	}
 
 
@@ -1276,14 +1113,14 @@ class Teammatch
 	public function getTeam1ScoreVisibly()
 	{
 		return $this->getTeam1Score() === null ?
-			($this->getSubmittedById() === null ? '‒' : '?') :
+			($this->Submitted_By === null ? '‒' : '?') :
 			$this->getTeam1Score();
 	}
 
 	public function getTeam2ScoreVisibly()
 	{
 		return $this->getTeam2Score() === null ?
-			($this->getSubmittedById() === null ? '‒' : '?') :
+			($this->Submitted_By === null ? '‒' : '?') :
 			$this->getTeam2Score();
 	}
 
@@ -1301,12 +1138,12 @@ class Teammatch
 	 */
 	public function transformToClubView(Club $club)
 	{
-		if ($this->getTeam1()->getClubId() != $club->getId() && $this->getTeam2()->getClubId() == $club->getId())
+		if ($this->Team1->getClub() !== $club && $this->Team2->getClub() === $club)
 		{
 			$this->homeaway = 'away';
 			$this->swapTeamData();
 		}
-		else if ($this->getTeam1()->getClubId() == $club->getId())
+		else if ($this->Team1->getClub() === $club)
 		{
 			$this->homeaway = 'home';
 		}
@@ -1314,12 +1151,12 @@ class Teammatch
 
 	public function transformToTeamView(Team $team)
 	{
-		if ($this->getTeam1Id() != $team->getId() && $this->getTeam2Id() == $team->getId())
+		if ($this->Team1 !== $team && $this->Team2 === $team)
 		{
 			$this->homeaway = 'away';
 			$this->swapTeamData();
 		}
-		else if ($this->getTeam1Id() == $team->getId())
+		else if ($this->Team1 === $team)
 		{
 			$this->homeaway = 'home';
 		}
@@ -1332,10 +1169,6 @@ class Teammatch
 
 	public function swapTeamData()
 	{
-		$tmp = $this->team1_id;
-		$this->team1_id = $this->team2_id;
-		$this->team2_id = $tmp;
-
 		$tmp = $this->Team1;
 		$this->Team1 = $this->Team2;
 		$this->Team2 = $tmp;
@@ -1362,7 +1195,7 @@ class Teammatch
 
 	public function isSameClub()
 	{
-		return $this->getTeam1()->getClubId() === $this->getTeam2()->getClubId();
+		return $this->Team1->getClub() === $this->Team2->getClub();
 	}
 
 	/**
@@ -1461,14 +1294,14 @@ class Teammatch
 
 	function __toString()
 	{
-		if ($this->hasResult() || $this->getSubmittedById() !== null) {
+		if ($this->hasResult() || $this->Submitted_By !== null) {
 			return sprintf('%s – %s = %s',
-				$this->getTeam1(), $this->getTeam2(), 
+				$this->Team1, $this->Team2,
 				$this->getResultVisible()
 			);
 		} else {
 			return sprintf('%s – %s @ %s',
-				$this->getTeam1(), $this->getTeam2(), 
+				$this->Team1, $this->Team2,
 				$this->getPerformedAt()->format('d.m.Y H:i')
 			);
 		}

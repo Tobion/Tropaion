@@ -235,7 +235,7 @@ class TournamentController extends Controller
 			->innerJoin('tm.Team2', 't2')
 			->innerJoin('t1.Club', 'c1')
 			->innerJoin('t2.Club', 'c2')
-			->where($qb->expr()->eq('t1.league_id', ':id'))
+			->where($qb->expr()->eq('t1.League', ':id'))
 			->setParameter('id', $league->getId());
 
 		$teammatches = $qb->getQuery()->getResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
@@ -244,7 +244,7 @@ class TournamentController extends Controller
 		foreach ($teammatches as $teammatch) {
 			// set league which is not hydrated but needed for teammatches methods 
 			$teammatch->setLeague($league);
-			$teammatchesCrossover[$teammatch->getTeam1Id()][$teammatch->getTeam2Id()] = $teammatch;
+			$teammatchesCrossover[$teammatch->getTeam1()->getId()][$teammatch->getTeam2()->getId()] = $teammatch;
 		}
 
 		$previousLeague = $rep->findHierarchicallyPrevious($league);
@@ -392,7 +392,7 @@ class TournamentController extends Controller
 			->innerJoin('t1.Club', 'c1')
 			->innerJoin('t2.Club', 'c2')
 			->innerJoin('tm.Venue', 'v')
-			->where('tm.team1_id = :id OR tm.team2_id = :id')
+			->where('tm.Team1 = :id OR tm.Team2 = :id')
 			->orderBy('tm.performed_at', 'ASC')
 			->setParameter('id', $team->getId());
 
@@ -458,7 +458,7 @@ class TournamentController extends Controller
 			->innerJoin('t2.Club', 'c2')
 			->innerJoin('t1.League', 'l')
 			->innerJoin('tm.Venue', 'v')
-			->where('t1.club_id = :club_id OR t2.club_id = :club_id')
+			->where('t1.Club = :club_id OR t2.Club = :club_id')
 			->andWhere($qb->expr()->eq('l.tournament_id', ':tournament_id'))
 			->orderBy('tm.performed_at', 'ASC')
 			->setParameter('club_id', $club->getId())
@@ -494,17 +494,11 @@ class TournamentController extends Controller
 
 		$em = $this->getDoctrine()->getEntityManager();
 
-		$qb = $em->createQueryBuilder();
-		$qb->select(array('a'))
-			->from('TobionTropaionBundle:Athlete', 'a')
-			->where($qb->expr()->eq('a.id', '?0'))
-			->setParameters(array(
-				$this->getRequest()->get('id')
-			));
+		$athlete = $em->getRepository('TobionTropaionBundle:Athlete')->find(
+			$this->getRequest()->get('id')
+		);
 
-		try {
-			$athlete = $qb->getQuery()->getSingleResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
-		} catch (\Doctrine\Orm\NoResultException $e) {
+		if (!$athlete) {
 			throw $this->createNotFoundException('Athlete not found.');
 		}
 
@@ -529,12 +523,12 @@ class TournamentController extends Controller
 			->leftJoin('m.Team1_Partner', 't1p2')
 			->leftJoin('m.Team2_Player', 't2p1')
 			->leftJoin('m.Team2_Partner', 't2p2')
-			->leftJoin('m.Ratinghistory', 'rh', 'WITH', $qb->expr()->eq('rh.athlete_id', ':athlete_id')) // \Doctrine\ORM\Expr\Join::WITH
-			->where('m.team1_player_id = :athlete_id OR m.team1_partner_id = :athlete_id OR ' .
-				'm.team2_player_id = :athlete_id OR m.team2_partner_id = :athlete_id')
-			->andWhere($qb->expr()->eq('l.tournament_id', ':tournament_id'))
+			->leftJoin('m.Ratinghistory', 'rh', 'WITH', $qb->expr()->eq('rh.Athlete', ':athlete_id')) // \Doctrine\ORM\Expr\Join::WITH
+			->where('m.Team1_Player = :athlete_id OR m.Team1_Partner = :athlete_id OR ' .
+				'm.Team2_Player = :athlete_id OR m.Team2_Partner = :athlete_id')
+			->andWhere($qb->expr()->eq('l.Tournament', ':tournament_id'))
 			->orderBy('tm.performed_at', 'ASC')
-			->addOrderBy('m.match_type_id', 'ASC')
+			->addOrderBy('y.id', 'ASC')
 			// addOrderBy game_sequence ASC is added automatically
 			->setParameter('athlete_id', $athlete->getId())
 			->setParameter('tournament_id', $tournament->getId());
@@ -557,11 +551,11 @@ class TournamentController extends Controller
 			$opponentGames += $match->getTeam2OriginalFallbackEffectiveScore() ?: 0;
 			$myPoints += $match->getTeam1OriginalFallbackEffectivePoints() ?: 0;
 			$opponentPoints += $match->getTeam2OriginalFallbackEffectivePoints() ?: 0;
-			if ($match->getTeam1PartnerId()) {
-				$nbPartners[$match->getTeam1PartnerId()] = true;
+			if ($match->getTeam1Partner()) {
+				$nbPartners[$match->getTeam1Partner()->getId()] = true;
 			}
-			$nbTeammatches[$match->getTeammatchId()] = true;
-			$nbMyTeams[$match->getTeammatch()->getTeam1Id()] = true;
+			$nbTeammatches[$match->getTeammatch()->getId()] = true;
+			$nbMyTeams[$match->getTeammatch()->getTeam1()->getId()] = true;
 		}
 
 		if (($sum = $wins + $draws + $losses) > 0) {
@@ -580,8 +574,8 @@ class TournamentController extends Controller
 			->from('TobionTropaionBundle:Lineup', 'lu')
 			->innerJoin('lu.Team', 't')
 			->innerJoin('t.League', 'l')
-			->where($qb->expr()->eq('lu.athlete_id', ':athlete_id'))
-			->andWhere($qb->expr()->eq('l.tournament_id', ':tournament_id'))
+			->where($qb->expr()->eq('lu.Athlete', ':athlete_id'))
+			->andWhere($qb->expr()->eq('l.Tournament', ':tournament_id'))
 			->andWhere($qb->expr()->eq('lu.stage', ':stage'))
 			->setParameter('athlete_id', $athlete->getId())
 			->setParameter('tournament_id', $tournament->getId());
@@ -592,9 +586,9 @@ class TournamentController extends Controller
 		$qb->setParameter('stage', 2);
 		$lineupSecondRound = $qb->getQuery()->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
 
-		$lineupChanged = $lineupSecondRound && 
+		$lineupChanged = $lineupFirstRound && $lineupSecondRound &&
 			(
-				$lineupFirstRound->getTeamId() != $lineupSecondRound->getTeamId() ||
+				$lineupFirstRound->getTeam() !== $lineupSecondRound->getTeam() ||
 				$lineupFirstRound->getPosition() != $lineupSecondRound->getPosition()
 			);
 
@@ -708,11 +702,15 @@ class TournamentController extends Controller
 
 			// var_dump($form->getErrorsAsString());
 
-			echo 'SSS'.$teammatch->getMatches()->get(1)->getTeam2Player();
+			//echo 'Player2'.$teammatch->getMatches()->get(1)->getTeam2Player();
+
 
 			if ($form->isValid()) {
 				// save the teammatch to the database
 				$em = $this->getDoctrine()->getEntityManager();
+
+				//$teammatch->getMatches()->get(1)->setTeam2Player($em->getReference('TobionTropaionBundle:Athlete', 808884));
+				//echo 'Player2'.$teammatch->getMatches()->get(1)->getTeam2Player();
 
 				$em->persist($teammatch);
 				$em->flush();
@@ -774,18 +772,18 @@ class TournamentController extends Controller
 		$conn = $this->getDoctrine()->getEntityManager()->getConnection();
 
 		$sqlParams = array();
-		$sqlParams['TEAM_ID'] = $teammatch->getTeam1Id();
+		$sqlParams['TEAM_ID'] = $teammatch->getTeam1()->getId();
 		$sqlParams['TEAM_NUMBER'] = $teammatch->getTeam1()->getTeamNumber();
-		$sqlParams['CLUB_ID'] = $teammatch->getTeam1()->getClubId();
+		$sqlParams['CLUB_ID'] = $teammatch->getTeam1()->getClub()->getId();
 		$sqlParams['STAGE'] = $teammatch->getStage();
 		$sqlParams['SEASON'] = $tournament->getSeason();
 
 		$club1_athletes = $conn->fetchAll($query, $sqlParams);
 
 		$sqlParams = array();
-		$sqlParams['TEAM_ID'] = $teammatch->getTeam2Id();
+		$sqlParams['TEAM_ID'] = $teammatch->getTeam2()->getId();
 		$sqlParams['TEAM_NUMBER'] = $teammatch->getTeam2()->getTeamNumber();
-		$sqlParams['CLUB_ID'] = $teammatch->getTeam2()->getClubId();
+		$sqlParams['CLUB_ID'] = $teammatch->getTeam2()->getClub()->getId();
 		$sqlParams['STAGE'] = $teammatch->getStage();
 		$sqlParams['SEASON'] = $tournament->getSeason();
 

@@ -15,25 +15,11 @@ class Ratinghistory
 	/**
 	 * @var integer $id
 	 *
-	 * @ORM\Column(name="id", type="integer")
+	 * @ORM\Column(type="integer")
 	 * @ORM\Id
 	 * @ORM\GeneratedValue(strategy="AUTO")
 	 */
 	private $id;
-
-	/**
-	 * @var integer $athlete_id
-	 *
-	 * @ORM\Column(type="integer")
-	 */
-	private $athlete_id;
-
-	/**
-	 * @var integer $match_id
-	 *
-	 * @ORM\Column(type="integer")
-	 */
-	private $match_id;
 
 	/**
 	 * singles, doubles, mixed
@@ -65,7 +51,7 @@ class Ratinghistory
 	/**
 	 * @var Athlete
 	 *
-	 * @ORM\ManyToOne(targetEntity="Athlete", inversedBy="Ratinghistory")
+	 * @ORM\ManyToOne(targetEntity="Athlete")
 	 * @ORM\JoinColumn(name="athlete_id", referencedColumnName="id", nullable=false)
 	 */
 	private $Athlete;
@@ -93,46 +79,6 @@ class Ratinghistory
 	public function getId()
 	{
 		return $this->id;
-	}
-
-	/**
-	 * Set athlete_id
-	 *
-	 * @param integer $athleteId
-	 */
-	public function setAthleteId($athleteId)
-	{
-		$this->athlete_id = $athleteId;
-	}
-
-	/**
-	 * Get athlete_id
-	 *
-	 * @return integer
-	 */
-	public function getAthleteId()
-	{
-		return $this->athlete_id;
-	}
-
-	/**
-	 * Set match_id
-	 *
-	 * @param integer $matchId
-	 */
-	public function setMatchId($matchId)
-	{
-		$this->match_id = $matchId;
-	}
-
-	/**
-	 * Get match_id
-	 *
-	 * @return integer
-	 */
-	public function getMatchId()
-	{
-		return $this->match_id;
 	}
 
 	/**

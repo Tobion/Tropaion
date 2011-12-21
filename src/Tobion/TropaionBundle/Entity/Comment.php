@@ -15,32 +15,11 @@ class Comment
 	/**
 	 * @var integer $id
 	 *
-	 * @ORM\Column(name="id", type="integer")
+	 * @ORM\Column(type="integer")
 	 * @ORM\Id
 	 * @ORM\GeneratedValue(strategy="AUTO")
 	 */
 	private $id;
-
-	/**
-	 * @var integer $author_id
-	 *
-	 * @ORM\Column(name="author_id", type="integer")
-	 */
-	private $author_id;
-
-	/**
-	 * @var integer $teammatch_id
-	 *
-	 * @ORM\Column(name="teammatch_id", type="integer")
-	 */
-	private $teammatch_id;
-
-	/**
-	 * @var integer $match_id
-	 *
-	 * @ORM\Column(name="match_id", type="integer", nullable=true)
-	 */
-	private $match_id;
 
 	/**
 	 * @var string $title
@@ -59,7 +38,7 @@ class Comment
 	/**
 	 * @var User
 	 *
-	 * @ORM\ManyToOne(targetEntity="User", inversedBy="Comments")
+	 * @ORM\ManyToOne(targetEntity="User")
 	 * @ORM\JoinColumn(name="author_id", referencedColumnName="id", nullable=false)
 	 */
 	private $Author;
@@ -67,10 +46,18 @@ class Comment
 	/**
 	 * @var Teammatch
 	 *
-	 * @ORM\ManyToOne(targetEntity="Teammatch", inversedBy="Comments")
+	 * @ORM\ManyToOne(targetEntity="Teammatch")
 	 * @ORM\JoinColumn(name="teammatch_id", referencedColumnName="id", nullable=false)
 	 */
 	private $Teammatch;
+
+	/**
+	 * @var Match
+	 *
+	 * @ORM\ManyToOne(targetEntity="Match")
+	 * @ORM\JoinColumn(name="match_id", referencedColumnName="id", nullable=true)
+	 */
+	private $Match;
 
 
 
@@ -82,66 +69,6 @@ class Comment
 	public function getId()
 	{
 		return $this->id;
-	}
-
-	/**
-	 * Set author_id
-	 *
-	 * @param integer $authorId
-	 */
-	public function setAuthorId($authorId)
-	{
-		$this->author_id = $authorId;
-	}
-
-	/**
-	 * Get author_id
-	 *
-	 * @return integer
-	 */
-	public function getAuthorId()
-	{
-		return $this->author_id;
-	}
-
-	/**
-	 * Set teammatch_id
-	 *
-	 * @param integer $teammatchId
-	 */
-	public function setTeammatchId($teammatchId)
-	{
-		$this->teammatch_id = $teammatchId;
-	}
-
-	/**
-	 * Get teammatch_id
-	 *
-	 * @return integer
-	 */
-	public function getTeammatchId()
-	{
-		return $this->teammatch_id;
-	}
-
-	/**
-	 * Set match_id
-	 *
-	 * @param integer $matchId
-	 */
-	public function setMatchId($matchId)
-	{
-		$this->match_id = $matchId;
-	}
-
-	/**
-	 * Get match_id
-	 *
-	 * @return integer
-	 */
-	public function getMatchId()
-	{
-		return $this->match_id;
 	}
 
 	/**
@@ -222,5 +149,25 @@ class Comment
 	public function getTeammatch()
 	{
 		return $this->Teammatch;
+	}
+
+	/**
+	 * Set Match
+	 *
+	 * @param Match $match
+	 */
+	public function setMatch(Match $match = null)
+	{
+		$this->Match = $match;
+	}
+
+	/**
+	 * Get Match
+	 *
+	 * @return Match
+	 */
+	public function getMatch()
+	{
+		return $this->Match;
 	}
 }

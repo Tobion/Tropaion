@@ -16,15 +16,6 @@ use Tobion\TropaionBundle\Entity\Team;
 class Lineup
 {
 	/**
-	 * @var integer $team_id
-	 *
-	 * @ORM\Column(type="integer")
-	 * @ORM\Id
-	 * @ORM\GeneratedValue(strategy="NONE")
-	 */
-	private $team_id;
-
-	/**
 	 * Hinrunde = 1, Rückrunde = 2
 	 * @var integer $stage
 	 *
@@ -35,24 +26,10 @@ class Lineup
 	private $stage;
 
 	/**
-	 * @var integer $athlete_id
-	 *
-	 * @ORM\Column(type="integer")
-	 * @ORM\Id
-	 * @ORM\GeneratedValue(strategy="NONE")
-	 */
-	private $athlete_id;
-
-	/**
-	 * @var integer $position
-	 *
-	 * @ORM\Column(type="smallint")
-	 */
-	private $position;
-
-	/**
 	 * @var Team
 	 *
+	 * @ORM\Id
+	 * @ORM\GeneratedValue(strategy="NONE")
 	 * @ORM\ManyToOne(targetEntity="Team", inversedBy="Lineups")
 	 * @ORM\JoinColumn(name="team_id", referencedColumnName="id", nullable=false)
 	 */
@@ -61,32 +38,20 @@ class Lineup
 	/**
 	 * @var Athlete
 	 *
+	 * @ORM\Id
+	 * @ORM\GeneratedValue(strategy="NONE")
 	 * @ORM\ManyToOne(targetEntity="Athlete")
 	 * @ORM\JoinColumn(name="athlete_id", referencedColumnName="id", nullable=false)
 	 */
 	private $Athlete;
 
-
-
 	/**
-	 * Set team_id
+	 * @var integer $position
 	 *
-	 * @param integer $teamId
+	 * @ORM\Column(type="smallint")
 	 */
-	public function setTeamId($teamId)
-	{
-		$this->team_id = $teamId;
-	}
+	private $position;
 
-	/**
-	 * Get team_id
-	 *
-	 * @return integer
-	 */
-	public function getTeamId()
-	{
-		return $this->team_id;
-	}
 
 	/**
 	 * Set stage
@@ -106,26 +71,6 @@ class Lineup
 	public function getStage()
 	{
 		return $this->stage;
-	}
-
-	/**
-	 * Set athlete_id
-	 *
-	 * @param integer $athleteId
-	 */
-	public function setAthleteId($athleteId)
-	{
-		$this->athlete_id = $athleteId;
-	}
-
-	/**
-	 * Get athlete_id
-	 *
-	 * @return integer
-	 */
-	public function getAthleteId()
-	{
-		return $this->athlete_id;
 	}
 
 	/**

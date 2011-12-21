@@ -20,8 +20,6 @@ class BadmintonMatchType extends AbstractType
 
 	public function buildForm(FormBuilder $builder, array $options)
 	{
-		$builder->add('match_type_id', 'hidden');
-
 		$builder->add('noresult', 'checkbox', array(
 			'required' => false
 		));

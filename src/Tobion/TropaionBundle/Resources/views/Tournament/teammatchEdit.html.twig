@@ -146,7 +146,6 @@
 		{% set match = teammatch.matches.get(loop.index0) %}
 		<tr class="match" tabindex="-1">
 			<th scope="row" class="matchtype">
-				{{ form_widget(matchForm.match_type_id) }}
 				{{ match.matchType }}
 				<div class="noresult{% if matchForm.noresult.all.errors|length > 0 %} error{% endif %}">
 					{{ form_label(matchForm.noresult, 'Kein Ergebnis') }}

@@ -58,13 +58,6 @@ class Athlete
 	private $country = '';
 
 	/**
-	 * @var integer $club_id
-	 *
-	 * @ORM\Column(type="integer")
-	 */
-	private $club_id;
-
-	/**
 	 * @var boolean $is_active
 	 *
 	 * @ORM\Column(type="boolean")
@@ -280,26 +273,6 @@ class Athlete
 	public function getCountry()
 	{
 		return $this->country;
-	}
-
-	/**
-	 * Set club_id
-	 *
-	 * @param integer $clubId
-	 */
-	public function setClubId($clubId)
-	{
-		$this->club_id = $clubId;
-	}
-
-	/**
-	 * Get club_id
-	 *
-	 * @return integer
-	 */
-	public function getClubId()
-	{
-		return $this->club_id;
 	}
 
 	/**

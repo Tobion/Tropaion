@@ -21,37 +21,30 @@ class Game
 	/**
 	 * @var integer $id
 	 *
-	 * @ORM\Column(name="id", type="integer")
+	 * @ORM\Column(type="integer")
 	 * @ORM\Id
 	 * @ORM\GeneratedValue(strategy="AUTO")
 	 */
 	private $id;
 
 	/**
-	 * @var integer $match_id
-	 *
-	 * @ORM\Column(name="match_id", type="integer")
-	 */
-	private $match_id;
-
-	/**
 	 * @var integer $game_sequence
 	 *
-	 * @ORM\Column(name="game_sequence", type="smallint")
+	 * @ORM\Column(type="smallint")
 	 */
 	private $game_sequence;
 
 	/**
 	 * @var integer $team1_score
 	 *
-	 * @ORM\Column(name="team1_score", type="smallint")
+	 * @ORM\Column(type="smallint")
 	 */
 	private $team1_score;
 
 	/**
 	 * @var integer $team2_score
 	 *
-	 * @ORM\Column(name="team2_score", type="smallint")
+	 * @ORM\Column(type="smallint")
 	 */
 	private $team2_score;
 
@@ -60,7 +53,7 @@ class Game
 	 * oder Spielstand zum Zeitpunkt einer Aufgabe (dessen gewertetes Ergebnis anders ist)
 	 * @var boolean $annulled
 	 *
-	 * @ORM\Column(name="annulled", type="boolean")
+	 * @ORM\Column(type="boolean")
 	 */
 	private $annulled = false;
 
@@ -82,26 +75,6 @@ class Game
 	public function getId()
 	{
 		return $this->id;
-	}
-
-	/**
-	 * Set match_id
-	 *
-	 * @param integer $matchId
-	 */
-	public function setMatchId($matchId)
-	{
-		$this->match_id = $matchId;
-	}
-
-	/**
-	 * Get match_id
-	 *
-	 * @return integer
-	 */
-	public function getMatchId()
-	{
-		return $this->match_id;
 	}
 
 	/**
