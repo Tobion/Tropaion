@@ -29,9 +29,6 @@ TODO:
 	- scheduled_date, scheduled_location
 	- moved_date, moved_location
 	- performed_date, performed_location
-- Umbenennen: 
-matches.revised_score -> revised_score + revaluation_wrongdoer und reason
-
 - clubs.contact_person_id = 0 ?! Integrity error
 - athletes.country = Integer like 0 instead of 'DE'
 - set venues.lontitude, latitude
@@ -323,7 +320,6 @@ CREATE PROCEDURE migrate_games(
     IN game1_team1_score SMALLINT UNSIGNED, IN game1_team2_score SMALLINT UNSIGNED, 
     IN game2_team1_score SMALLINT UNSIGNED, IN game2_team2_score SMALLINT UNSIGNED, 
     IN game3_team1_score SMALLINT UNSIGNED, IN game3_team2_score SMALLINT UNSIGNED,
-    IN annulled_score TINYINT,
     IN game1_team1_orig_score SMALLINT UNSIGNED, IN game1_team2_orig_score SMALLINT UNSIGNED, 
     IN game2_team1_orig_score SMALLINT UNSIGNED, IN game2_team2_orig_score SMALLINT UNSIGNED, 
     IN game3_team1_orig_score SMALLINT UNSIGNED, IN game3_team2_orig_score SMALLINT UNSIGNED
@@ -364,7 +360,6 @@ BEGIN
                 -- - nicht immer gesetzt, obwohl es sollte: 2009-10/BB/0/BerlBrau-2_BG%20ProZ-1
                 -- - angebliche Aenderung, wo urspruengliches und endgueltiges Ergebnis uebereinstimmen: 2007-08/BZ/3/Gaselan-2_TSVSCSBF-2 [21:0 21:0 (21:0 21:0)]
 
-                -- annulled_score OR
                 game1_team1_orig_score <> game1_team1_score OR game1_team2_orig_score <> game1_team2_score OR 
                 game2_team1_orig_score <> game2_team1_score OR game2_team2_orig_score <> game2_team2_score OR 
                 (game3_team1_orig_score <> game3_team1_score AND game3_team1_orig_score <> 99) OR 
@@ -722,7 +717,6 @@ BEGIN
                     ms1_game1_team1_score, ms1_game1_team2_score, 
                     ms1_game2_team1_score, ms1_game2_team2_score, 
                     ms1_game3_team1_score, ms1_game3_team2_score,
-                    ms1_annulled_score,
                     ms1_game1_team1_orig_score, ms1_game1_team2_orig_score, 
                     ms1_game2_team1_orig_score, ms1_game2_team2_orig_score, 
                     ms1_game3_team1_orig_score, ms1_game3_team2_orig_score
@@ -740,7 +734,6 @@ BEGIN
                     ms2_game1_team1_score, ms2_game1_team2_score, 
                     ms2_game2_team1_score, ms2_game2_team2_score, 
                     ms2_game3_team1_score, ms2_game3_team2_score,
-                    ms2_annulled_score,
                     ms2_game1_team1_orig_score, ms2_game1_team2_orig_score, 
                     ms2_game2_team1_orig_score, ms2_game2_team2_orig_score, 
                     ms2_game3_team1_orig_score, ms2_game3_team2_orig_score
@@ -758,7 +751,6 @@ BEGIN
                     ms3_game1_team1_score, ms3_game1_team2_score, 
                     ms3_game2_team1_score, ms3_game2_team2_score, 
                     ms3_game3_team1_score, ms3_game3_team2_score,
-                    ms3_annulled_score,
                     ms3_game1_team1_orig_score, ms3_game1_team2_orig_score, 
                     ms3_game2_team1_orig_score, ms3_game2_team2_orig_score, 
                     ms3_game3_team1_orig_score, ms3_game3_team2_orig_score
@@ -776,7 +768,6 @@ BEGIN
                     ws_game1_team1_score, ws_game1_team2_score, 
                     ws_game2_team1_score, ws_game2_team2_score, 
                     ws_game3_team1_score, ws_game3_team2_score,
-                    ws_annulled_score,
                     ws_game1_team1_orig_score, ws_game1_team2_orig_score, 
                     ws_game2_team1_orig_score, ws_game2_team2_orig_score, 
                     ws_game3_team1_orig_score, ws_game3_team2_orig_score
@@ -794,7 +785,6 @@ BEGIN
                     md1_game1_team1_score, md1_game1_team2_score, 
                     md1_game2_team1_score, md1_game2_team2_score, 
                     md1_game3_team1_score, md1_game3_team2_score,
-                    md1_annulled_score,
                     md1_game1_team1_orig_score, md1_game1_team2_orig_score, 
                     md1_game2_team1_orig_score, md1_game2_team2_orig_score, 
                     md1_game3_team1_orig_score, md1_game3_team2_orig_score
@@ -812,7 +802,6 @@ BEGIN
                     md2_game1_team1_score, md2_game1_team2_score, 
                     md2_game2_team1_score, md2_game2_team2_score, 
                     md2_game3_team1_score, md2_game3_team2_score,
-                    md2_annulled_score,
                     md2_game1_team1_orig_score, md2_game1_team2_orig_score, 
                     md2_game2_team1_orig_score, md2_game2_team2_orig_score, 
                     md2_game3_team1_orig_score, md2_game3_team2_orig_score
@@ -830,7 +819,6 @@ BEGIN
                     wd_game1_team1_score, wd_game1_team2_score, 
                     wd_game2_team1_score, wd_game2_team2_score, 
                     wd_game3_team1_score, wd_game3_team2_score,
-                    wd_annulled_score,
                     wd_game1_team1_orig_score, wd_game1_team2_orig_score, 
                     wd_game2_team1_orig_score, wd_game2_team2_orig_score, 
                     wd_game3_team1_orig_score, wd_game3_team2_orig_score
@@ -848,7 +836,6 @@ BEGIN
                     mx_game1_team1_score, mx_game1_team2_score, 
                     mx_game2_team1_score, mx_game2_team2_score, 
                     mx_game3_team1_score, mx_game3_team2_score,
-                    mx_annulled_score,
                     mx_game1_team1_orig_score, mx_game1_team2_orig_score, 
                     mx_game2_team1_orig_score, mx_game2_team2_orig_score, 
                     mx_game3_team1_orig_score, mx_game3_team2_orig_score
@@ -988,37 +975,6 @@ UPDATE teammatches tm
     SET annulled = 1
     WHERE t1.withdrawn = 1 OR t2.withdrawn = 1;
   
-# Revidierung / Ergebnisänderung / Umwertung überprüfen
-# Es wurden vom BVBB fälschlicherweise auch Spiele als geändert markiert, die wegen Spielermangels kampflos abgegeben wurden oder von vorn herein gar nicht in die Wertung einfließen (kein Spieler, Score von beiden NULL)
-# Besser geeignet wäre ein neues Flag: unvollständiges Mannschaftsspiel -> incomplete_lineup
-# Falsche Kennzeichnung: 
-# - http://sportservice.tobiserver/league/2005-06/CK/2/BSC-4_GutsM-5#match-17784 (Mix)
-# - http://sportservice.tobiserver/league/2005-06/CK/2/MSC-3_BC+Spand-8#match-20399 (DD)
-
-
-# wenige betroffen
-UPDATE matches 
-SET revised_score = 0
-WHERE
-	revised_score AND
-	team1_player_id IS NULL AND team2_player_id IS NULL AND
-	team1_score IS NULL AND team2_score IS NULL AND
-	team1_original_score IS NULL AND team2_original_score IS NULL;
-
-# > 1100 betroffen
-
-UPDATE matches
-SET revised_score = 0
-WHERE 
-	revised_score AND
-	(
-		(team1_player_id IS NULL AND team2_player_id IS NOT NULL AND team1_score = 0)
-		OR
-		(team1_player_id IS NOT NULL AND team2_player_id IS NULL AND team2_score = 0)
-	) AND
-	team1_original_score IS NULL AND team2_original_score IS NULL;
-	
-
  
 /*
 SELECT * FROM matches WHERE revised_score AND team1_original_score IS NULL
@@ -1176,6 +1132,53 @@ SET
 	m.avg_orig_smaller_div_bigger_gamescore_permil = IFNULL(g.annulled_smaller_of_bigger_score_permil_avg, g.smaller_of_bigger_score_permil_avg),
     m.std_orig_smaller_div_bigger_gamescore_permil = IFNULL(g.annulled_smaller_of_bigger_score_permil_std, g.smaller_of_bigger_score_permil_std);
  
+
+# Revidierung / Ergebnisänderung / Umwertung überprüfen
+# Es wurden vom BVBB fälschlicherweise auch Spiele als geändert markiert, die wegen Spielermangels kampflos abgegeben wurden oder von vorn herein gar nicht in die Wertung einfließen (kein Spieler, Score von beiden NULL)
+# Besser geeignet wäre ein neues Flag: unvollständiges Mannschaftsspiel -> incomplete_lineup
+# Falsche Kennzeichnung:
+# - http://sportservice.tobiserver/league/2005-06/CK/2/BSC-4_GutsM-5#match-17784 (Mix)
+# - http://sportservice.tobiserver/league/2005-06/CK/2/MSC-3_BC+Spand-8#match-20399 (DD)
+
+
+# wenige betroffen
+UPDATE matches
+SET revised_score = 0
+WHERE
+	revised_score AND
+	team1_player_id IS NULL AND team2_player_id IS NULL AND
+	team1_score IS NULL AND team2_score IS NULL AND
+	team1_original_score IS NULL AND team2_original_score IS NULL;
+
+# > 1100 betroffen
+
+UPDATE matches
+SET revised_score = 0
+WHERE
+	revised_score AND
+	(
+		(team1_player_id IS NULL AND team2_player_id IS NOT NULL AND team1_score = 0)
+		OR
+		(team1_player_id IS NOT NULL AND team2_player_id IS NULL AND team2_score = 0)
+	) AND
+	team1_original_score IS NULL AND team2_original_score IS NULL;
+
+
+# revaluation_wrongdoer
+UPDATE matches
+SET revaluation_wrongdoer = CASE
+	WHEN revised_score AND team1_score = 0 AND team2_score = 0 THEN 3
+	WHEN revised_score AND team1_score = 0 THEN 1
+	WHEN revised_score AND team2_score = 0 THEN 2
+	WHEN revised_score AND team1_score IS NULL AND team2_score IS NULL
+		AND team1_player_id IS NOT NULL AND team2_player_id IS NOT NULL THEN 3
+	WHEN revised_score AND team1_score IS NULL AND team2_score IS NULL
+		AND team1_player_id IS NOT NULL AND team2_player_id IS NULL THEN 1
+	WHEN revised_score AND team1_score IS NULL AND team2_score IS NULL
+		AND team1_player_id IS NULL AND team2_player_id IS NOT NULL THEN 2
+	ELSE 0
+END;
+
 
 
 UPDATE teammatches tm 

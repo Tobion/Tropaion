@@ -12,6 +12,8 @@
 
 {% block tail_javascripts %}
     {{ parent() }}
+
+{% if matches %}
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
 	<script src="{{ asset('bundles/tobiontropaion/js/Placeholder-jQuery-Plugin/jquery.placeholder.min.js') }}"></script>
 	<script src="{{ asset('bundles/tobiontropaion/js/DataTables-1.8.1/media/js/jquery.dataTables.min.js') }}"></script>
@@ -178,7 +180,8 @@
 		} );
 
 	//]]>
-	</script> 
+	</script>
+{% endif %}
 {% endblock %}
 
 {% set pageRdfId = path('tournament_athlete', athlete.routingParams(tournament)) %}
@@ -222,7 +225,7 @@
 		<dt>{% trans %}Rückrunde{% endtrans %}</dt>
 		<dd>{{ _self.lineup_team(lineupSecondRound, tournament) }}</dd>
 	</dl>
-{% else %}
+{% elseif lineupFirstRound %}
 	<p>{{ _self.lineup_team(lineupFirstRound, tournament) }}</p>
 {% endif %}
 
@@ -231,23 +234,28 @@
 <section id="my-results">
 <h2>{% trans with { '%givenName%': athlete.firstName, '%familyName%': athlete.lastName } %}Spiele &amp; Statistiken von <em>%givenName% %familyName%</em>{% endtrans %}</h2>
 
-<details style="margin-bottom: 1em">
-	<summary>{% trans %}Hilfe{% endtrans %}</summary>
-	{% trans %}<p>Alle Spiele werden in der Tabelle in chronologischer Reihenfolge angezeigt. Durch Klicken auf die Spaltenüberschriften kann man die Spiele 
-		umsortieren. Hält man dabei die Shift-Taste gedrückt, können auch mehrere Sortierkriterien angewendet werden. 
-		Die Pfeile in den Überschriften geben Auskunft über die Sortierbarkeit und die aktive Sortierrichtung (aufsteigend bzw. absteigend).</p>
-		<p>Zusätzlich können die Spiele nach verschiedenen, kombinierbaren Kriterien gefiltert und durchsucht werden. Auch werden Statistiken berechnet, die sich auf
-		die angezeigten, möglicherweise gefilterten Spiele beziehen. Dadurch kann man sich flexibel seine eigenen Auswertungen generieren und 
-		ist nicht auf die vordefinierten Statistiken beschränkt. 
-		Beispielsweise findet man durch das Auswählen einer Mannschaft heraus, wieviele Einsätze man für bzw. gegen diese Mannschaft bestritten hat und 
-		wie viele Individualspiele man dabei gewonnen und verloren hat. Die Sieg/Niederlage-Rate wird hierbei zur Anschaulichkeit als Kreisdiagramm visualisiert.</p>
-		<p>Bei den Auswertungen kommen die ursprünglichen, tatsächlich gespielten Ergebnisse zum Tragen, 
-		und nicht die formellen, am grünen Tisch entschiedenen.</p>{% endtrans %}
-</details>
+{% if matches %}
+	<details style="margin-bottom: 1em">
+		<summary>{% trans %}Hilfe{% endtrans %}</summary>
+		{% trans %}<p>Alle Spiele werden in der Tabelle in chronologischer Reihenfolge angezeigt. Durch Klicken auf die Spaltenüberschriften kann man die Spiele
+			umsortieren. Hält man dabei die Shift-Taste gedrückt, können auch mehrere Sortierkriterien angewendet werden.
+			Die Pfeile in den Überschriften geben Auskunft über die Sortierbarkeit und die aktive Sortierrichtung (aufsteigend bzw. absteigend).</p>
+			<p>Zusätzlich können die Spiele nach verschiedenen, kombinierbaren Kriterien gefiltert und durchsucht werden. Auch werden Statistiken berechnet, die sich auf
+			die angezeigten, möglicherweise gefilterten Spiele beziehen. Dadurch kann man sich flexibel seine eigenen Auswertungen generieren und
+			ist nicht auf die vordefinierten Statistiken beschränkt.
+			Beispielsweise findet man durch das Auswählen einer Mannschaft heraus, wieviele Einsätze man für bzw. gegen diese Mannschaft bestritten hat und
+			wie viele Individualspiele man dabei gewonnen und verloren hat. Die Sieg/Niederlage-Rate wird hierbei zur Anschaulichkeit als Kreisdiagramm visualisiert.</p>
+			<p>Bei den Auswertungen kommen die ursprünglichen, tatsächlich gespielten Ergebnisse zum Tragen,
+			und nicht die formellen, am grünen Tisch entschiedenen.</p>{% endtrans %}
+	</details>
 
-{% include 'TobionTropaionBundle::matches-profile-view.html.twig' with {'matches': matches, 'athlete': athlete} %}
 
-<p>ToDo: Partner Search funktioniert noch nicht!</p>
+	{% include 'TobionTropaionBundle::matches-profile-view.html.twig' with {'matches': matches, 'athlete': athlete} %}
+
+	<p>ToDo: Partner Search funktioniert noch nicht!</p>
+{% else %}
+	<p>{% trans %}Keine Spiele vorhanden.{% endtrans %}</p>
+{% endif %}
 
 </section>
 

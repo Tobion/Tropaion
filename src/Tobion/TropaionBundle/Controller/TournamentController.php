@@ -592,6 +592,10 @@ class TournamentController extends Controller
 				$lineupFirstRound->getPosition() != $lineupSecondRound->getPosition()
 			);
 
+		if (!$matches && !$lineupFirstRound && !$lineupSecondRound) {
+			throw $this->createNotFoundException('Athlete not participating in tournament.');
+		}
+
 		return array(
 			'tournament' => $tournament,
 			'athlete' => $athlete,

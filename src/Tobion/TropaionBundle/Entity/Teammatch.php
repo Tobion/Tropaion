@@ -265,6 +265,19 @@ class Teammatch
 	private $Matches;
 
 
+	public static $revaluation_reasons = array(
+		0 => '',
+		1 => 'nicht angetreten',
+		2 => 'falsche Aufstellung',
+		3 => 'zu wenig Spieler',
+		4 => 'zu viele Spieler',
+		5 => 'Spieler wurden mehr als 2x höher eingesetzt',
+		6 => 'Spielbericht nicht abgegeben',
+		7 => 'Mannschaft zurückgezogen; sie fällt aus der Wertung'
+	);
+
+
+
 	public function __construct()
 	{
 		$this->created_at = $this->updated_at = new \DateTime('now');
@@ -557,7 +570,7 @@ class Teammatch
 	 */
 	public function setRevaluationWrongdoer($revaluationWrongdoer)
 	{
-		$this->revaluation_wrongdoer = $revaluationWrongdoer;
+		$this->revaluation_wrongdoer = (int) $revaluationWrongdoer;
 	}
 
 	/**
@@ -677,7 +690,7 @@ class Teammatch
 	 */
 	public function setDescription($description)
 	{
-		$this->description = $description;
+		$this->description = (string) $description;
 	}
 
 	/**
@@ -1185,10 +1198,10 @@ class Teammatch
 		$this->team1_points = $this->team2_points;
 		$this->team2_points = $tmp;
 
-		if ($this->revaluation_wrongdoer == 2) {
+		if ($this->revaluation_wrongdoer === 2) {
 			$this->revaluation_wrongdoer = 1;
 		}
-		else if ($this->revaluation_wrongdoer == 1) {
+		else if ($this->revaluation_wrongdoer === 1) {
 			$this->revaluation_wrongdoer = 2;
 		}
 	}
@@ -1217,33 +1230,14 @@ class Teammatch
 
 	public function isTeam1RevaluatedAgainst()
 	{
-		return $this->getRevaluationWrongdoer() == 1 || $this->getRevaluationWrongdoer() == 3;
+		return $this->getRevaluationWrongdoer() === 1 || $this->getRevaluationWrongdoer() === 3;
 	}
 
 	public function isTeam2RevaluatedAgainst()
 	{
-		return $this->getRevaluationWrongdoer() == 2 || $this->getRevaluationWrongdoer() == 3;
+		return $this->getRevaluationWrongdoer() === 2 || $this->getRevaluationWrongdoer() === 3;
 	}
 	
-	public function getRevaluationAgainst()
-	{
-		switch ($this->getRevaluationWrongdoer()) {
-			case 1:
-				return 'team1';
-			case 2:
-				return 'team2';
-			case 3:
-				return 'both';
-		}
-
-		return '';
-	}
-	
-	public function setRevaluationAgainst($value)
-	{
-		// TODO (switch to RevaluationWrongdoer)
-	}
-
 	/**
 	 * Recalculates all statistics, like the score based on the matches and games
 	 */

@@ -29,7 +29,16 @@
 
 {% block content %}
 
-<article>
+<article id="teammatch-{{ teammatch.id }}">
+
+<hgroup>
+	<h1>{{ teammatch.team1 }} <abbr title="{% trans %}versus{% endtrans %}">{% trans %}vs{% endtrans %}</abbr>  {{ teammatch.team2 }}</h1>
+	<h2>
+		<a href="{{ path('tournament_league', teammatch.league.routingParams ) }}">
+			{{ teammatch.league.fullName }}
+		</a>
+	</h2>
+</hgroup>
 
 <form action="{{ path('tournament_teammatch_edit', teammatch.routingParams) }}" method="post" {{ form_enctype(form) }}>
 	{# form_widget(form) #}
@@ -111,8 +120,8 @@
 				{% endspaceless %}
 				</mark></div>
 				{# <div class="revaluation"> #}
-					{{ form_errors(form.revaluation_against) }}
-					{{ form_widget(form.revaluation_against) }}
+					{{ form_errors(form.revaluation_wrongdoer) }}
+					{{ form_widget(form.revaluation_wrongdoer) }}
 				{# </div> #}
 			</td>
 			<th scope="col" class="team awayteam" title="{% trans %}Auswärtsmannschaft{% endtrans %}">
@@ -180,8 +189,8 @@
 					{{ form_widget(matchForm.result_incident) }}
 				</div>
 				<div class="revaluation">
-					{{ form_errors(matchForm.revaluation_against) }}
-					{{ form_widget(matchForm.revaluation_against) }}
+					{{ form_errors(matchForm.revaluation_wrongdoer) }}
+					{{ form_widget(matchForm.revaluation_wrongdoer) }}
 				</div>
 			</td>
 			<td class="team awayteam">

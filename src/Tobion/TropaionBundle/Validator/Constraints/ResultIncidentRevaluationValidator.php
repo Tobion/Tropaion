@@ -33,7 +33,7 @@ class ResultIncidentRevaluationValidator extends ConstraintValidator
 		// wenn Aufgabe und umgewertet -> urspr. Ergebnis nicht validieren, da unvollst. Ergebnis zum Zeitpunkt der Aufgabe
 		// wenn kampfloser Sieg und nicht umgewertet -> richtiger Sieger und zu Null beim gewert. Ergebnis
 		// wenn kampfloser Sieg und umgewertet -> richtiger Sieger und zu Null beim urspr. Ergebnis
-		// wenn umgewertet (nicht gegen beide) -> richtiger Sieger beim gewert. Ergebnis
+		// wenn umgewertet (nicht gegen beide) und nicht noresult -> richtiger Sieger und zu Null beim gewert. Ergebnis
 		
 		// TODO evtl. nachfragen (als Flash-Hinweis nach dem Speichern zum nachträgl. Bearbeiten), ob Ergebnis richtig ist:
 		// wenn nicht kampfloser Sieg (auch Aufgabe) und nicht umgewertet, aber gewert. Ergebnis zu Null

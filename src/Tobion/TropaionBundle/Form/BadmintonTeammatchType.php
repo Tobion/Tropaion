@@ -42,12 +42,12 @@ class BadmintonTeammatchType extends AbstractType
 			'required' => false
 		));
 		
-		$builder->add('revaluation_against', 'choice', array(
+		$builder->add('revaluation_wrongdoer', 'choice', array(
 			'required' => false,
 			'choices'   => array(
-				'team1' => 'Umw. gegen: Heim',
-				'team2' => 'Umw. gegen: Gast',
-				'both' => 'Umw. gegen: Beide',
+				'1' => 'Umw. gegen: Heim',
+				'2' => 'Umw. gegen: Gast',
+				'3' => 'Umw. gegen: Beide',
 			),
 			'multiple'  => false,
 			'expanded'  => false,

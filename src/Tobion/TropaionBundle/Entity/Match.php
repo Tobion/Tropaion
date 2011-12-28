@@ -89,6 +89,25 @@ class Match
 	private $revised_score = false;
 
 	/**
+	 * Ob und wer einen (Aufstellungs-)Fehler begangen hat,
+	 * der zu einer Umwertung führt (Verursacher)
+	 * 0 = false, 1 = Fehler verursacht von Team1, 2 = Team2, 3 = beide schuldig
+	 * @var integer $revaluation_wrongdoer
+	 *
+	 * @ORM\Column(type="smallint")
+	 */
+	private $revaluation_wrongdoer = 0;
+
+	/**
+	 * Begründung der Umwertung
+	 * 0 = false, sonst Fehlernummer
+	 * @var integer $revaluation_reason
+	 *
+	 * @ORM\Column(type="smallint")
+	 */
+	private $revaluation_reason = 0;
+
+	/**
 	 * Ursprüngliches Ergebnis von Team1 (vor der Änderung oder Aufgabe; siehe games.annulled = 1)
 	 * NULL = nicht vorhanden
 	 * @var integer $team1_original_score
@@ -227,7 +246,6 @@ class Match
 	public $noresult;
 
 	public $result_incident;
-	public $revaluation_against;
 
 
 	public function __construct()
@@ -393,6 +411,46 @@ class Match
 	public function getRevisedScore()
 	{
 		return $this->revised_score;
+	}
+
+	/**
+	 * Set revaluation_wrongdoer
+	 *
+	 * @param smallint $revaluationWrongdoer
+	 */
+	public function setRevaluationWrongdoer($revaluationWrongdoer)
+	{
+		$this->revaluation_wrongdoer = (int) $revaluationWrongdoer;
+	}
+
+	/**
+	 * Get revaluation_wrongdoer
+	 *
+	 * @return smallint
+	 */
+	public function getRevaluationWrongdoer()
+	{
+		return $this->revaluation_wrongdoer;
+	}
+
+	/**
+	 * Set revaluation_reason
+	 *
+	 * @param smallint $revaluationReason
+	 */
+	public function setRevaluationReason($revaluationReason)
+	{
+		$this->revaluation_reason = $revaluationReason;
+	}
+
+	/**
+	 * Get revaluation_reason
+	 *
+	 * @return smallint
+	 */
+	public function getRevaluationReason()
+	{
+		return $this->revaluation_reason;
 	}
 
 	/**
@@ -906,27 +964,12 @@ class Match
 
 	public function isTeam1RevaluatedAgainst()
 	{
-		return $this->getRevisedScore() && ($this->isTeam2Winner() || $this->isBothTeamsLost());
+		return $this->getRevaluationWrongdoer() === 1 || $this->getRevaluationWrongdoer() === 3;
 	}
 
 	public function isTeam2RevaluatedAgainst()
 	{
-		return $this->getRevisedScore() && ($this->isTeam1Winner() || $this->isBothTeamsLost());
-	}
-
-	public function getRevaluationAgainst()
-	{
-		if ($this->getRevisedScore() && $this->isTeam2Winner()) {
-			return 'team1';
-		}
-		if ($this->getRevisedScore() && $this->isTeam1Winner()) {
-			return 'team2';
-		}
-		if ($this->getRevisedScore() && $this->isBothTeamsLost()) {
-			return 'both';
-		}
-
-		return '';
+		return $this->getRevaluationWrongdoer() === 2 || $this->getRevaluationWrongdoer() === 3;
 	}
 
 	/**
@@ -949,12 +992,12 @@ class Match
 
 	public function hasTeam1GivenUp()
 	{
-		return $this->getGivenUpBy() == 1;
+		return $this->getGivenUpBy() === 1;
 	}
 
 	public function hasTeam2GivenUp()
 	{
-		return $this->getGivenUpBy() == 2;
+		return $this->getGivenUpBy() === 2;
 	}
 
 
@@ -1214,11 +1257,18 @@ class Match
 		$this->team1_original_points = $this->team2_original_points;
 		$this->team2_original_points = $tmp;
 
-		if ($this->given_up_by == 2) {
+		if ($this->given_up_by === 2) {
 			$this->given_up_by = 1;
 		}
-		else if ($this->given_up_by == 1) {
+		else if ($this->given_up_by === 1) {
 			$this->given_up_by = 2;
+		}
+
+		if ($this->revaluation_wrongdoer === 2) {
+			$this->revaluation_wrongdoer = 1;
+		}
+		else if ($this->revaluation_wrongdoer === 1) {
+			$this->revaluation_wrongdoer = 2;
 		}
 	}
 
@@ -1266,8 +1316,8 @@ class Match
 
 		$hasOriginalGames = count($this->getAnnulledGames()) > 0;
 
-		// TODO fixme: fälschlicherweise auch aufgegebene Spiele
-		$this->setRevisedScore($hasOriginalGames);
+		// nicht aufgegebene Spiele einbeziehen
+		$this->setRevisedScore($hasOriginalGames && $this->getRevaluationWrongdoer());
 
 		$gamescoreQuotients = array();
 
