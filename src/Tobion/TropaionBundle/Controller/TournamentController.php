@@ -536,9 +536,31 @@ class TournamentController extends Controller
 
 		$matches = $qb->getQuery()->getResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
 
+		$qb = $em->createQueryBuilder();
+		$qb->select(array('lu', 't'))
+			->from('TobionTropaionBundle:Lineup', 'lu')
+			->innerJoin('lu.Team', 't')
+			->innerJoin('t.League', 'l')
+			->where($qb->expr()->eq('lu.Athlete', ':athlete_id'))
+			->andWhere($qb->expr()->eq('l.Tournament', ':tournament_id'))
+			->andWhere($qb->expr()->eq('lu.stage', ':stage'))
+			->setParameter('athlete_id', $athlete->getId())
+			->setParameter('tournament_id', $tournament->getId());
+
+		$qb->setParameter('stage', 1);
+		$lineupFirstRound = $qb->getQuery()->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
+
+		$qb->setParameter('stage', 2);
+		$lineupSecondRound = $qb->getQuery()->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
+
+		if (!$matches && !$lineupFirstRound && !$lineupSecondRound) {
+			throw $this->createNotFoundException('Athlete not participating in tournament.');
+		}
+
+		$lineupChanged = Entity\Lineup::lineupChanged(array($lineupFirstRound, $lineupSecondRound));
+
 		$wins = $draws = $losses = $winsPercent = $drawsPercent = $lossesPercent = $noFights = $myGames = $opponentGames = $myPoints = $opponentPoints = 0;
 		$nbPartners = $nbTeammatches = $nbMyTeams = array();
-
 
 		foreach ($matches as $match) {
 			$match->transformToAthleteView($athlete);
@@ -567,34 +589,6 @@ class TournamentController extends Controller
 		$nbPartners = count($nbPartners);
 		$nbTeammatches = count($nbTeammatches);
 		$nbMyTeams = count($nbMyTeams);
-
-
-		$qb = $em->createQueryBuilder();
-		$qb->select(array('lu', 't'))
-			->from('TobionTropaionBundle:Lineup', 'lu')
-			->innerJoin('lu.Team', 't')
-			->innerJoin('t.League', 'l')
-			->where($qb->expr()->eq('lu.Athlete', ':athlete_id'))
-			->andWhere($qb->expr()->eq('l.Tournament', ':tournament_id'))
-			->andWhere($qb->expr()->eq('lu.stage', ':stage'))
-			->setParameter('athlete_id', $athlete->getId())
-			->setParameter('tournament_id', $tournament->getId());
-
-		$qb->setParameter('stage', 1);
-		$lineupFirstRound = $qb->getQuery()->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
-
-		$qb->setParameter('stage', 2);
-		$lineupSecondRound = $qb->getQuery()->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
-
-		$lineupChanged = $lineupFirstRound && $lineupSecondRound &&
-			(
-				$lineupFirstRound->getTeam() !== $lineupSecondRound->getTeam() ||
-				$lineupFirstRound->getPosition() != $lineupSecondRound->getPosition()
-			);
-
-		if (!$matches && !$lineupFirstRound && !$lineupSecondRound) {
-			throw $this->createNotFoundException('Athlete not participating in tournament.');
-		}
 
 		return array(
 			'tournament' => $tournament,
@@ -694,6 +688,8 @@ class TournamentController extends Controller
 		$this->prepareTeammatchResultProperties($teammatch);
 
 		$form = $this->createForm(new BadmintonTeammatchType($this->getDoctrine()), $teammatch);
+        
+		$invalid = false;
 
 		if ($this->getRequest()->getMethod() == 'POST') {
 			$form->bindRequest($this->getRequest());
@@ -706,21 +702,16 @@ class TournamentController extends Controller
 
 			// var_dump($form->getErrorsAsString());
 
-			//echo 'Player2'.$teammatch->getMatches()->get(1)->getTeam2Player();
-
-
 			if ($form->isValid()) {
 				// save the teammatch to the database
 				$em = $this->getDoctrine()->getEntityManager();
-
-				//$teammatch->getMatches()->get(1)->setTeam2Player($em->getReference('TobionTropaionBundle:Athlete', 808884));
-				//echo 'Player2'.$teammatch->getMatches()->get(1)->getTeam2Player();
 
 				$em->persist($teammatch);
 				$em->flush();
 
 				return $this->redirect($this->generateUrl('tournament_teammatch', $teammatch->routingParams()));
 			} else {
+				$invalid = true;
 				// $this->prepareTeammatchResultProperties($teammatch);
 			}
 		}
@@ -774,29 +765,31 @@ class TournamentController extends Controller
 		// Auch nach Position sotieren, um Stammspieler der selben Mannschaft entsprechend zu priotisieren, da Spieler an Pos. 1 eher die ersten Spiele machen (z.B. 1.HD, 1.HE)
 
 		$conn = $this->getDoctrine()->getEntityManager()->getConnection();
+		$stmt = $conn->prepare($query);
 
 		$sqlParams = array();
+		$sqlParams['STAGE'] = $teammatch->getStage();
+		$sqlParams['SEASON'] = $tournament->getSeason();
+
 		$sqlParams['TEAM_ID'] = $teammatch->getTeam1()->getId();
 		$sqlParams['TEAM_NUMBER'] = $teammatch->getTeam1()->getTeamNumber();
 		$sqlParams['CLUB_ID'] = $teammatch->getTeam1()->getClub()->getId();
-		$sqlParams['STAGE'] = $teammatch->getStage();
-		$sqlParams['SEASON'] = $tournament->getSeason();
 
-		$club1_athletes = $conn->fetchAll($query, $sqlParams);
+		$stmt->execute($sqlParams);
+		$club1_athletes = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-		$sqlParams = array();
 		$sqlParams['TEAM_ID'] = $teammatch->getTeam2()->getId();
 		$sqlParams['TEAM_NUMBER'] = $teammatch->getTeam2()->getTeamNumber();
 		$sqlParams['CLUB_ID'] = $teammatch->getTeam2()->getClub()->getId();
-		$sqlParams['STAGE'] = $teammatch->getStage();
-		$sqlParams['SEASON'] = $tournament->getSeason();
 
-		$club2_athletes = $conn->fetchAll($query, $sqlParams);
+		$stmt->execute($sqlParams);
+		$club2_athletes = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
 		return array(
 			'tournament' => $tournament,
 			'teammatch' => $teammatch,
 			'form' => $form->createView(),
+			'invalid' => $invalid,
 			'club1_athletes' => $club1_athletes,
 			'club2_athletes' => $club2_athletes,
 		);

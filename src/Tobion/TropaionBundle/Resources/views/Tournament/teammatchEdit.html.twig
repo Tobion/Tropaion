@@ -27,6 +27,13 @@
 	<script src="{{ asset('bundles/tobiontropaion/js/teammatch-edit.js') }}"></script>
 {% endblock %}
 
+{# text-only error message, e.g. for tooltips #}
+{% block field_errors %}
+	{%- for error in errors -%}
+		{{ error.messageTemplate|trans(error.messageParameters, 'validators') }}{% if not loop.last %}&#10;{% endif %}
+	{%- endfor -%}
+{% endblock field_errors %}
+
 {% block content %}
 
 <article id="teammatch-{{ teammatch.id }}">
@@ -39,6 +46,12 @@
 		</a>
 	</h2>
 </hgroup>
+
+{% if invalid %}
+    <div class="error">
+        {% trans %}Das Formular wurde nicht einwandfrei ausgefüllt. Bitte korrigieren Sie die Eingaben und übermitteln das Formular erneut.{% endtrans %}
+    </div>
+{% endif %}
 
 <form action="{{ path('tournament_teammatch_edit', teammatch.routingParams) }}" method="post" {{ form_enctype(form) }}>
 	{# form_widget(form) #}
@@ -67,6 +80,8 @@
 		{{ form_widget(form.annulled) }}
 	</dd>
 </dl>
+
+
 
 {#
 	tabindex="-1": exclude the element from sequential focus navigation 
@@ -211,15 +226,14 @@
 				{% endif %}
 			</td>
 			<td class="games">
-				{# form_errors(matchForm.games) #}
+				{% form_theme matchForm.games _self %} {# apply local theme for text-only error messages to all sub-forms following #}
 				<fieldset class="effective-fieldset{% if matchForm.games.all.errors|length > 0 %} error{% endif %}">
-					<legend>{% trans %}Gewertetes Ergebnis{% endtrans %}</legend>
+					<legend title="{{ form_errors(matchForm.games) }}">{% trans %}Gewertetes Ergebnis{% endtrans %}</legend>
 					<ol class="effective">
 					{% for gameForm in matchForm.games %}
 						{% if not gameForm.annulled.get('value') %}
-						<li tabindex="-1"{% if gameForm.all.errors|length > 0 %} class="error"{% endif %}>
+						<li tabindex="-1"{% if gameForm.all.errors|length > 0 %} class="error" title="{{ form_errors(gameForm) }}"{% endif %}>
 							{# form_widget(gameForm.annulled) #}
-							{# form_errors(gameForm) #}
 							{{ form_widget(gameForm.team1_score) }}
 							<abbr> : </abbr>
 							{{ form_widget(gameForm.team2_score) }}

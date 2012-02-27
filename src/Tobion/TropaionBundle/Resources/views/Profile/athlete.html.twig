@@ -126,6 +126,8 @@
 	<meta property="og:type" content="athlete" />
 {% endblock %}
 
+{% import "TobionTropaionBundle::macros.html.twig" as macros %}
+
 {% block content %}
 
 <article id="athlete-{{ athlete.id }}" about="{{ path('profile_athlete', athlete.routingParams ) }}" typeof="sport:Athlete">
@@ -141,7 +143,11 @@
 <h2>{% trans %}Turniere{% endtrans %}</h2>
 
 <ul>
-	<li>... in Mannschaft ...</li>
+{% for tl in tournamentLineups %}
+	<li><h4>{{ tl.tournament }}</h4>
+		{{ macros.lineup_athlete(tl.lineups.1|default(null), tl.lineups.2|default(null), tl.lineupChanged, tl.tournament) }}
+	</li>
+{% endfor %}
 </ul>
 
 <h2>{% trans %}Letzte Spiele{% endtrans %} [feed]</h2>
@@ -233,7 +239,9 @@
 </tbody>
 </table>
 
-<div id="rating-graph" style="width: 95%; height: 350px;"></div>
+<div id="rating-graph" style="width: 95%; height: 350px;">
+	<p>{% trans %}JavaScript notwendig{% endtrans %}</p>
+</div>
 
 </article>
 

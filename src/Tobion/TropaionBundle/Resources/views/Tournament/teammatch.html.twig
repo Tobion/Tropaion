@@ -130,7 +130,14 @@
 	<dd id="revaluation-reason">
 		<img src="{{ asset('bundles/tobiontropaion/images/icons/status/revaluation.png') }}" width="16" height="16" alt="" />
 		{# <object type="image/svg+xml" data="{{ asset('bundles/tobiontropaion/images/attention.svg') }}" height="17" width="20"><img src="{{ asset('bundles/tobiontropaion/images/attention.png') }}" height="17" width="20" alt="{% trans %}Achtung Symbol{% endtrans %}" /></object> #}
-		{{ teammatch.description }}
+		<span title="{{ teammatch.description }}">
+		{% transchoice teammatch.revaluationWrongdoer %}
+			{1} gegen <em>Heim</em>|{2} gegen <em>Gast</em>|{3} gegen <em>beide</em>
+		{% endtranschoice %}
+		{% trans with { '%reason%': teammatch.revaluationReasonMessage|trans } %}
+			| Grund: %reason%
+		{% endtrans %}
+		</span>
 	</dd>
 	{% endif %}
 	{% if teammatch.noFight %}

@@ -884,6 +884,14 @@ class Teammatch
 	}
 
 
+	/**
+	 *
+	 * @return string 
+	 */
+	public function getRevaluationReasonMessage()
+	{
+		return self::$revaluation_reasons[$this->revaluation_reason];
+	}
 
 	/**
 	 * Returns safe CURIE for referencing resources in RDFa

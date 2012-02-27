@@ -138,4 +138,35 @@ class Lineup
 	{
 		return $this->getTeam()->getLeague()->getClassLevel() == 255;
 	}
+
+	function __toString()
+	{
+		return sprintf('%s for %s at #%s (stage %s)',
+			$this->Athlete, $this->Team,
+			$this->position, $this->stage
+		);
+	}
+
+	/**
+	 *
+	 * @param array $lineups array of Lineup instances
+	 * @return Boolean
+	 */
+	public static function lineupChanged($lineups)
+	{
+		$prev = null;
+		foreach ($lineups as $lineup) {
+			if ($prev && $lineup) {
+				if ($lineup->getTeam() !== $prev->getTeam() ||
+					$lineup->getPosition() !== $prev->getPosition()) {
+
+					return true;
+				}
+			} else if ($lineup) {
+				$prev = $lineup;
+			}
+		}
+
+		return false;
+	}
 }

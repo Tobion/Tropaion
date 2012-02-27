@@ -190,6 +190,8 @@
 	{{ parent() }}
 {% endblock %}
 
+{% import "TobionTropaionBundle::macros.html.twig" as macros %}
+
 {% block content %}
 
 <article id="athlete-{{ athlete.id }}">
@@ -201,33 +203,7 @@
 <section id="my-lineup">
 <h2>{% trans %}Stamm-Mannschaft{% endtrans %}</h2>
 
-{% macro lineup_team(lineup, tournament) %}
-	{% if lineup.isSubstitute %}
-		{% set clubLink %}
-			<a href="{{ path('tournament_club', lineup.team.club.routingParams(tournament) ) }} ">{{ lineup.team.club.name }}</a>
-		{% endset %}
-		{% trans with { '%club%': clubLink } %}Ersatzspieler für %club%{% endtrans %}
-	{% else %}
-		{% set teamLink %}
-			<a href="{{ path('tournament_team', lineup.team.routingParams ) }} ">{{ lineup.team.shortName }}</a>
-		{% endset %}
-		{% set leagueLink %}
-			<a href="{{ path('tournament_league', lineup.team.league.routingParams ) }} ">{{ lineup.team.league.fullName }}</a>
-		{% endset %}
-		{% trans with { '%team%': teamLink, '%position%' : lineup.position, '%league%' : leagueLink } %}%team% an Meldeposition <strong>%position%</strong> in %league%{% endtrans %}
-	{% endif %}
-{% endmacro %}
-
-{% if lineupSecondRound and lineupChanged %}
-	<dl>
-		<dt>{% trans %}Hinrunde{% endtrans %}</dt>
-		<dd>{{ _self.lineup_team(lineupFirstRound, tournament) }}</dd>
-		<dt>{% trans %}Rückrunde{% endtrans %}</dt>
-		<dd>{{ _self.lineup_team(lineupSecondRound, tournament) }}</dd>
-	</dl>
-{% elseif lineupFirstRound %}
-	<p>{{ _self.lineup_team(lineupFirstRound, tournament) }}</p>
-{% endif %}
+{{ macros.lineup_athlete(lineupFirstRound, lineupSecondRound, lineupChanged, tournament) }}
 
 </section>
 

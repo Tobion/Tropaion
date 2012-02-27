@@ -48,6 +48,30 @@ class ProfileController extends Controller
 		);
 
 
+		$qb = $em->createQueryBuilder();
+		$qb->select(array('lu', 't', 'l', 'r'))
+			->from('TobionTropaionBundle:Lineup', 'lu')
+			->innerJoin('lu.Team', 't')
+			->innerJoin('t.League', 'l')
+			->innerJoin('l.Tournament', 'r')
+			->where($qb->expr()->eq('lu.Athlete', ':athlete_id'))
+			->addOrderBy('r.end_date', 'DESC')
+			->addOrderBy('r.id', 'ASC')
+			->addOrderBy('lu.stage', 'ASC')
+			->setParameter('athlete_id', $athlete->getId());
+
+		$lineups = $qb->getQuery()->getResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
+
+		$tournamentLineups = array();
+
+		foreach ($lineups as $lineup) {
+			$tl =& $tournamentLineups[$lineup->getTeam()->getLeague()->getTournament()->getId()];
+			$tl['tournament'] = $lineup->getTeam()->getLeague()->getTournament();
+			$tl['lineups'][$lineup->getStage()] = $lineup;
+			$tl['lineupChanged'] = Entity\Lineup::lineupChanged($tl['lineups']);
+		}
+
+
 		/*
 		 *	Version with partial selection when using array tree hydration
 			$qb->select('partial h.{id, discipline, post_rating}, 
@@ -118,7 +142,7 @@ class ProfileController extends Controller
 				$match[$rating['match_id']]['annulled'] .= $rating['g_team1_score'] . ':' . $rating['g_team2_score'] . ' ';
 			} else {
 				$match[$rating['match_id']]['effective'] .= $rating['g_team1_score'] . ':' . $rating['g_team2_score'] . ' ';		
-			}		
+			}
 		}
 
 		$router = $this->get('router');
@@ -214,6 +238,7 @@ class ProfileController extends Controller
 		return array(
 			'athlete' => $athlete,
 			'user' => $user,
+			'tournamentLineups' => $tournamentLineups,
 			'singlesRatings' => $singlesRatings,
 			'doublesRatings' => $doublesRatings,
 			'mixedRatings' => $mixedRatings,
