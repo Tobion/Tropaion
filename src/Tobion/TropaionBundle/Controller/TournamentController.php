@@ -128,18 +128,18 @@ class TournamentController extends Controller
 	{
 		$tournament = $this->getTournament();
 
+		$rep = $this->getDoctrine()->getRepository('TobionTropaionBundle:League');
+		$leagueHierarchy = $rep->getTournamentLeaguesHierarchically($tournament);
+
 		return array(
 			'tournament' => $tournament,
+			'leagueHierarchy' => $leagueHierarchy,
 		);
 
 	}
 
 	/**
-	 * @Route("/matches", 
-	 *     name="tournament_matches_index",
-	 *     defaults={"_format" = "html"},
-	 *     requirements={"_format" = "html|atom"}
-	 * ) 
+	 * @Route("/matches", name="tournament_matches_index") 
 	 * @Template()
 	 */
 	public function matchesIndexAction()
@@ -200,7 +200,7 @@ class TournamentController extends Controller
 		$qb = $em->createQueryBuilder();
 		$qb->select(array('l'))
 			->from('TobionTropaionBundle:League', 'l')
-			->where($qb->expr()->eq('l.tournament_id', '?0'))
+			->where($qb->expr()->eq('l.Tournament', '?0'))
 			->andWhere($qb->expr()->eq('l.class_abbr', '?1'))
 			->andWhere($qb->expr()->eq('l.division', '?2'))
 			->setParameters(array(
@@ -369,7 +369,7 @@ class TournamentController extends Controller
 			->innerJoin('t.League', 'l')
 			->leftJoin('t.Lineups', 'lu')
 			->leftJoin('lu.Athlete', 'a')
-			->where($qb->expr()->eq('l.tournament_id', '?0'))
+			->where($qb->expr()->eq('l.Tournament', '?0'))
 			->andWhere($qb->expr()->eq('c.code', '?1'))
 			->andWhere($qb->expr()->eq('t.team_number', '?2'))
 			->setParameters(array(
@@ -414,10 +414,9 @@ class TournamentController extends Controller
 
 
 	/**
-	 * @Route("/clubs/{club}.{_format}",
+	 * @Route("/clubs/{club}",
 	 *     name="tournament_club",
-	 *     defaults={"_format" = "html"},
-	 *     requirements={"club" = ".+", "_format" = "html"}
+	 *     requirements={"club" = ".+"}
 	 * ) 
 	 * @Template()
 	 */
@@ -436,7 +435,7 @@ class TournamentController extends Controller
 			->innerJoin('t.League', 'l')
 			->leftJoin('t.Lineups', 'lu')
 			->leftJoin('lu.Athlete', 'a')
-			->where($qb->expr()->eq('l.tournament_id', '?0'))
+			->where($qb->expr()->eq('l.Tournament', '?0'))
 			->andWhere($qb->expr()->eq('c.code', '?1'))
 			->setParameters(array(
 				$tournament->getId(), 
@@ -459,7 +458,7 @@ class TournamentController extends Controller
 			->innerJoin('t1.League', 'l')
 			->innerJoin('tm.Venue', 'v')
 			->where('t1.Club = :club_id OR t2.Club = :club_id')
-			->andWhere($qb->expr()->eq('l.tournament_id', ':tournament_id'))
+			->andWhere($qb->expr()->eq('l.Tournament', ':tournament_id'))
 			->orderBy('tm.performed_at', 'ASC')
 			->setParameter('club_id', $club->getId())
 			->setParameter('tournament_id', $tournament->getId());
@@ -480,10 +479,9 @@ class TournamentController extends Controller
 
 
 	/**
-	 * @Route("/players/@{id}/{firstName}-{lastName}.{_format}",
+	 * @Route("/players/@{id}/{firstName}-{lastName}",
 	 *     name="tournament_athlete",
-	 *     defaults={"_format" = "html"},
-	 *     requirements={"firstName" = ".+", "lastName" = ".+", "id" = "\d+", "_format" = "html"}
+	 *     requirements={"firstName" = ".+", "lastName" = ".+", "id" = "\d+"}
 	 * ) 
 	 * @Template()
 	 */

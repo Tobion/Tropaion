@@ -4,6 +4,8 @@ namespace Tobion\TropaionBundle\Repository;
 
 use Doctrine\ORM\EntityRepository;
 
+use Tobion\TropaionBundle\Entity\Teammatch;
+
 /**
  * TeammatchRepository
  *
@@ -35,7 +37,7 @@ class TeammatchRepository extends EntityRepository
 			->setParameter('id', $id);
 
 		try {
-			return $qb->getQuery()->getSingleResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
+			return $qb->getQuery()->getSingleResult();
 		} catch (\Doctrine\Orm\NoResultException $e) {
 			return null;
 		}
@@ -84,17 +86,20 @@ class TeammatchRepository extends EntityRepository
 		}
 	}
 
-	public function findChronologicallyPrevious($teammatch)
+	/**
+	 * Finds the chronologically previous Teammatch in the same league.
+	 *
+	 * @param Teammatch $teammatch
+	 * @return Teammatch|null
+	 */
+	public function findChronologicallyPrevious(Teammatch $teammatch)
 	{		
 		$qb = $this->createQueryBuilder('tm');
-		$qb->select(array('tm','t1','t2','c1','c2','l','r','o'))
+		$qb->select(array('tm','t1','t2','c1','c2'))
 			->innerJoin('tm.Team1', 't1')
 			->innerJoin('tm.Team2', 't2')
 			->innerJoin('t1.Club', 'c1')
 			->innerJoin('t2.Club', 'c2')
-			->innerJoin('t1.League', 'l')
-			->innerJoin('l.Tournament', 'r')
-			->innerJoin('r.Owner', 'o')
 			->where($qb->expr()->eq('t1.League', ':league_id'))
 			->andWhere('tm.performed_at <= :performed_at')
 			// das ist wichtig, um sowohl sich selber als auch circulären Referenzen (a has next b und b has next a) auszuschließen
@@ -107,23 +112,26 @@ class TeammatchRepository extends EntityRepository
 			->setMaxResults(1);
 
 		try {
-			return $qb->getQuery()->getSingleResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
+			return $qb->getQuery()->getSingleResult();
 		} catch (\Doctrine\Orm\NoResultException $e) {
 			return null;
 		}
 	}
 
-	public function findChronologicallyNext($teammatch)
+	/**
+	 * Finds the chronologically next Teammatch in the same league.
+	 *
+	 * @param Teammatch $teammatch
+	 * @return Teammatch|null
+	 */
+	public function findChronologicallyNext(Teammatch $teammatch)
 	{		
 		$qb = $this->createQueryBuilder('tm');
-		$qb->select(array('tm','t1','t2','c1','c2','l','r','o'))
+		$qb->select(array('tm','t1','t2','c1','c2'))
 			->innerJoin('tm.Team1', 't1')
 			->innerJoin('tm.Team2', 't2')
 			->innerJoin('t1.Club', 'c1')
 			->innerJoin('t2.Club', 'c2')
-			->innerJoin('t1.League', 'l')
-			->innerJoin('l.Tournament', 'r')
-			->innerJoin('r.Owner', 'o')
 			->where($qb->expr()->eq('t1.League', ':league_id'))
 			->andWhere('tm.performed_at >= :performed_at')
 			// das ist wichtig, um sowohl sich selber als auch circulären Referenzen (a has next b und b has next a) auszuschließen
@@ -136,31 +144,29 @@ class TeammatchRepository extends EntityRepository
 			->setMaxResults(1);
 
 		try {
-			return $qb->getQuery()->getSingleResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
+			return $qb->getQuery()->getSingleResult();
 		} catch (\Doctrine\Orm\NoResultException $e) {
 			return null;
 		}
 	}
 
-	public function findReturnTeammatch($teammatch)
+	/**
+	 * Finds the return match (Rückspiel).
+	 *
+	 * @param Teammatch $teammatch
+	 * @return Teammatch|null
+	 */
+	public function findReturnTeammatch(Teammatch $teammatch)
 	{		
 		$qb = $this->createQueryBuilder('tm');
-		$qb->select(array('tm','t1','t2','c1','c2','l','r','o'))
-			->innerJoin('tm.Team1', 't1')
-			->innerJoin('tm.Team2', 't2')
-			->innerJoin('t1.Club', 'c1')
-			->innerJoin('t2.Club', 'c2')
-			->innerJoin('t1.League', 'l')
-			->innerJoin('l.Tournament', 'r')
-			->innerJoin('r.Owner', 'o')
-			->where($qb->expr()->eq('tm.Team1', ':team1_id'))
+		$qb->where($qb->expr()->eq('tm.Team1', ':team1_id'))
 			->andWhere($qb->expr()->eq('tm.Team2', ':team2_id'))
 			->setParameter('team1_id', $teammatch->getTeam2()->getId())
 			->setParameter('team2_id', $teammatch->getTeam1()->getId())
 			->setMaxResults(1);
 
 		try {
-			return $qb->getQuery()->getSingleResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
+			return $qb->getQuery()->getSingleResult();
 		} catch (\Doctrine\Orm\NoResultException $e) {
 			return null;
 		}

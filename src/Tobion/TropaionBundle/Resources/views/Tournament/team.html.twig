@@ -69,83 +69,84 @@
 {% block metas %}
 	{{ parent() }}
 	<meta property="og:type" content="sports_team" />
+	<meta property="og:url" content="{{ path('tournament_team', team.routingParams ) }}" />
 {% endblock %}
 
 {% block content %}
 
-<article id="team-{{ team.id }}" about="{{ path('tournament_team', team.routingParams ) }}" typeof="sport:Team">
+<article id="team" about="{{ path('tournament_team', team.routingParams ) }}" typeof="sport:Team">
 
-<h1>{{ team }}</h1>
+<header>
+	<h1>{{ team }}</h1>
 
-<dl>
-	<dt>{% trans %}Klasse{% endtrans %}</dt>
-	<dd><a href="{{ path('tournament_league', team.league.routingParams ) }}#team-{{ team.id }}">{{ team.league.className }}{% if team.league.division %} {{ team.league.division }}{% endif %}</a></dd>
-	<dt>{% trans %}Verein{% endtrans %}</dt>
-	<dd><a href="{{ path('tournament_club', team.club.routingParams(tournament) ) }}">{{ team.club.name }}</a></dd>
-</dl>
+	<dl>
+		<dt>{% trans %}Klasse{% endtrans %}</dt>
+		<dd><a href="{{ path('tournament_league', team.league.routingParams ) }}#team-{{ team.id }}">{{ team.league.className }}{% if team.league.division %} {{ team.league.division }}{% endif %}</a></dd>
+		<dt>{% trans %}Verein{% endtrans %}</dt>
+		<dd><a href="{{ path('tournament_club', team.club.routingParams(tournament) ) }}">{{ team.club.name }}</a></dd>
+	</dl>
+</header>
 
-<section id="lineup" rel="sport:teamMate">
-<h2>{% trans %}Aufstellung{% endtrans %}</h2>
+<section id="team-lineup" rel="sport:teamMate">
+	<h2>{% trans %}Aufstellung{% endtrans %}</h2>
 
-{% macro lineup_athlete(lineup, gender, tournament) %}
-	<li about="{{ path('profile_athlete', lineup.athlete.routingParams ) }}" typeof="sport:Athlete" property="foaf:gender" xml:lang="en" content="{{ gender }}">
-		<a rel="foaf:page" href="{{ path('tournament_athlete',	lineup.athlete.routingParams(tournament) ) }}" xml:lang="de">{{ lineup.athlete }}</a></li>
-{% endmacro %}
+	{% macro lineup_athlete(lineup, gender, tournament) %}
+		<li about="{{ path('profile_athlete', lineup.athlete.routingParams ) }}" typeof="sport:Athlete" property="foaf:gender" xml:lang="en" content="{{ gender }}">
+			<a rel="foaf:page" href="{{ path('tournament_athlete',	lineup.athlete.routingParams(tournament) ) }}" xml:lang="de">{{ lineup.athlete }}</a></li>
+	{% endmacro %}
 
-<div id="lineup-first-half">
-	<h3>{% if hasSecondRoundLineup and not lineupChanged %}
-			{% trans %}Hinrunde &amp; Rückrunde{% endtrans %}
-		{% else %}
-			{% trans %}Hinrunde{% endtrans %}
-		{% endif %}</h3>
-	<div class="male">
-		<h4>{% trans %}Männer{% endtrans %}</h4>
-		<ol>
-			{%- for lineup in team.firstRoundMaleLineups %}
-			{{ _self.lineup_athlete(lineup, 'male', tournament) }}
-			{%- endfor %}
-		</ol>
+	<div id="lineup-first-half">
+		<h3>{% if hasSecondRoundLineup and not lineupChanged %}
+				{% trans %}Hinrunde &amp; Rückrunde{% endtrans %}
+			{% else %}
+				{% trans %}Hinrunde{% endtrans %}
+			{% endif %}</h3>
+		<div class="male">
+			<h4>{% trans %}Männer{% endtrans %}</h4>
+			<ol>
+				{%- for lineup in team.firstRoundMaleLineups %}
+				{{ _self.lineup_athlete(lineup, 'male', tournament) }}
+				{%- endfor %}
+			</ol>
+		</div>
+		<div class="female">
+			<h4>{% trans %}Frauen{% endtrans %}</h4>
+			<ol>
+				{%- for lineup in team.firstRoundFemaleLineups %}
+				{{ _self.lineup_athlete(lineup, 'female', tournament) }}
+				{%- endfor %}
+			</ol>
+		</div>
 	</div>
-	<div class="female">
-		<h4>{% trans %}Frauen{% endtrans %}</h4>
-		<ol>
-			{%- for lineup in team.firstRoundFemaleLineups %}
-			{{ _self.lineup_athlete(lineup, 'female', tournament) }}
-			{%- endfor %}
-		</ol>
-	</div>
-</div>
 
-{% if hasSecondRoundLineup and lineupChanged %}
-<div id="lineup-second-half">
-	<h3>{% trans %}Rückrunde{% endtrans %}</h3>
-	<div class="male">
-		<h4>{% trans %}Männer{% endtrans %}</h4>
-		<ol>
-			{%- for lineup in team.secondRoundMaleLineups %}
-			{{ _self.lineup_athlete(lineup, 'male', tournament) }}
-			{%- endfor %}
-		</ol>
+	{% if hasSecondRoundLineup and lineupChanged %}
+	<div id="lineup-second-half">
+		<h3>{% trans %}Rückrunde{% endtrans %}</h3>
+		<div class="male">
+			<h4>{% trans %}Männer{% endtrans %}</h4>
+			<ol>
+				{%- for lineup in team.secondRoundMaleLineups %}
+				{{ _self.lineup_athlete(lineup, 'male', tournament) }}
+				{%- endfor %}
+			</ol>
+		</div>
+		<div class="female">
+			<h4>{% trans %}Frauen{% endtrans %}</h4>
+			<ol>
+				{%- for lineup in team.secondRoundFemaleLineups %}
+				{{ _self.lineup_athlete(lineup, 'female', tournament) }}
+				{%- endfor %}
+			</ol>
+		</div>
 	</div>
-	<div class="female">
-		<h4>{% trans %}Frauen{% endtrans %}</h4>
-		<ol>
-			{%- for lineup in team.secondRoundFemaleLineups %}
-			{{ _self.lineup_athlete(lineup, 'female', tournament) }}
-			{%- endfor %}
-		</ol>
-	</div>
-</div>
-{% endif %}
-
+	{% endif %}
 </section>
 
 
-<section id="my-results">
-<h2>{% trans with { '%team%': team.__toString } %}Spiele der Mannschaft <em>%team%</em>{% endtrans %}</h2>
+<section id="team-results">
+	<h2>{% trans with { '%team%': team.__toString } %}Spiele der Mannschaft <em>%team%</em>{% endtrans %}</h2>
 
-{% include 'TobionTropaionBundle::teammatches-profile-view.html.twig' with {'teammatches': teammatches, 'profileView': 'team', 'perspective': team.__toString} %}
-
+	{% include 'TobionTropaionBundle::teammatches-profile-view.html.twig' with {'teammatches': teammatches, 'profileView': 'team', 'perspective': team.__toString} %}
 </section>
 
 <p>Zusätzl. Filter / Suche: <del>Status</del> <ins>Ergebnis</ins>: Sieg, Unentschieden, Niederlage (nur bei profil-view möglich; interessant in Kombination mit Statistiken wie Anteil der 3-Satz-Spiele, aber Sieg/Niederlage Statistik dann sinnlos), 2-Satz-Spiele, 3-Satz-Spiele, Ausstehende Ergebniseingabe, Fehlende Ergebnisbestätigung</p>

@@ -74,32 +74,26 @@
 	</script> 
 {% endblock %}
 
-{% set pageRdfId = path('tournament_club', club.routingParams(tournament)) %}
-
-{% block metas %}
-	{{ parent() }}
-	<meta property="og:type" content="sports_team" />
-{% endblock %}
-
 {% block content %}
 
-<article id="club-{{ club.id }}">
+<article id="club-tournament-page">
 
-<h1>{{ club }}</h1>
+<header>
+	<h1>{{ club }}</h1>
 
-<p><a href="{{ path('profile_club', club.routingParams ) }}">{% trans %}Profil-Seite{% endtrans %}</a></p>
+	<p><a href="{{ path('profile_club', club.routingParams ) }}">{% trans %}Turnierunabhängige Profil-Seite{% endtrans %}</a></p>
+</header>
 
-<section id="lineups">
+<section id="club-tournament-lineups">
 	<h2>{% trans %}Aufstellungen{% endtrans %}</h2>
 	<p>Mannschaften + Ersatzspieler</p>
 	<p>Link zur <a href="{{ path('tournament_athletes_index', tournament.routingParams|merge({ 'club': club.id })) }}">Spielerstatistik des Vereins</a></p>
 </section>
 
-<section id="my-results">
-<h2>{% trans with { '%club%': club.code } %}Spiele des Vereins <em>%club%</em>{% endtrans %}</h2>
+<section id="club-tournament-results">
+	<h2>{% trans with { '%club%': club.code } %}Spiele des Vereins <em>%club%</em>{% endtrans %}</h2>
 
-{% include 'TobionTropaionBundle::teammatches-profile-view.html.twig' with {'teammatches': teammatches, 'profileView': 'club', 'perspective': club.name} %}
-
+	{% include 'TobionTropaionBundle::teammatches-profile-view.html.twig' with {'teammatches': teammatches, 'profileView': 'club', 'perspective': club.name} %}
 </section>
 
 </article>

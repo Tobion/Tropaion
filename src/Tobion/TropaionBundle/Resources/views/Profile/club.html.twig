@@ -1,12 +1,33 @@
 {% extends "TobionTropaionBundle::layout.html.twig" %}
 
+{% set pageRdfId = path('profile_club', club.routingParams|merge({ '_format': 'html' }) ) ~ '.html' %}
+
+{% block metas %}
+	{{ parent() }}
+	<meta property="og:type" content="sports_team" />
+	<meta property="og:url" content="{{ path('profile_club', club.routingParams ) }}" />
+{% endblock %}
+
 {% block content %}
 
-<article>
-	<h1></h1>
-	<p>Saisonübergreifende Mannschaftsresultate mit Auf- und Abstieg</p>
+<article id="club-profile">
+
+<header>
+	<h1>{{ club.name }}
+		<span style="display:none;" rel="foaf:page" resource="{{ pageRdfId }}"></span>
+	</h1>
+
+	{% if club.contactPerson %}
+		<p>Kontakt: <a href="{{ path('profile_athlete', club.contactPerson.routingParams ) }}">{{ club.contactPerson }}</a></p>
+	{% endif %}
+
 	<p>Spielgemeinschaft aus ... und ...</p>
-	<p>Kontakt Verantwortliche</p>
+</header>
+
+<section id="team-results">
+	<h2>Saisonübergreifende Mannschaftsresultate mit Auf- und Abstieg</h2>
+</section>
+
 	<p>LikeBox: https://developers.facebook.com/docs/reference/plugins/like-box/
 		als Art CMS für den Verein (Photos, Kommentare)</p>
 </article>

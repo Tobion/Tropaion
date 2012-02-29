@@ -17,7 +17,7 @@ class ProfileController extends Controller
 	 * @Route("/@{id}/{firstName}-{lastName}.{_format}",
 	 *     name="profile_athlete",
 	 *     defaults={"_format" = "html"},
-	 *     requirements={"firstName" = ".+", "lastName" = ".+", "id" = "\d+", "_format" = "html|atom"}
+	 *     requirements={"firstName" = ".+", "lastName" = ".+", "id" = "\d+", "_format" = "html"}
 	 * ) 
 	 * @Template()
 	 */
@@ -251,13 +251,30 @@ class ProfileController extends Controller
 	 * @Route("/clubs/{club}.{_format}",
 	 *     name="profile_club",
 	 *     defaults={"_format" = "html"},
-	 *     requirements={"club" = ".+", "_format" = "html|atom"}
+	 *     requirements={"club" = ".+", "_format" = "html"}
 	 * ) 
 	 * @Template()
 	 */
 	public function clubAction($club)
 	{
+		$em = $this->getDoctrine()->getEntityManager();
 
+		$qb = $em->createQueryBuilder();
+		$qb->select(array('c'))
+			->from('TobionTropaionBundle:Club', 'c')
+			->leftJoin('c.Contact_Person', 'p')
+			->where('c.code = :club_code')
+			->setParameter('club_code', $club);
+
+		try {
+			$club = $qb->getQuery()->getSingleResult();
+		} catch (\Doctrine\Orm\NoResultException $e) {
+			throw $this->createNotFoundException('Club not found.');
+		}
+
+		return array(
+			'club' => $club,
+		);
 	}
 
 

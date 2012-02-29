@@ -4,6 +4,8 @@ namespace Tobion\TropaionBundle\Repository;
 
 use Doctrine\ORM\EntityRepository;
 
+use Tobion\TropaionBundle\Entity\Tournament;
+
 /**
  * LeagueRepository
  *
@@ -302,23 +304,20 @@ ORDER BY u.athlete_id ASC
 	public function findHierarchicallyPrevious($league)
 	{		
 		$qb = $this->createQueryBuilder('l');
-		$qb->select(array('l','r','o'))
-			->innerJoin('l.Tournament', 'r')
-			->innerJoin('r.Owner', 'o')
-			->where($qb->expr()->neq('l.id', ':league_id'))
-			->andWhere($qb->expr()->eq('l.tournament_id', ':tournament_id'))
+		$qb->where($qb->expr()->neq('l.id', ':league_id'))
+			->andWhere($qb->expr()->eq('l.Tournament', ':tournament_id'))
 			->andWhere('(l.class_level = :class_level AND l.division < :division) OR l.class_level < :class_level')
 			->andWhere($qb->expr()->neq('l.class_level', '255'))
 			->orderBy('l.class_level', 'DESC')
 			->addOrderBy('l.division', 'DESC')
 			->setParameter('league_id', $league->getId())
-			->setParameter('tournament_id', $league->getTournamentId())
+			->setParameter('tournament_id', $league->getTournament()->getId())
 			->setParameter('class_level', $league->getClassLevel())
 			->setParameter('division', $league->getDivision())
 			->setMaxResults(1);
 
 		try {
-			return $qb->getQuery()->getSingleResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
+			return $qb->getQuery()->getSingleResult();
 		} catch (\Doctrine\Orm\NoResultException $e) {
 			return null;
 		}
@@ -327,25 +326,46 @@ ORDER BY u.athlete_id ASC
 	public function findHierarchicallyNext($league)
 	{		
 		$qb = $this->createQueryBuilder('l');
-		$qb->select(array('l','r','o'))
-			->innerJoin('l.Tournament', 'r')
-			->innerJoin('r.Owner', 'o')
-			->where($qb->expr()->neq('l.id', ':league_id'))
-			->andWhere($qb->expr()->eq('l.tournament_id', ':tournament_id'))
+		$qb->where($qb->expr()->neq('l.id', ':league_id'))
+			->andWhere($qb->expr()->eq('l.Tournament', ':tournament_id'))
 			->andWhere('(l.class_level = :class_level AND l.division > :division) OR l.class_level > :class_level')
 			->andWhere($qb->expr()->neq('l.class_level', '255'))
 			->orderBy('l.class_level', 'ASC')
 			->addOrderBy('l.division', 'ASC')
 			->setParameter('league_id', $league->getId())
-			->setParameter('tournament_id', $league->getTournamentId())
+			->setParameter('tournament_id', $league->getTournament()->getId())
 			->setParameter('class_level', $league->getClassLevel())
 			->setParameter('division', $league->getDivision())
 			->setMaxResults(1);
 
 		try {
-			return $qb->getQuery()->getSingleResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
+			return $qb->getQuery()->getSingleResult();
 		} catch (\Doctrine\Orm\NoResultException $e) {
 			return null;
 		}
+	}
+
+	/**
+	 *
+	 * @param Tournament $tournament
+	 * @return array
+	 */
+	public function getTournamentLeaguesHierarchically(Tournament $tournament)
+	{
+		$qb = $this->createQueryBuilder('l');
+		$qb->where($qb->expr()->eq('l.Tournament', ':tournament_id'))
+			->andWhere($qb->expr()->neq('l.class_level', '255'))
+			->orderBy('l.class_level', 'ASC')
+			->addOrderBy('l.division', 'ASC')
+			->setParameter('tournament_id', $tournament->getId());
+
+		$leagues = $qb->getQuery()->getResult();
+
+		$leagueHierarchy = array();
+		foreach ($leagues as $league) {
+			$leagueHierarchy[$league->getClassLevel()][$league->getDivision()] = $league;
+		}
+
+		return $leagueHierarchy;
 	}
 }

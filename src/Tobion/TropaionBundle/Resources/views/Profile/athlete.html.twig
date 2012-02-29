@@ -119,129 +119,143 @@
 	
 {% endblock %}
 
-{# set pageRdfId = path('profile_athlete', athlete.routingParams|merge({ '_format': 'html' }) ) ~ '.html' #}
+{% set pageRdfId = path('profile_athlete', athlete.routingParams|merge({ '_format': 'html' }) ) ~ '.html' %}
 
 {% block metas %}
 	{{ parent() }}
 	<meta property="og:type" content="athlete" />
+	<meta property="og:url" content="{{ path('profile_athlete', athlete.routingParams ) }}" />
 {% endblock %}
 
 {% import "TobionTropaionBundle::macros.html.twig" as macros %}
 
 {% block content %}
 
-<article id="athlete-{{ athlete.id }}" about="{{ path('profile_athlete', athlete.routingParams ) }}" typeof="sport:Athlete">
+<article id="athlete-profile" about="{{ path('profile_athlete', athlete.routingParams ) }}" typeof="sport:Athlete">
 
-<h1>{{ athlete.fullName }}</h1>
+<header>
+	<h1>{# TODO: athlete data like familyName, givenName, gender is already marked up in each teammatch-scoresheet,
+		but might be better placed here to reduce duplication #}
+		{{ athlete.fullName }}
+		<span style="display:none;" rel="foaf:page" resource="{{ pageRdfId }}"></span>
+	</h1>
 
-{% if user %}
-	<p>Registriertes Nutzerprofil: <a href="{{ path('profile_user', user.routingParams ) }}">{{ user }}</a></p>
-{% endif %}
+	{% if user %}{# TODO rel="me" ?! #}
+		<p>Registriertes Nutzerprofil: <a href="{{ path('profile_user', user.routingParams ) }}">{{ user }}</a></p>
+	{% endif %}
 
-<p>Aktueller Verein: <a href="{{ path('profile_club', athlete.club.routingParams ) }}">{{ athlete.club }}</a></p>
+	<p>Aktueller Verein: <a href="{{ path('profile_club', athlete.club.routingParams ) }}">{{ athlete.club }}</a></p>
+</header>
 
-<h2>{% trans %}Turniere{% endtrans %}</h2>
+<section id="athlete-tournaments">
+	<h2>{% trans %}Turniere{% endtrans %}</h2>
 
-<ul>
-{% for tl in tournamentLineups %}
-	<li><h4>{{ tl.tournament }}</h4>
-		{{ macros.lineup_athlete(tl.lineups.1|default(null), tl.lineups.2|default(null), tl.lineupChanged, tl.tournament) }}
-	</li>
-{% endfor %}
-</ul>
+	<ul>
+	{% for tl in tournamentLineups %}
+		<li><h4><a href="{{ path('tournament_athlete', athlete.routingParams(tl.tournament) ) }}">{{ tl.tournament }}</a></h4>
+			{{ macros.lineup_athlete(tl.lineups.1|default(null), tl.lineups.2|default(null), tl.lineupChanged, tl.tournament) }}
+		</li>
+	{% endfor %}
+	</ul>
+</section>
 
-<h2>{% trans %}Letzte Spiele{% endtrans %} [feed]</h2>
+<section id="athlete-last-matches">
+	<h2>{% trans %}Letzte Spiele{% endtrans %}</h2>
 
-<p>TODO</p>
+	<p>TODO mit Feed</p>
+</section>
 
-<h2>{% trans %}Rating{% endtrans %}</h2>
 
-<details>
-	<summary>{% trans %}Hilfe{% endtrans %}</summary>
-	{% trans %}<p>Informationen zum Rating ... TODO
-		</p>
-		<p>Beim Bewegen des Cursors über den Graphen werden zusätzliche Informationen angezeigt, 
-		wie das jeweilige Rating und das Spielergebnis, das zu der neuen Ratingbewertung geführt hat. 
-		Ein Klick auf den Punkt öffnet die Webseite zum Spiel.
-		</p>
-		<p>Man kann in das Diagramm hineinzoomen, indem man den Bereich durch Klicken und Ziehen auswählt. 
-		Oben rechts befindet sich dann ein Link zum Hinauszoomen.
-		</p> 
-		<p>Über den Button in der oberen rechten Ecke kann das Diagramm als Bild exportiert werden.
-		</p>
-	{% endtrans %}
-</details>
+<section id="athlete-rating">
+	<h2>{% trans %}Rating{% endtrans %}</h2>
 
-<table>
-<thead>
-	<tr>
-		<th></th>
-		<th>{% trans %}Aktuell{% endtrans %}</th>
-		<th>{% trans %}Min{% endtrans %}</th>
-		<th>{% trans %}Max{% endtrans %}</th>
-	</tr>
-</thead>
-<tbody>
-	<tr>
-		<th>{% trans %}Einzel{% endtrans %}</th>
-		<td>{% if athlete.singlesRating is not empty %}
-			{{ athlete.singlesRating }}
-			{% else %}—{% endif %}</td>
-		<td>{% if ratingStats.singles.minRating is not empty %}
-			{% trans with {
-				'%rating%': ratingStats.singles.minRating,
-				'%date%': ratingStats.singles.minAt|date("d.m.Y")
-			} %}%rating% am %date%{% endtrans %}
-			{% else %}—{% endif %}</td>
-		<td>{% if ratingStats.singles.maxRating is not empty %}
-			{% trans with {
-				'%rating%': ratingStats.singles.maxRating,
-				'%date%': ratingStats.singles.maxAt|date("d.m.Y")
-			} %}%rating% am %date%{% endtrans %}
-			{% else %}—{% endif %}</td>
-	</tr>
-	<tr>
-		<th>{% trans %}Doppel{% endtrans %}</th>
-		<td>{% if athlete.doublesRating is not empty %}
-			{{ athlete.doublesRating }}
-			{% else %}—{% endif %}</td>
-		<td>{% if ratingStats.doubles.minRating is not empty %}
-			{% trans with {
-				'%rating%': ratingStats.doubles.minRating,
-				'%date%': ratingStats.doubles.minAt|date("d.m.Y")
-			} %}%rating% am %date%{% endtrans %}
-			{% else %}—{% endif %}</td>
-		<td>{% if ratingStats.doubles.maxRating is not empty %}
-			{% trans with {
-				'%rating%': ratingStats.doubles.maxRating,
-				'%date%': ratingStats.doubles.maxAt|date("d.m.Y")
-			} %}%rating% am %date%{% endtrans %}
-			{% else %}—{% endif %}</td>
-	</tr>
-	<tr>
-		<th>{% trans %}Mixed{% endtrans %}</th>
-		<td>{% if athlete.mixedRating is not empty %}
-			{{ athlete.mixedRating }}
-			{% else %}—{% endif %}</td>
-		<td>{% if ratingStats.mixed.minRating is not empty %}
-			{% trans with {
-				'%rating%': ratingStats.mixed.minRating,
-				'%date%': ratingStats.mixed.minAt|date("d.m.Y")
-			} %}%rating% am %date%{% endtrans %}
-			{% else %}—{% endif %}</td>
-		<td>{% if ratingStats.mixed.maxRating is not empty %}
-			{% trans with {
-				'%rating%': ratingStats.mixed.maxRating,
-				'%date%': ratingStats.mixed.maxAt|date("d.m.Y")
-			} %}%rating% am %date%{% endtrans %}
-			{% else %}—{% endif %}</td>
-	</tr>
-</tbody>
-</table>
+	<details>
+		<summary>{% trans %}Hilfe{% endtrans %}</summary>
+		{% trans %}<p>Informationen zum Rating ... TODO
+			</p>
+			<p>Beim Bewegen des Cursors über den Graphen werden zusätzliche Informationen angezeigt,
+			wie das jeweilige Rating und das Spielergebnis, das zu der neuen Ratingbewertung geführt hat.
+			Ein Klick auf den Punkt öffnet die Webseite zum Spiel.
+			</p>
+			<p>Man kann in das Diagramm hineinzoomen, indem man den Bereich durch Klicken und Ziehen auswählt.
+			Oben rechts befindet sich dann ein Link zum Hinauszoomen.
+			</p>
+			<p>Über den Button in der oberen rechten Ecke kann das Diagramm als Bild exportiert werden.
+			</p>
+		{% endtrans %}
+	</details>
 
-<div id="rating-graph" style="width: 95%; height: 350px;">
-	<p>{% trans %}JavaScript notwendig{% endtrans %}</p>
-</div>
+	<table>
+	<thead>
+		<tr>
+			<th></th>
+			<th>{% trans %}Aktuell{% endtrans %}</th>
+			<th>{% trans %}Min{% endtrans %}</th>
+			<th>{% trans %}Max{% endtrans %}</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<th>{% trans %}Einzel{% endtrans %}</th>
+			<td>{% if athlete.singlesRating is not empty %}
+				{{ athlete.singlesRating }}
+				{% else %}—{% endif %}</td>
+			<td>{% if ratingStats.singles.minRating is not empty %}
+				{% trans with {
+					'%rating%': ratingStats.singles.minRating,
+					'%date%': ratingStats.singles.minAt|date("d.m.Y")
+				} %}%rating% am %date%{% endtrans %}
+				{% else %}—{% endif %}</td>
+			<td>{% if ratingStats.singles.maxRating is not empty %}
+				{% trans with {
+					'%rating%': ratingStats.singles.maxRating,
+					'%date%': ratingStats.singles.maxAt|date("d.m.Y")
+				} %}%rating% am %date%{% endtrans %}
+				{% else %}—{% endif %}</td>
+		</tr>
+		<tr>
+			<th>{% trans %}Doppel{% endtrans %}</th>
+			<td>{% if athlete.doublesRating is not empty %}
+				{{ athlete.doublesRating }}
+				{% else %}—{% endif %}</td>
+			<td>{% if ratingStats.doubles.minRating is not empty %}
+				{% trans with {
+					'%rating%': ratingStats.doubles.minRating,
+					'%date%': ratingStats.doubles.minAt|date("d.m.Y")
+				} %}%rating% am %date%{% endtrans %}
+				{% else %}—{% endif %}</td>
+			<td>{% if ratingStats.doubles.maxRating is not empty %}
+				{% trans with {
+					'%rating%': ratingStats.doubles.maxRating,
+					'%date%': ratingStats.doubles.maxAt|date("d.m.Y")
+				} %}%rating% am %date%{% endtrans %}
+				{% else %}—{% endif %}</td>
+		</tr>
+		<tr>
+			<th>{% trans %}Mixed{% endtrans %}</th>
+			<td>{% if athlete.mixedRating is not empty %}
+				{{ athlete.mixedRating }}
+				{% else %}—{% endif %}</td>
+			<td>{% if ratingStats.mixed.minRating is not empty %}
+				{% trans with {
+					'%rating%': ratingStats.mixed.minRating,
+					'%date%': ratingStats.mixed.minAt|date("d.m.Y")
+				} %}%rating% am %date%{% endtrans %}
+				{% else %}—{% endif %}</td>
+			<td>{% if ratingStats.mixed.maxRating is not empty %}
+				{% trans with {
+					'%rating%': ratingStats.mixed.maxRating,
+					'%date%': ratingStats.mixed.maxAt|date("d.m.Y")
+				} %}%rating% am %date%{% endtrans %}
+				{% else %}—{% endif %}</td>
+		</tr>
+	</tbody>
+	</table>
+
+	<div id="rating-graph" style="width: 95%; height: 350px;">
+		<p>{% trans %}JavaScript notwendig{% endtrans %}</p>
+	</div>
+</section>
 
 </article>
 

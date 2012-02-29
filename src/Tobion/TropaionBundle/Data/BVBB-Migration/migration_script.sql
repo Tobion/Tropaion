@@ -33,6 +33,7 @@ TODO:
 - athletes.country = Integer like 0 instead of 'DE'
 - set venues.lontitude, latitude
 - no_fight boolean -> smallint indicating the team that did not participate
+- tournament.start_date und end_date
 
 
 DBV-Statistik: 4.164 Mitglieder in Berlin-Brandenburg 2009

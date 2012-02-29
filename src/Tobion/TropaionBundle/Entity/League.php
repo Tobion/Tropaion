@@ -22,13 +22,6 @@ class League
 	private $id;
 
 	/**
-	 * @var integer $tournament_id
-	 *
-	 * @ORM\Column(type="integer")
-	 */
-	private $tournament_id;
-
-	/**
 	 * @var string $class_abbr
 	 *
 	 * @ORM\Column(type="string", length=10)
@@ -103,26 +96,6 @@ class League
 	public function getId()
 	{
 		return $this->id;
-	}
-
-	/**
-	 * Set tournament_id
-	 *
-	 * @param string $tournamentId
-	 */
-	public function setTournamentId($tournamentId)
-	{
-		$this->tournament_id = $tournamentId;
-	}
-
-	/**
-	 * Get tournament_id
-	 *
-	 * @return string
-	 */
-	public function getTournamentId()
-	{
-		return $this->tournament_id;
 	}
 
 	/**

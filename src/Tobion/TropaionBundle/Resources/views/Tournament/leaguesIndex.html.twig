@@ -4,9 +4,19 @@
 
 {% block content %}
 
-<article>
+<article id="tournament-leagues">
 	<h1>{% trans %}Ligen{% endtrans %}</h1>
-	<p>Hierarchische Struktur der Ligen (direkt mit der Mannschaftstabelle in Kurzform als Klasseneinteilung)</p>
+	<p>Hierarchische Struktur der Ligen (TODO direkt mit der Mannschaftstabelle in Kurzform als Klasseneinteilung)</p>
+
+	<ol>
+	{% for leagueLevel in leagueHierarchy %}
+		<li><ul>
+		{% for league in leagueLevel %}
+			<li><a href="{{ path('tournament_league', league.routingParams ) }}">{{ league.fullName }}</a></li>
+		{% endfor %}
+		</ul></li>
+	{% endfor %}
+	</ol>
 </article>
 
 {% endblock %}
