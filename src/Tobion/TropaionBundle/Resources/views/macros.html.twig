@@ -35,5 +35,7 @@
 		</dl>
 	{% elseif lineupFirstRound %}
 		<p>{{ _self.lineup_team(lineupFirstRound, tournament) }}</p>
+	{% elseif lineupSecondRound %}
+		<p>{{ _self.lineup_team(lineupSecondRound, tournament) }} {% trans %}(Nur Rückrunde){% endtrans %}</p>
 	{% endif %}
 {% endmacro %}

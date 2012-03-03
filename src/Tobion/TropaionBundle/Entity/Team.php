@@ -278,22 +278,7 @@ class Team
 
 	public function hasLineupChanged()
 	{
-		$firstRoundLineup = array();
-		$secondRoundLineup = array();
-		foreach ($this->Lineups as $lineup) {
-			if ($lineup->getStage() == 1) {
-				$firstRoundLineup[$lineup->getAthlete()->getId()] = $lineup->getPosition();
-			}
-			else {
-				$secondRoundLineup[$lineup->getAthlete()->getId()] = $lineup->getPosition();
-			}
-		}
-
-		// wenn noch keine Aufstellung für Rückrunde vorhanden -> Aufstellung nicht geändert
-		// die Überprüfung auf gleiche Anzahl an Elementen ist wichtig, da array_diff_assoc abhängig von der Reihenfolge der Parameter ist
-		return count($secondRoundLineup) > 0 && 
-			(count($secondRoundLineup) != count($firstRoundLineup) || count(array_diff_assoc($firstRoundLineup, $secondRoundLineup)) > 0);
-
+		return Lineup::hasLineupChanged($this->Lineups);
 	}
 
 
@@ -334,6 +319,11 @@ class Team
 		return $this->Club->getName() . 
 			($html ? '&#160;' /* '&nbsp;' */ : ' ') . 
 			($toRoman ? RomanNumeral::convertIntToRoman($this->getTeamNumber()) : $this->getTeamNumber());
+	}
+
+	public function isSubstitute()
+	{
+		return $this->getLeague()->isSubstitute();
 	}
 
 

@@ -37,6 +37,7 @@ class Athlete
 	private $first_name;
 
 	/**
+	 * Man (male) or Woman (female)
 	 * @var string $gender
 	 *
 	 * @ORM\Column(type="string", length=6)

@@ -68,7 +68,7 @@ class ProfileController extends Controller
 			$tl =& $tournamentLineups[$lineup->getTeam()->getLeague()->getTournament()->getId()];
 			$tl['tournament'] = $lineup->getTeam()->getLeague()->getTournament();
 			$tl['lineups'][$lineup->getStage()] = $lineup;
-			$tl['lineupChanged'] = Entity\Lineup::lineupChanged($tl['lineups']);
+			$tl['lineupChanged'] = Entity\Lineup::hasLineupChanged($tl['lineups']);
 		}
 
 

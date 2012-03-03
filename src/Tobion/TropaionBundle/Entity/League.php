@@ -317,6 +317,11 @@ class League
 		return $this->getClassName() . ($this->getDivision() != 0 ? ' ' . $this->getDivision() : '');
 	}
 
+	public function isSubstitute()
+	{
+		return $this->getClassLevel() == 255;
+	}
+
 	function __toString()
 	{
 		return $this->getShortName();

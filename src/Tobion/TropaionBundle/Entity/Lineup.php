@@ -136,7 +136,7 @@ class Lineup
 
 	public function isSubstitute()
 	{
-		return $this->getTeam()->getLeague()->getClassLevel() == 255;
+		return $this->getTeam()->isSubstitute();
 	}
 
 	function __toString()
@@ -146,27 +146,42 @@ class Lineup
 			$this->position, $this->stage
 		);
 	}
-
+	
 	/**
+	 * Has lineup changed between stage 1 and stage 2?
+	 * Handles both the lineup of a single athlete and a whole team.
+	 * It ignores null values.
 	 *
-	 * @param array $lineups array of Lineup instances
+	 * @param array|Traversable $lineups sequence of Lineup instances
 	 * @return Boolean
 	 */
-	public static function lineupChanged($lineups)
+	public static function hasLineupChanged($lineups)
 	{
-		$prev = null;
+		$prevTeam = null;
+		$firstStageLineup = array();
+		$secondStageLineup = array();
+		
 		foreach ($lineups as $lineup) {
-			if ($prev && $lineup) {
-				if ($lineup->getTeam() !== $prev->getTeam() ||
-					$lineup->getPosition() !== $prev->getPosition()) {
-
-					return true;
-				}
-			} else if ($lineup) {
-				$prev = $lineup;
+			if (!$lineup) {
+				continue;
+			}
+			if (!$prevTeam) {
+				$prevTeam = $lineup->getTeam();
+			} else if ($prevTeam !== $lineup->getTeam()) {
+				return true;
+			}
+			if ($lineup->getStage() == 1) {
+				$firstStageLineup[$lineup->getAthlete()->getId()] = $lineup->getPosition();
+			} else {
+				$secondStageLineup[$lineup->getAthlete()->getId()] = $lineup->getPosition();
 			}
 		}
 
-		return false;
+		// wenn noch keine Aufstellung für Rückrunde vorhanden oder nur Rückrundenaufstellung vorliegend -> Aufstellung nicht geändert
+		// die Überprüfung auf gleiche Anzahl an Elementen ist wichtig, da array_diff_assoc abhängig von der Reihenfolge der Parameter ist
+		return count($firstStageLineup) > 0 && count($secondStageLineup) > 0 &&
+			(count($firstStageLineup) !== count($secondStageLineup) || count(array_diff_assoc($firstStageLineup, $secondStageLineup)) > 0);
 	}
+
+
 }

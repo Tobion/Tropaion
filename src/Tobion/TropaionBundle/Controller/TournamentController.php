@@ -160,8 +160,54 @@ class TournamentController extends Controller
 	{
 		$tournament = $this->getTournament();
 
+		$em = $this->getDoctrine()->getEntityManager();
+
+		/* TODO improve performance by not hydrating lineup and athlete,
+			instead use aggregation on database level */
+		$qb = $em->createQueryBuilder();
+		$qb->select(array('t','c','l','lu','a'))
+			->from('TobionTropaionBundle:Team', 't')
+			->innerJoin('t.Club', 'c')
+			->innerJoin('t.League', 'l')
+			->innerJoin('t.Lineups', 'lu')
+			->innerJoin('lu.Athlete', 'a')
+			->where($qb->expr()->eq('l.Tournament', ':tournament_id'))
+			->andWhere($qb->expr()->eq('lu.stage', ':stage'))
+			->orderBy('c.name', 'ASC')
+			->addOrderBy('t.team_number', 'ASC')
+			->setParameter('tournament_id', $tournament->getId())
+			->setParameter('stage', 1);
+
+		$teams = $qb->getQuery()->getResult();
+
+		$clubTeams = array();
+		foreach ($teams as $team) {
+			$c =& $clubTeams[$team->getClub()->getId()];
+			$c['club'] = $team->getClub();
+			if (!isset($c['nbTeams'])) {
+				$c['nbTeams'] = $c['nbAthletes'] = $c['nbMen'] = $c['nbWomen'] = $c['nbSubstitutes'] = 0;
+			}
+			if (!$team->isSubstitute()) {
+				$c['teams'][$team->getId()] = $team;
+				$c['nbTeams'] += 1;
+			}
+
+			foreach ($team->getLineups() as $lineup) {
+				$c['nbAthletes'] += 1;
+				if ($lineup->getAthlete()->getGender() === 'male') {
+					$c['nbMen'] += 1;
+				} else {
+					$c['nbWomen'] += 1;
+				}
+				if ($lineup->isSubstitute()) {
+					$c['nbSubstitutes'] += 1;
+				}
+			}
+		}
+
 		return array(
 			'tournament' => $tournament,
+			'clubTeams' => $clubTeams,
 		);
 
 	}
@@ -545,17 +591,18 @@ class TournamentController extends Controller
 			->setParameter('athlete_id', $athlete->getId())
 			->setParameter('tournament_id', $tournament->getId());
 
+		/* TODO prepare query?! */
 		$qb->setParameter('stage', 1);
-		$lineupFirstRound = $qb->getQuery()->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
+		$lineupFirstRound = $qb->getQuery()->getOneOrNullResult();
 
 		$qb->setParameter('stage', 2);
-		$lineupSecondRound = $qb->getQuery()->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
+		$lineupSecondRound = $qb->getQuery()->getOneOrNullResult();
 
 		if (!$matches && !$lineupFirstRound && !$lineupSecondRound) {
 			throw $this->createNotFoundException('Athlete not participating in tournament.');
 		}
 
-		$lineupChanged = Entity\Lineup::lineupChanged(array($lineupFirstRound, $lineupSecondRound));
+		$lineupChanged = Entity\Lineup::hasLineupChanged(array($lineupFirstRound, $lineupSecondRound));
 
 		$wins = $draws = $losses = $winsPercent = $drawsPercent = $lossesPercent = $noFights = $myGames = $opponentGames = $myPoints = $opponentPoints = 0;
 		$nbPartners = $nbTeammatches = $nbMyTeams = array();

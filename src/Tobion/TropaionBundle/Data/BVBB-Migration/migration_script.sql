@@ -34,6 +34,7 @@ TODO:
 - set venues.lontitude, latitude
 - no_fight boolean -> smallint indicating the team that did not participate
 - tournament.start_date und end_date
+- venues.code & clubs.code -> slug + short_name, clubs.name -> full_name
 
 
 DBV-Statistik: 4.164 Mitglieder in Berlin-Brandenburg 2009

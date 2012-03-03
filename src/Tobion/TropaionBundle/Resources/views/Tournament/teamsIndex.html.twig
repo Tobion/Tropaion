@@ -6,7 +6,11 @@
 
 <article id="tournament-teams">
 	<h1>{% trans %}Vereine &amp; Mannschaften{% endtrans %}</h1>
-	
+
+<section>
+	<h2>{% trans %}Übersicht{% endtrans %}</h2>
+
+	{#
 	<ul>
 		<li>Verein: Anz. Mannschaften, Spieler (Herren, Damen) + davon Ersatzspieler, Ansässiger Ort-Bezirk
 			<ol>
@@ -15,6 +19,24 @@
 			</ol>
 		</li>
 	</ul>
+	#}
+
+	<ul>
+	{% for clubTeam in clubTeams %}
+		<li><a href="{{ path('tournament_club', clubTeam.club.routingParams(tournament) ) }}">{{ clubTeam.club.name }}</a> : {{ clubTeam.nbTeams }} Mannschaften &amp; {{ clubTeam.nbAthletes }} Spieler (davon {{ clubTeam.nbMen }} Männer, {{ clubTeam.nbWomen }} Frauen, {{ clubTeam.nbSubstitutes }} Ersatzspieler/innen)<ol>
+		{% for team in clubTeam.teams %}
+			<li><a href="{{ path('tournament_team', team.routingParams ) }}">{{ team }}</a> in Liga <a href="{{ path('tournament_league', team.league.routingParams ) }}">{{ team.league.shortName }}</a></li>
+		{% endfor %}
+		</ol></li>
+	{% endfor %}
+	</ul>
+</section>
+
+<section id="lineup-change">
+	<h2>{% trans %}Ummeldungen zur Rückrunde{% endtrans %}</h2>
+	<p>TODO</p>
+</section>
+
 </article>
 
 {% endblock %}
