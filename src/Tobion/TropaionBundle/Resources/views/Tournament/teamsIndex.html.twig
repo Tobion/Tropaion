@@ -21,13 +21,19 @@
 	</ul>
 	#}
 
-	<ul>
+	<ul style="column-count:3; column-gap:20px; -webkit-column-count: 3; -webkit-column-gap:20px; -moz-column-count:3; -moz-column-gap:20px; -o-column-count:3; -o-column-gap:20px;">
 	{% for clubTeam in clubTeams %}
-		<li><a href="{{ path('tournament_club', clubTeam.club.routingParams(tournament) ) }}">{{ clubTeam.club.name }}</a> : {{ clubTeam.nbTeams }} Mannschaften &amp; {{ clubTeam.nbAthletes }} Spieler (davon {{ clubTeam.nbMen }} Männer, {{ clubTeam.nbWomen }} Frauen, {{ clubTeam.nbSubstitutes }} Ersatzspieler/innen)<ol>
-		{% for team in clubTeam.teams %}
-			<li><a href="{{ path('tournament_team', team.routingParams ) }}">{{ team }}</a> in Liga <a href="{{ path('tournament_league', team.league.routingParams ) }}">{{ team.league.shortName }}</a></li>
-		{% endfor %}
-		</ol></li>
+		<li>
+			<a href="{{ path('tournament_club', clubTeam.club.routingParams(tournament) ) }}">{{ clubTeam.club.name }}</a>
+			<div>{{ clubTeam.nbTeams }} Mannschaften &amp; {{ clubTeam.nbAthletes }} Spieler
+				<span title="{{ clubTeam.nbMen }} Männer, {{ clubTeam.nbWomen }} Frauen, {{ clubTeam.nbSubstitutes }} Ersatzspieler/innen">({{ clubTeam.nbMen }} ♂, {{ clubTeam.nbWomen }} ♀, {{ clubTeam.nbSubstitutes }} ⇄)</span>
+			</div>
+			<ol>
+			{% for team in clubTeam.teams %}
+				<li><a href="{{ path('tournament_team', team.routingParams ) }}">{{ team }}</a> in Liga <a href="{{ path('tournament_league', team.league.routingParams ) }}">{{ team.league.shortName }}</a></li>
+			{% endfor %}
+			</ol>
+		</li>
 	{% endfor %}
 	</ul>
 </section>

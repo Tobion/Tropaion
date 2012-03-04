@@ -131,9 +131,14 @@ class TournamentController extends Controller
 		$rep = $this->getDoctrine()->getRepository('TobionTropaionBundle:League');
 		$leagueHierarchy = $rep->getTournamentLeaguesHierarchically($tournament);
 
+		$nbLeagueClasses = count($leagueHierarchy);
+		$nbLeagueDivisions = count($leagueHierarchy, COUNT_RECURSIVE) - $nbLeagueClasses;
+
 		return array(
 			'tournament' => $tournament,
 			'leagueHierarchy' => $leagueHierarchy,
+			'nbLeagueClasses' => $nbLeagueClasses,
+			'nbLeagueDivisions' => $nbLeagueDivisions,
 		);
 
 	}
@@ -162,46 +167,50 @@ class TournamentController extends Controller
 
 		$em = $this->getDoctrine()->getEntityManager();
 
-		/* TODO improve performance by not hydrating lineup and athlete,
-			instead use aggregation on database level */
 		$qb = $em->createQueryBuilder();
-		$qb->select(array('t','c','l','lu','a'))
+		$qb->select(array('t','c','l'))
 			->from('TobionTropaionBundle:Team', 't')
 			->innerJoin('t.Club', 'c')
 			->innerJoin('t.League', 'l')
-			->innerJoin('t.Lineups', 'lu')
-			->innerJoin('lu.Athlete', 'a')
 			->where($qb->expr()->eq('l.Tournament', ':tournament_id'))
-			->andWhere($qb->expr()->eq('lu.stage', ':stage'))
+			->andWhere($qb->expr()->neq('l.class_level', ':class_level'))
 			->orderBy('c.name', 'ASC')
 			->addOrderBy('t.team_number', 'ASC')
 			->setParameter('tournament_id', $tournament->getId())
-			->setParameter('stage', 1);
+			->setParameter('class_level', 255);
 
 		$teams = $qb->getQuery()->getResult();
+
+		$query = 'SELECT COUNT(DISTINCT(IF(l.class_level = 255, NULL, t.id))) AS nbTeams,
+				COUNT(*) AS nbAthletes,
+				SUM(a.gender = "male") AS nbMen, SUM(a.gender = "female") AS nbWomen,
+				SUM(l.class_level = 255) AS nbSubstitutes
+			FROM lineups lu
+			INNER JOIN athletes a ON a.id = lu.athlete_id
+			INNER JOIN teams t ON t.id = lu.team_id
+			INNER JOIN clubs c ON c.id = t.club_id
+			INNER JOIN leagues l ON l.id = t.league_id
+			WHERE l.tournament_id = :TOURNAMENT AND lu.stage = :STAGE
+			GROUP BY c.id
+			ORDER BY c.name ASC';
+
+		$conn = $em->getConnection();
+		$stmt = $conn->prepare($query);
+
+		$sqlParams = array();
+		$sqlParams['STAGE'] = 1;
+		$sqlParams['TOURNAMENT'] = $tournament->getId();
+
+		$stmt->execute($sqlParams);
+		$clubAthleteStats = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
 		$clubTeams = array();
 		foreach ($teams as $team) {
 			$c =& $clubTeams[$team->getClub()->getId()];
-			$c['club'] = $team->getClub();
-			if (!isset($c['nbTeams'])) {
-				$c['nbTeams'] = $c['nbAthletes'] = $c['nbMen'] = $c['nbWomen'] = $c['nbSubstitutes'] = 0;
-			}
-			if (!$team->isSubstitute()) {
-				$c['teams'][$team->getId()] = $team;
-				$c['nbTeams'] += 1;
-			}
-
-			foreach ($team->getLineups() as $lineup) {
-				$c['nbAthletes'] += 1;
-				if ($lineup->getAthlete()->getGender() === 'male') {
-					$c['nbMen'] += 1;
-				} else {
-					$c['nbWomen'] += 1;
-				}
-				if ($lineup->isSubstitute()) {
-					$c['nbSubstitutes'] += 1;
-				}
+			$c['teams'][$team->getId()] = $team;
+			if (!isset($c['club'])) {
+				$c['club'] = $team->getClub();
+				$c += array_shift($clubAthleteStats);
 			}
 		}
 

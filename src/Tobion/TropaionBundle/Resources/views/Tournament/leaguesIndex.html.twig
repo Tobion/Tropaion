@@ -17,6 +17,8 @@
 		</ul></li>
 	{% endfor %}
 	</ol>
+
+	<p>{% trans with { '%nbLeagueDivisions%': nbLeagueDivisions, '%nbLeagueClasses%': nbLeagueClasses  } %}%nbLeagueDivisions% Staffeln in %nbLeagueClasses% Klassen{% endtrans %}</p>
 </article>
 
 {% endblock %}
