@@ -1134,14 +1134,14 @@ class Teammatch
 	public function getTeam1ScoreVisibly()
 	{
 		return $this->getTeam1Score() === null ?
-			($this->Submitted_By === null ? '‒' : '?') :
+			($this->Submitted_By === null ? '?' : '‒') :
 			$this->getTeam1Score();
 	}
 
 	public function getTeam2ScoreVisibly()
 	{
 		return $this->getTeam2Score() === null ?
-			($this->Submitted_By === null ? '‒' : '?') :
+			($this->Submitted_By === null ? '?' : '‒') :
 			$this->getTeam2Score();
 	}
 
