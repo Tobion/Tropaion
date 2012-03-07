@@ -1,0 +1,17 @@
+{% extends "TobionTropaionBundle::layout.html.twig" %}
+
+{% block title %}
+	{% trans with { '%statusText%': status_text|trans } %}Ein Fehler trat auf: %status_text%{% endtrans %}
+{% endblock %}
+
+{% block content %}
+
+<article id="error-page">
+	<h1>{% trans %}Ops! Ein Fehler ist aufgetreten.{% endtrans %}</h1>
+	<h2>Der Server gab den HTTP Fehlercode "{{ status_code }} {{ status_text }}" zurück.</h2>
+
+	<p>{% trans %}Es ist entweder ein unerwarteter Fehler aufgetreten 
+		oder die angeforderte Funktionalität ist noch nicht implementiert.{% endtrans %}</p>
+</article>
+
+{% endblock %}
