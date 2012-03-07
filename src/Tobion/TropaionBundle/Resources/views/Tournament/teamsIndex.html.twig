@@ -21,6 +21,12 @@
 	</ul>
 	#}
 
+	{# TODO translatable #}
+	<p>Insgesamt treten {{ nbTeams }} Mannschaften von {{ nbClubs }} Vereinen bzw. Spielgemeinschaften an. 
+		Es wurden {{ nbAthletes }} Spieler gemeldet, 
+		davon sind {{ nbMen }} Männer ♂, {{ nbWomen }} Frauen ♀ und {{ nbSubstitutes }} Ersatzspieler/innen ⇄.
+	</p>
+
 	<ul style="column-count:3; column-gap:20px; -webkit-column-count: 3; -webkit-column-gap:20px; -moz-column-count:3; -moz-column-gap:20px; -o-column-count:3; -o-column-gap:20px;">
 	{% for clubTeam in clubTeams %}
 		<li>

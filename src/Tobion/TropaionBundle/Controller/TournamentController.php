@@ -202,7 +202,11 @@ class TournamentController extends Controller
 		$sqlParams['TOURNAMENT'] = $tournament->getId();
 
 		$stmt->execute($sqlParams);
-		$clubAthleteStats = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+		$clubStats = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+		$nbClubs = count($clubStats);
+		$nbTeams = count($teams);
+		$nbAthletes = $nbMen = $nbWomen = $nbSubstitutes = 0;
 
 		$clubTeams = array();
 		foreach ($teams as $team) {
@@ -210,13 +214,23 @@ class TournamentController extends Controller
 			$c['teams'][$team->getId()] = $team;
 			if (!isset($c['club'])) {
 				$c['club'] = $team->getClub();
-				$c += array_shift($clubAthleteStats);
+				$c += array_shift($clubStats);
+				$nbAthletes += $c['nbAthletes'];
+				$nbMen += $c['nbMen'];
+				$nbWomen += $c['nbWomen'];
+				$nbSubstitutes += $c['nbSubstitutes'];
 			}
 		}
 
 		return array(
 			'tournament' => $tournament,
 			'clubTeams' => $clubTeams,
+			'nbClubs' => $nbClubs,
+			'nbTeams' => $nbTeams,
+			'nbAthletes' => $nbAthletes,
+			'nbMen' => $nbMen,
+			'nbWomen' => $nbWomen,
+			'nbSubstitutes' => $nbSubstitutes,
 		);
 
 	}
