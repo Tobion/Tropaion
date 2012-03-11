@@ -9,6 +9,7 @@
 	xmlns:dc="http://purl.org/dc/terms/"
 	xmlns:foaf="http://xmlns.com/foaf/0.1/"
 	xmlns:og="http://ogp.me/ns#"
+	xmlns:fb="http://ogp.me/ns/fb#"
 	xmlns:sport="http://purl.org/sport/ontology/"
 	class="no-js">
 <head{% if pageRdfId is defined %} about="{{ pageRdfId }}"{% endif %}>
@@ -35,6 +36,7 @@
 	{% block metas %}
 		<meta name="publisher" property="dc:publisher" content="{% if tournament is defined %}{{ tournament.owner.fullName }}{% else %}Badminton-Verband Berlin-Brandenburg e.V.{% endif %}" />
 		<meta name="generator" property="dc:creator" content="Tropaion" />
+		<meta property="fb:app_id" content="TODO">
 	{% endblock %}
 
 	{% block head_javascripts %}
@@ -71,7 +73,7 @@
 				<li><a href="{{ path('home_clubs') }}">
 					{% trans %}Vereine{% endtrans %}</a>
 				</li>
-				<li><a href="">
+				<li><a href="{{ path('home_venues') }}">
 					{% trans %}Hallen{% endtrans %}</a>
 				</li>
 				<li>
@@ -150,19 +152,19 @@
 
 		<nav id="main-footer-menu">
 			<ul>
-				<li><a href="">
+				<li><a href="{{ path('home_help') }}">
 					{% trans %}Hilfe / Über{% endtrans %}</a>
 				</li>
-				<li><a href="">
+				<li><a href="{{ path('home_contact') }}">
 					{% trans %}Feedback{% endtrans %}</a>
 				</li>
-				<li><a href="">
+				<li><a href="{{ path('home_privacy') }}">
 					{% trans %}Datenschutz{% endtrans %}</a>
 				</li>
-				<li><a href="">
+				<li><a href="{{ path('home_developer') }}">
 					{% trans %}Entwickler{% endtrans %}</a>
 				</li>
-				<li><a href="">
+				<li><a href="{{ path('home_imprint') }}">
 					{% trans %}Impressum{% endtrans %}</a>
 				</li>
 			</ul>

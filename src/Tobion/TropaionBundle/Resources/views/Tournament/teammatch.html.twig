@@ -70,7 +70,7 @@
 		{% endif %}{% endspaceless %}" />{% endif %}
 
 	<meta property="og:type" content="sport" />
-	<meta property="og:url" content="{{ teammatchRdfUri }}" />
+	<meta property="og:url" content="{{ url('tournament_teammatch', teammatch.routingParams ) }}" />
 	<meta property="og:street-address" content="{{ teammatch.venue.street }}" />
 	<meta property="og:postal-code" content="{{ teammatch.venue.zip }}" />
 {% endblock %}

@@ -5,7 +5,7 @@
 {% block metas %}
 	{{ parent() }}
 	<meta property="og:type" content="sports_team" />
-	<meta property="og:url" content="{{ path('profile_club', club.routingParams ) }}" />
+	<meta property="og:url" content="{{ url('profile_club', club.routingParams ) }}" />
 {% endblock %}
 
 {% block content %}

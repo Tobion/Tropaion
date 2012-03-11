@@ -1,0 +1,55 @@
+{% extends "TobionTropaionBundle::layout.html.twig" %}
+
+{% block metas %}
+	{{ parent() }}
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="{{ url('home') }}" />
+{% endblock %}
+
+{% block content %}
+
+<article id="homepage">
+
+<header id="about-abstract">
+	<h1>{% trans %}Über Tropaion{% endtrans %}</h1>
+
+	<p>TODO <a href="{{ path('home_help') }}">mehr Informationen...</a></p>
+</header>
+
+<section id="current-tournaments">
+	<h2>{% trans %}Aktuelle Turniere{% endtrans %}</h2>
+	<p>aktuelle Turniere mit Statistiken wie Anzahl der Spieler ...</p>
+	<p>Link zu vergangenen Turnieren</p>
+</section>
+
+<section id="leagues-teaser">
+	<h2>{% trans %}Top Liga{% endtrans %}</h2>
+
+	<p>BBL: Tabelle erste 3</p>
+
+	<h2>{% trans %}Spannendste Liga{% endtrans %}</h2>
+
+	<p>...</p>
+</section>
+
+<section id="athletes-teaser">
+	<h2 id="top-men">{% trans %}Männer Top 5{% endtrans %}</h2>
+	
+	<p>Nach Rating bzw. Siegquote der aktiven Spieler</p>
+
+	<h2 id="top-women">{% trans %}Frauen Top 5{% endtrans %}</h2>
+
+	<p>Nach Rating bzw. Siegquote der aktiven Spieler</p>
+
+	<h2 id="aspiring-players">{% trans %}Aufstrebende Spieler{% endtrans %}</h2>
+
+	<p>Nach Ratingveränderung in letzter Zeit bzw. Siegesserie</p>
+
+	<h2 id="most-active-players">{% trans %}Aktivste Spieler{% endtrans %}</h2>
+
+	<p>Nach Anzahl der Spiele</p>
+</section>
+
+</article>
+
+{% endblock %}

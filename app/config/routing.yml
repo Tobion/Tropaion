@@ -1,5 +1,11 @@
-TobionTropaionBundle:
-    resource: "@TobionTropaionBundle/Controller/"
+tropaion_home:
+    resource: "@TobionTropaionBundle/Controller/HomeController.php"
     type:     annotation
-    prefix:   /
 
+tropaion_profile:
+    resource: "@TobionTropaionBundle/Controller/ProfileController.php"
+    type:     annotation
+
+tropaion_tournament:
+    resource: "@TobionTropaionBundle/Controller/TournamentController.php"
+    type:     annotation

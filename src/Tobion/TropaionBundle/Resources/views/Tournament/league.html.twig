@@ -146,7 +146,7 @@
 	{% if nextLeague %}<link rel="next" href="{{ path('tournament_league', nextLeague.routingParams ) }}" title="{{ nextLeague.className }} {{ nextLeague.division }}" />{% endif %}
 
 	<meta property="og:type" content="sports_league" />
-	<meta property="og:url" content="{{ leagueRdfUri }}" />
+	<meta property="og:url" content="{{ url('tournament_league', league.routingParams ) }}" />
 {% endblock %}
 
 {% block content %}

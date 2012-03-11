@@ -19,7 +19,12 @@ class HomeController extends Controller
 	 */
 	public function homeAction()
 	{
+		// aktuelle Turniere mit Statistiken wie Anzahl der Spieler ...
+		// Top Liga (BBL): Tabelle erste 3
+		// Spannendste Liga: ...
+		// Männer Top 10, Frauen Top 10, Newcomer (Top der Woche)
 
+		return array();
 	}
 
 	/**
@@ -50,12 +55,21 @@ class HomeController extends Controller
 	}
 
 	/**
+	 * @Route("/venues", name="home_venues")
+	 * @Template()
+	 */
+	public function venuesAction()
+	{
+
+	}
+
+	/**
 	 * @Route("/rankings", name="home_rankings") 
 	 * @Template()
 	 */
 	public function rankingsAction()
 	{
-
+		return array();
 	}
 
 	/**
@@ -63,6 +77,51 @@ class HomeController extends Controller
 	 * @Template()
 	 */
 	public function searchAction()
+	{
+
+	}
+
+	/**
+	 * @Route("/help", name="home_help")
+	 * @Template()
+	 */
+	public function helpAction()
+	{
+
+	}
+
+	/**
+	 * @Route("/contact", name="home_contact")
+	 * @Template()
+	 */
+	public function contactAction()
+	{
+
+	}
+
+	/**
+	 * @Route("/privacy", name="home_privacy")
+	 * @Template()
+	 */
+	public function privacyAction()
+	{
+
+	}
+
+	/**
+	 * @Route("/developer", name="home_developer")
+	 * @Template()
+	 */
+	public function developerAction()
+	{
+
+	}
+
+	/**
+	 * @Route("/imprint", name="home_imprint")
+	 * @Template()
+	 */
+	public function imprintAction()
 	{
 
 	}
