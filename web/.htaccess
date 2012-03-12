@@ -1,9 +1,17 @@
+# ----------------------------------------------------------------------
+# Symfony2 rewrite to front controller
+# ----------------------------------------------------------------------
+
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^(.*)$ app.php [QSA,L]
 </IfModule>
 
+
+# ----------------------------------------------------------------------
+# HTML5 Boilerplate
+# ----------------------------------------------------------------------
 
 # Apache configuration file
 # httpd.apache.org/docs/2.2/mod/quickreference.html
