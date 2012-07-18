@@ -4,14 +4,14 @@ namespace Tobion\TropaionBundle\Form\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\Event\FilterDataEvent;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 use Tobion\TropaionBundle\Entity\Match;
 
 /**
- * This listener removes empty games from the games collection of matches
- * It also reassigns the game_sequence of games
+ * This listener removes empty games from the games collection of matches.
+ * It also reassigns the game_sequence of games.
  * 
  *
  * @author Tobias Schultze <http://www.tobion.de>
@@ -21,10 +21,9 @@ class RemoveEmptyGamesListener implements EventSubscriberInterface
 	public static function getSubscribedEvents()
 	{
 		return array(
-			FormEvents::BIND_NORM_DATA  => 'onBindNormData'
+			FormEvents::BIND => 'onBindData'
 		);
 	}
-
 
 	/**
 	 * Inspired by MergeCollectionListener
@@ -32,7 +31,7 @@ class RemoveEmptyGamesListener implements EventSubscriberInterface
 	 *
 	 * @param FilterDataEvent $event
 	 */
-	public function onBindNormData(FilterDataEvent $event)
+	public function onBindData(FormEvent $event)
 	{
 		$match = $event->getData();
 
@@ -61,5 +60,4 @@ class RemoveEmptyGamesListener implements EventSubscriberInterface
 
 		$event->setData($match);
 	}
-
 }

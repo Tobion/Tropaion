@@ -3,7 +3,8 @@
 namespace Tobion\TropaionBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Tobion\TropaionBundle\Form\EventListener\AddAthletesListener;
 use Tobion\TropaionBundle\Form\EventListener\TransformAthletesListener;
@@ -18,7 +19,7 @@ class BadmintonMatchType extends AbstractType
 		$this->registry = $registry;
 	}
 
-	public function buildForm(FormBuilder $builder, array $options)
+	public function buildForm(FormBuilderInterface $builder, array $options)
 	{
 		$builder->add('noresult', 'checkbox', array(
 			'required' => false
@@ -58,9 +59,9 @@ class BadmintonMatchType extends AbstractType
 
 
 		$builder->add('games', 'collection', array(
-			'type' => new BadmintonGameType(), 
-			'allow_add' => false, 
-			'allow_delete' => false, 
+			'type' => new BadmintonGameType(),
+			'allow_add' => false,
+			'allow_delete' => false,
 			'prototype' => false,
 			'by_reference' => true,
 			'error_bubbling' => false // so we can assign errors to this collection
@@ -72,11 +73,11 @@ class BadmintonMatchType extends AbstractType
 
 	}
 
-	public function getDefaultOptions(array $options)
+	public function setDefaultOptions(OptionsResolverInterface $resolver)
 	{
-		return array(
+		$resolver->setDefaults(array(
 			'data_class' => 'Tobion\TropaionBundle\Entity\Match',
-		);
+		));
 	}
 
 	public function getName()

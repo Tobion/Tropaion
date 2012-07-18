@@ -5,12 +5,12 @@ namespace Tobion\TropaionBundle\Form\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\Event\DataEvent;
+use Symfony\Component\Form\FormEvent;
 
 use Tobion\TropaionBundle\Entity\Match;
 
 /**
- * Adds form fields for athletes depending on the match type
+ * Adds form fields for athletes depending on the match type.
  *
  * @author Tobias Schultze <http://www.tobion.de>
  */
@@ -30,7 +30,7 @@ class AddAthletesListener implements EventSubscriberInterface
 		return array(FormEvents::PRE_SET_DATA => 'preSetData');
 	}
 
-	public function preSetData(DataEvent $event)
+	public function preSetData(FormEvent $event)
 	{
 		$match = $event->getData();
 		$form = $event->getForm();
@@ -60,8 +60,8 @@ class AddAthletesListener implements EventSubscriberInterface
 			)
 		);
 
-		$form->add($this->factory->createNamed('text', 'team1_player_readable_id', null, $fieldOptions));
-		$form->add($this->factory->createNamed('text', 'team2_player_readable_id', null, $fieldOptions));
+		$form->add($this->factory->createNamed('team1_player_readable_id', 'text', null, $fieldOptions));
+		$form->add($this->factory->createNamed('team2_player_readable_id', 'text', null, $fieldOptions));
 
 		// in doubles add second field for both teams
 		if ($match->getMatchType()->getXOnX() != 1) {
@@ -69,8 +69,8 @@ class AddAthletesListener implements EventSubscriberInterface
 			$fieldOptions['attr']['data-gender'] = $matchType->getGender() == 0 ? 'both' : 
 				($matchType->getGender() == 1 ? 'male' : 'female');
 
-			$form->add($this->factory->createNamed('text', 'team1_partner_readable_id', null, $fieldOptions));
-			$form->add($this->factory->createNamed('text', 'team2_partner_readable_id', null, $fieldOptions));
+			$form->add($this->factory->createNamed('team1_partner_readable_id', 'text', null, $fieldOptions));
+			$form->add($this->factory->createNamed('team2_partner_readable_id', 'text', null, $fieldOptions));
 		}
 	}
 }

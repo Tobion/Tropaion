@@ -3,11 +3,12 @@
 namespace Tobion\TropaionBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class BadmintonGameType extends AbstractType
 {
-	public function buildForm(FormBuilder $builder, array $options)
+	public function buildForm(FormBuilderInterface $builder, array $options)
 	{
 		$builder->add('annulled', 'hidden');
 
@@ -31,15 +32,14 @@ class BadmintonGameType extends AbstractType
 				'autocomplete' => 'off'
 			)
 		));
-
 	}
 
-	public function getDefaultOptions(array $options)
+	public function setDefaultOptions(OptionsResolverInterface $resolver)
 	{
-		return array(
+		$resolver->setDefaults(array(
 			'data_class' => 'Tobion\TropaionBundle\Entity\Game',
-			'error_bubbling'    => false
-		);
+			'error_bubbling' => false
+		));
 	}
 
 	public function getName()

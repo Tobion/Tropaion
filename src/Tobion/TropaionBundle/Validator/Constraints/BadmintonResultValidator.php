@@ -4,17 +4,17 @@ namespace Tobion\TropaionBundle\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 use Tobion\TropaionBundle\Entity\Match;
 use Tobion\TropaionBundle\Entity\Game;
 
 /**
- * 
+ *
  */
 class BadmintonResultValidator extends ConstraintValidator
 {
-
-	public function isValid($match, Constraint $constraint)
+	public function validate($match, Constraint $constraint)
 	{
 		if (!$match instanceof Match) {
 			throw new UnexpectedTypeException($match, 'Tobion\TropaionBundle\Entity\Match');
@@ -23,33 +23,22 @@ class BadmintonResultValidator extends ConstraintValidator
 		if ($match->noresult) {
 			// wenn noresult -> gewert. Ergebnis muss leer sein
 			if (count($match->getEffectiveGames()) > 0) {
-				$this->addError('.noresult', $constraint->contradictoryNoResult, $this->context->getPropertyPath());
+                //var_dump($this->context->getPropertyPath());
+                $this->context->addViolationAtSubPath('noresult', $constraint->contradictoryNoResult, array(), $match->noresult);
 			}
 		} else {
-			
-			$basePath = strstr($this->context->getPropertyPath(), '.', true);
-			
 			if (!$this->isBadmintonMatchResultValid($match)) {
-				$this->addError('[games]', $constraint->invalidMatchResult, $basePath);
+                $this->context->addViolationAtSubPath('[games]', $constraint->invalidMatchResult);
 			}
 
 			foreach ($match->getGames() as $index => $game) {
 				if (!$game->getAnnulled()) { // do not validate annulled / given-up game
 					if (!$this->isBadmintonGameResultValid($game)) {
-						$this->addError("[games][$index]", $constraint->invalidGameResult, $basePath);
+                        $this->context->addViolationAtSubPath("[games][$index]", $constraint->invalidGameResult, array(), $game);
 					}
 				}
 			}
-			
-		}		
-
-		return true; // always true, we added the violations already
-	}
-	
-	private function addError($propertyPath, $message, $basePath = '')
-	{
-		$this->context->setPropertyPath($basePath . $propertyPath);
-		$this->context->addViolation($message, array(), null);
+		}
 	}
 
 	private function isBadmintonGameResultValid(Game $game)
@@ -59,10 +48,10 @@ class BadmintonResultValidator extends ConstraintValidator
 
 		if ($biggerScore === 21) {
 			return ($smallerScore >= 0 && $smallerScore <= 19 && is_int($smallerScore)); // is_int because NULL >= 0 -> true
-		} 
+		}
 		else if ($biggerScore > 21 && $biggerScore <= 29) {
 			return ($smallerScore === $biggerScore - 2);
-		} 
+		}
 		else if ($biggerScore === 30) {
 			return ($smallerScore === 28 || $smallerScore === 29);
 		}
@@ -72,12 +61,12 @@ class BadmintonResultValidator extends ConstraintValidator
 	
 	/**
 	 * Überprüfen auf korrektes Satzergebnis eines Badmintonspiels (z.B. kein 3:0)
-	 * Nicht nur das Ergebnis, sondern auch die Reihenfolge ist wichtig. 
+	 * Nicht nur das Ergebnis, sondern auch die Reihenfolge ist wichtig.
 	 * D.h. bei 2:0 Führung sollte es keinen 3. Satz geben.
 	 * @see isGameSequenceValid
 	 *
 	 * @param Match $match
-	 * @return boolean 
+	 * @return boolean
 	 */
 	private function isBadmintonMatchResultValid(Match $match)
 	{

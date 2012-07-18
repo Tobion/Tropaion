@@ -3,7 +3,8 @@
 namespace Tobion\TropaionBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Tobion\TropaionBundle\Form\EventListener\CalculateTeammatchStatisticsListener;
 
@@ -16,7 +17,7 @@ class BadmintonTeammatchType extends AbstractType
 		$this->registry = $registry;
 	}
 
-	public function buildForm(FormBuilder $builder, array $options)
+	public function buildForm(FormBuilderInterface $builder, array $options)
 	{
 		$builder->add('performed_at', 'datetime');
 		$builder->add('venue', 'entity', array(
@@ -55,9 +56,9 @@ class BadmintonTeammatchType extends AbstractType
 		));
 
 		$builder->add('matches', 'collection', array(
-			'type' => new BadmintonMatchType($this->registry), 
-			'allow_add' => false, 
-			'allow_delete' => false, 
+			'type' => new BadmintonMatchType($this->registry),
+			'allow_add' => false,
+			'allow_delete' => false,
 			'prototype' => false,
 			'by_reference' => true,
 		));
@@ -65,11 +66,11 @@ class BadmintonTeammatchType extends AbstractType
 		$builder->addEventSubscriber(new CalculateTeammatchStatisticsListener());
 	}
 
-	public function getDefaultOptions(array $options)
+	public function setDefaultOptions(OptionsResolverInterface $resolver)
 	{
-		return array(
+		$resolver->setDefaults(array(
 			'data_class' => 'Tobion\TropaionBundle\Entity\Teammatch',
-		);
+		));
 	}
 
 	public function getName()

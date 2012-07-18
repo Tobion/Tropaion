@@ -758,7 +758,7 @@ class TournamentController extends Controller
 		$invalid = false;
 
 		if ($this->getRequest()->getMethod() == 'POST') {
-			$form->bindRequest($this->getRequest());
+			$form->bind($this->getRequest());
 
 			// TODO
 			//$teammatch->setSubmittedBy();

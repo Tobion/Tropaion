@@ -4,8 +4,7 @@ namespace Tobion\TropaionBundle\Form\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\Event\DataEvent;
-use Symfony\Component\Form\Event\FilterDataEvent;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\NotValidException;
@@ -31,8 +30,8 @@ class TransformAthletesListener implements EventSubscriberInterface
 	public static function getSubscribedEvents()
 	{
 		return array(
-			FormEvents::SET_DATA => 'setData', 
-			FormEvents::BIND_NORM_DATA  => 'onBindNormData'
+			FormEvents::PRE_SET_DATA => 'onPreSetData', 
+			FormEvents::BIND => 'onBindData'
 		);
 	}
 
@@ -41,7 +40,7 @@ class TransformAthletesListener implements EventSubscriberInterface
 	 *
 	 * @param FilterDataEvent $event
 	 */
-	public function setData(FilterDataEvent $event)
+	public function onPreSetData(FormEvent $event)
 	{
 		$match = $event->getData();
 		$form = $event->getForm();
@@ -64,7 +63,6 @@ class TransformAthletesListener implements EventSubscriberInterface
 			$match->getTeam2Partner()->getReadableId() : '';
 
 		$event->setData($match);
-
 	}
 
 	/**
@@ -73,7 +71,7 @@ class TransformAthletesListener implements EventSubscriberInterface
 	 *
 	 * @param FilterDataEvent $event
 	 */
-	public function onBindNormData(FilterDataEvent $event)
+	public function onBindData(FormEvent $event)
 	{
 		$match = $event->getData();
 		$form = $event->getForm();
@@ -140,7 +138,6 @@ class TransformAthletesListener implements EventSubscriberInterface
 		// echo 'Player:'.$match->getTeam2Player();
 
 		$event->setData($match);
-
 	}
 
 	/**

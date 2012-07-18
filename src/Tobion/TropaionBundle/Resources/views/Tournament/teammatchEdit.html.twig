@@ -28,11 +28,11 @@
 {% endblock %}
 
 {# text-only error message, e.g. for tooltips #}
-{% block field_errors %}
+{% block form_errors %}
 	{%- for error in errors -%}
 		{{ error.messageTemplate|trans(error.messageParameters, 'validators') }}{% if not loop.last %}&#10;{% endif %}
 	{%- endfor -%}
-{% endblock field_errors %}
+{% endblock form_errors %}
 
 {% block content %}
 
@@ -171,7 +171,7 @@
 		<tr class="match" tabindex="-1">
 			<th scope="row" class="matchtype">
 				{{ match.matchType }}
-				<div class="noresult{% if matchForm.noresult.all.errors|length > 0 %} error{% endif %}">
+				<div class="noresult{% if matchForm.noresult.vars.errors|length > 0 %} error{% endif %}">
 					{{ form_label(matchForm.noresult, 'Kein Ergebnis') }}
 					{{ form_widget(matchForm.noresult) }}
 					{{ form_errors(matchForm.noresult) }}
@@ -183,13 +183,13 @@
 					{{ form_label(matchForm.team1_noplayer, 'Nicht angetreten') }}
 				</div>
 				
-				<div{% if matchForm.team1_player_readable_id.all.errors|length > 0 %} class="error"{% endif %}>
+				<div{% if matchForm.team1_player_readable_id.vars.errors|length > 0 %} class="error"{% endif %}>
 					{{ form_errors(matchForm.team1_player_readable_id) }}
 					{{ form_widget(matchForm.team1_player_readable_id) }}
 				</div>
 
 				{% if matchForm.team1_partner_readable_id is defined %}
-					<div{% if matchForm.team1_partner_readable_id.all.errors|length > 0 %} class="error"{% endif %}>
+					<div{% if matchForm.team1_partner_readable_id.vars.errors|length > 0 %} class="error"{% endif %}>
 						{{ form_errors(matchForm.team1_partner_readable_id) }}
 						{{ form_widget(matchForm.team1_partner_readable_id) }}
 					</div>
@@ -213,13 +213,13 @@
 					{{ form_widget(matchForm.team2_noplayer) }}
 					{{ form_label(matchForm.team2_noplayer, 'Nicht angetreten') }}
 				</div>
-				<div{% if matchForm.team2_player_readable_id.all.errors|length > 0 %} class="error"{% endif %}>
+				<div{% if matchForm.team2_player_readable_id.vars.errors|length > 0 %} class="error"{% endif %}>
 					{{ form_errors(matchForm.team2_player_readable_id) }}
 					{{ form_widget(matchForm.team2_player_readable_id) }}
 				</div>
 
 				{% if matchForm.team2_partner_readable_id is defined %}
-					<div{% if matchForm.team2_partner_readable_id.all.errors|length > 0 %} class="error"{% endif %}>
+					<div{% if matchForm.team2_partner_readable_id.vars.errors|length > 0 %} class="error"{% endif %}>
 						{{ form_errors(matchForm.team2_partner_readable_id) }}
 						{{ form_widget(matchForm.team2_partner_readable_id) }}
 					</div>
@@ -227,12 +227,12 @@
 			</td>
 			<td class="games">
 				{% form_theme matchForm.games _self %} {# apply local theme for text-only error messages to all sub-forms following #}
-				<fieldset class="effective-fieldset{% if matchForm.games.all.errors|length > 0 %} error{% endif %}">
+				<fieldset class="effective-fieldset{% if matchForm.games.vars.errors|length > 0 %} error{% endif %}">
 					<legend title="{{ form_errors(matchForm.games) }}">{% trans %}Gewertetes Ergebnis{% endtrans %}</legend>
 					<ol class="effective">
 					{% for gameForm in matchForm.games %}
-						{% if not gameForm.annulled.get('value') %}
-						<li tabindex="-1"{% if gameForm.all.errors|length > 0 %} class="error" title="{{ form_errors(gameForm) }}"{% endif %}>
+						{% if not gameForm.annulled.getVar('value') %}
+						<li tabindex="-1"{% if gameForm.vars.errors|length > 0 %} class="error" title="{{ form_errors(gameForm) }}"{% endif %}>
 							{# form_widget(gameForm.annulled) #}
 							{{ form_widget(gameForm.team1_score) }}
 							<abbr> : </abbr>
@@ -246,8 +246,8 @@
 					<legend>{% trans %}Usprüngliches Ergebnis{% endtrans %}</legend>
 					<ol class="annulled">
 					{% for gameForm in matchForm.games %}
-						{% if gameForm.annulled.get('value') %}
-						<li tabindex="-1"{% if gameForm.all.errors|length > 0 %} class="error"{% endif %}>
+						{% if gameForm.annulled.getVar('value') %}
+						<li tabindex="-1"{% if gameForm.vars.errors|length > 0 %} class="error"{% endif %}>
 							{{ form_widget(gameForm.annulled) }}
 							{{ form_widget(gameForm.team1_score) }}
 							<abbr> : </abbr>

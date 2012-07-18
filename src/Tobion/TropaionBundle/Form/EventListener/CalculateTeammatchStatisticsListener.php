@@ -4,7 +4,7 @@ namespace Tobion\TropaionBundle\Form\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\Event\FilterDataEvent;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 use Tobion\TropaionBundle\Entity\Teammatch;
@@ -19,17 +19,16 @@ class CalculateTeammatchStatisticsListener implements EventSubscriberInterface
 	public static function getSubscribedEvents()
 	{
 		return array(
-			FormEvents::BIND_NORM_DATA  => 'onBindNormData'
+			FormEvents::BIND => 'onBindData'
 		);
 	}
 
-
 	/**
-	 * Updates the teammatch statistics
+	 * Updates the teammatch statistics.
 	 *
 	 * @param FilterDataEvent $event
 	 */
-	public function onBindNormData(FilterDataEvent $event)
+	public function onBindData(FormEvent $event)
 	{
 		$teammatch = $event->getData();
 
@@ -44,7 +43,5 @@ class CalculateTeammatchStatisticsListener implements EventSubscriberInterface
 		$teammatch->updateStats();
 
 		$event->setData($teammatch);
-
 	}
-
 }

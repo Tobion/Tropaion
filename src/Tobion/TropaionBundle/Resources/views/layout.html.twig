@@ -115,11 +115,13 @@
 	</div>
 </header>
 
-	{% if app.session.flash('notice') %}
-		<div class="flash-message">
-			<em>Notice</em>: {{ app.session.flash('notice') }}
-		</div>
-	{% endif %}
+	{% for type, flashMessages in app.session.flashbag.all() %}
+		{% for flashMessage in flashMessages %}
+			<div class="flash-{{ type }}">
+				{{ flashMessage }}
+			</div>
+		{% endfor %}
+	{% endfor %}
 
 	<section id="content" class="container-fluid">
 		{% if tournament is defined %}

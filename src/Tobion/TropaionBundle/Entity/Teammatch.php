@@ -208,7 +208,7 @@ class Teammatch
 	 * @var Venue
 	 *
 	 * @ORM\ManyToOne(targetEntity="Venue")
-	 * @ORM\JoinColumn(name="venue_id", referencedColumnName="id", nullable=true, onDelete="SET NULL", onUpdate="CASCADE")
+	 * @ORM\JoinColumn(name="venue_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
 	 */
 	private $Venue;
 

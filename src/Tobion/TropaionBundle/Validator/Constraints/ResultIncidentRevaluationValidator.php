@@ -4,27 +4,25 @@ namespace Tobion\TropaionBundle\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 use Tobion\TropaionBundle\Entity\Match;
 
 /**
- * 
+ *
  */
 class ResultIncidentRevaluationValidator extends ConstraintValidator
 {
 
-	public function isValid($match, Constraint $constraint)
+	public function validate($match, Constraint $constraint)
 	{
 		if (!$match instanceof Match) {
 			throw new UnexpectedTypeException($match, 'Tobion\TropaionBundle\Entity\Match');
 		}
-		
-		$basePath = strstr($this->context->getPropertyPath(), '.', true);
-		
-		
+			
 		if ($match->result_incident == 'team1_wonbydefault' && !$match->revaluation_against) {
 			if (!$match->isTeam1Winner()) {
-				$this->addError('.noresult', $constraint->contradictoryNoResult, $this->context->getPropertyPath());
+                //$this->context->addViolationAtSubPath('noresult', $constraint->contradictoryNoResult, array(), $match->result_incident);
 			}
 		}
 		
@@ -38,9 +36,5 @@ class ResultIncidentRevaluationValidator extends ConstraintValidator
 		// TODO evtl. nachfragen (als Flash-Hinweis nach dem Speichern zum nachträgl. Bearbeiten), ob Ergebnis richtig ist:
 		// wenn nicht kampfloser Sieg (auch Aufgabe) und nicht umgewertet, aber gewert. Ergebnis zu Null
 		// wenn nicht kampfloser Sieg (auch Aufgabe) und umgewertet, aber urspr. Ergebnis zu Null
-		
-
-		return true;
 	}
-
 }
