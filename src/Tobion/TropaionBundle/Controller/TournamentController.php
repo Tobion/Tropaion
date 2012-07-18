@@ -604,6 +604,7 @@ class TournamentController extends Controller
 		$matches = $qb->getQuery()->getResult(\Doctrine\ORM\Query::HYDRATE_OBJECT);
 
 		$qb = $em->createQueryBuilder();
+
 		$qb->select(array('lu', 't'))
 			->from('TobionTropaionBundle:Lineup', 'lu')
 			->innerJoin('lu.Team', 't')
@@ -614,12 +615,9 @@ class TournamentController extends Controller
 			->setParameter('athlete_id', $athlete->getId())
 			->setParameter('tournament_id', $tournament->getId());
 
-		/* TODO prepare query?! */
-		$qb->setParameter('stage', 1);
-		$lineupFirstRound = $qb->getQuery()->getOneOrNullResult();
-
-		$qb->setParameter('stage', 2);
-		$lineupSecondRound = $qb->getQuery()->getOneOrNullResult();
+		$query = $qb->getQuery();
+		$lineupFirstRound = $query->setParameter('stage', 1)->getOneOrNullResult();
+		$lineupSecondRound = $query->setParameter('stage', 2)->getOneOrNullResult();
 
 		if (!$matches && !$lineupFirstRound && !$lineupSecondRound) {
 			throw $this->createNotFoundException('Athlete not participating in tournament.');

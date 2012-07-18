@@ -30,67 +30,90 @@
 	<link rel="search" type="application/opensearchdescription+xml" title="Tropaion Search" href="" />
 	#}
 	{% block stylesheets %}
+		<link rel="stylesheet" href="{{ asset('bundles/tobiontropaion/lib/bootstrap/css/bootstrap.min.css') }}" />
+		<link rel="stylesheet" href="{{ asset('bundles/tobiontropaion/lib/bootstrap/css/bootstrap-responsive.min.css') }}" />
 		<link rel="stylesheet" href="{{ asset('bundles/tobiontropaion/css/layout.css') }}" />
 		<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Droid+Sans|Droid+Sans+Mono" />
 	{% endblock %}
 	{% block metas %}
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="publisher" property="dc:publisher" content="{% if tournament is defined %}{{ tournament.owner.fullName }}{% else %}Badminton-Verband Berlin-Brandenburg e.V.{% endif %}" />
 		<meta name="generator" property="dc:creator" content="Tropaion" />
-		<meta property="fb:app_id" content="TODO">
+		<meta property="fb:app_id" content="TODO" />
 	{% endblock %}
 
 	{% block head_javascripts %}
 	<!--[if lt IE 9]>
 		<script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE9.js"></script>
 	<![endif]-->
-	<script src="{{ asset('bundles/tobiontropaion/js/Modernizr/modernizr-latest.js') }}"></script>
+	<script src="{{ asset('bundles/tobiontropaion/lib/modernizr/modernizr-latest.js') }}"></script>
 	{% endblock %}
 </head>
 <body>
-	<header id="main-header">
-		<img style="float:left;" src="{{ asset('bundles/tobiontropaion/images/logos/bvbb_logo.jpg') }}" alt="BVBB Logo" title="Badminton-Verband Berlin-Brandenburg" width="102" height="90" />
-		<hgroup >  
-			<h1 title="Startseite • Ergebnisdienst powered by Tropaion"><a href="{{ path('home') }}">{% trans %}Ergebnisdienst{% endtrans %}</a></h1>  
-			<h2 title="bvbb.net"><a href="http://bvbb.net">{% trans %}Badminton-Verband Berlin-Brandenburg <abbr title="eingetragener Verein">e. V.</abbr>{% endtrans %}</a></h2>
-		</hgroup>	
-	</header>
 
-	<nav id="main-menu" style="clear:left;">
-		{% block main_menu %}
-			<ul>
-				<li><a href="{{ path('home') }}">
-					{% trans %}Startseite{% endtrans %}</a>
-				</li>
-				<li><a href="{{ path('home_tournaments') }}">
-					{% trans %}Turniere{% endtrans %}</a>
-				</li>
-				<li><a href="{{ path('home_rankings') }}">
-					{% trans %}Ranglisten{% endtrans %}</a>
-				</li>
-				<li title="{% trans %}Durchsuche Spiele nach verschiedenen Kriterien{% endtrans %}"><a href="{{ path('home_matches') }}">
-					{% trans %}Spiele-Browser{% endtrans %}</a>
-				</li>
-				<li><a href="{{ path('home_clubs') }}">
-					{% trans %}Vereine{% endtrans %}</a>
-				</li>
-				<li><a href="{{ path('home_venues') }}">
-					{% trans %}Hallen{% endtrans %}</a>
-				</li>
-				<li>
-					<form action="{{ path('home_search') }}" id="main-search-form" method="get">      
-						<div>
-							<label for="main-search-field">{% trans %}Suche…{% endtrans %}</label>
-							<input type="search" id="main-search-field" name="q" placeholder="{% trans %}Suche Spieler / Mannschaften / Vereine / Turniere{% endtrans %}" /> 
-							<input type="submit" value="{% trans %}Suche{% endtrans %}" />
-						</div>
+<header id="main-header" class="navbar">
+	<div class="navbar-inner">
+	<div class="row-fluid">
+		<div class="span4 brand">
+			<a href="{{ path('home') }}"><img src="{{ asset('bundles/tobiontropaion/img/logos/bvbb_logo_unlabeled_4x_transparent.png') }}" alt="BVBB Logo" title="Badminton-Verband Berlin-Brandenburg" width="60" height="48" /></a>
+			<hgroup>
+				<h1 title="Startseite • Ergebnisdienst powered by Tropaion"><a href="{{ path('home') }}">{% trans %}Ergebnisdienst{% endtrans %}</a></h1>
+				<h2 title="bvbb.net"><a href="http://bvbb.net">{% trans %}Badminton-Verband Berlin-Brandenburg{% endtrans %}</a></h2>
+			</hgroup>
+		</div>
+
+		<nav id="main-menu" class="span5">
+			{% block main_menu %}
+				<ul class="nav">
+					<li title="{% trans %}Finde aktuelle und vergangene Turniere &amp; Ligen{% endtrans %}"><a href="{{ path('home_tournaments') }}">
+						{% trans %}Turniere{% endtrans %}</a>
+					</li>
+					<li><a href="{{ path('home_rankings') }}">
+						{% trans %}Ranglisten{% endtrans %}</a>
+					</li>
+					<li title="{% trans %}Durchsuche Spiele nach verschiedenen Kriterien{% endtrans %}"><a href="{{ path('home_matches') }}">
+						{% trans %}Spiele{% endtrans %}</a>
+					</li>
+					<li><a href="{{ path('home_clubs') }}">
+						{% trans %}Vereine{% endtrans %}</a>
+					</li>
+					<li><a href="{{ path('home_athletes') }}">
+						{% trans %}Spieler{% endtrans %}</a>
+					</li>
+					{#
+					<li><a href="{{ path('home_venues') }}">
+						{% trans %}Hallen{% endtrans %}</a>
+					</li>
+					#}
+				</ul>
+
+				<form action="{{ path('home_search') }}" id="main-search-form" class="navbar-search" method="get">
+					<div class="input-append">
 						{% if tournament is defined %}
 							<input type="hidden" name="tournament" value="{{ tournament.id }}" />
 						{% endif %}
-					</form> 
-				</li>	
+						<input type="search" id="main-search-field" class="search-query" name="q" placeholder="{% trans %}Suche alles &amp; jeden...{% endtrans %}" />
+						<button type="submit" class="btn{# add-on"#}"><i class="icon-search"></i></button>
+					</div>
+				</form>
+			{% endblock %}
+		</nav>
+
+		<nav id="user-menu" class="span3">
+			<h2><a href="#">Username</a></h2>
+			<ul class="nav">
+				<li><a href="#">
+					{% trans %}Einstellungen{% endtrans %}</a>
+				</li>
+				<li><a href="#">
+					{% trans %}Ausloggen{% endtrans %}</a>
+				</li>
 			</ul>
-		{% endblock %}
-	</nav>
+		</nav>
+
+	</div>
+	</div>
+</header>
 
 	{% if app.session.flash('notice') %}
 		<div class="flash-message">
@@ -98,18 +121,18 @@
 		</div>
 	{% endif %}
 
-	<section id="content">
+	<section id="content" class="container-fluid">
 		{% if tournament is defined %}
-		<header>
-			<h1>{% trans %}Veranstalter:{% endtrans %} 
+		<header id="tournament-header">
+			<h1>{% trans %}Turnier:{% endtrans %} 
+					<a href="{{ path('tournament', tournament.routingParams ) }}">{{ tournament.shortName }}</a> |
+				{% trans %}Veranstalter:{% endtrans %} 
 					<a href="{{ path('profile_user', tournament.owner.routingParams ) }}">{{ tournament.owner.username }}</a> 
-				| 
-				{% trans %}Turnier:{% endtrans %} 
-					<a href="{{ path('tournament', tournament.routingParams ) }}">{{ tournament.shortName }}</a></h1>
+			</h1>
 		</header>
 
 		<nav id="tournament-menu">
-			<ul>
+			<ul class="nav nav-tabs">
 				<li title="{% trans %}News und Spielverlegungen{% endtrans %}"><a href="{{ path('tournament', tournament.routingParams ) }}">
 					{% trans %}Übersicht{% endtrans %}</a>
 				</li>
@@ -132,12 +155,10 @@
 		</nav>
 		{% endif %}
 
-		{% block content %}
-		{% endblock %}
+		{% block content %}{% endblock %}
 	</section>
 
-	<footer id="main-footer">
-		<p>{% trans %}Powered by{% endtrans %} <img src="{{ asset('bundles/tobiontropaion/images/trophy/trophy_32px_24bit.png') }}" alt="{% trans %}Trophäe{% endtrans %}" /> <a href="https://github.com/Tobion/Tropaion" title="{% trans %}Tropaion - Der soziale und semantische Sportergebnisdienst{% endtrans %}">Tropaion</a></p>
+	<footer id="main-footer" class="container-fluid row-fluid">
 	<!--
 	<p class="license" about="http://www.tobion.de/sportservice/software/" xmlns:doap="http://usefulinc.com/ns/doap#" typeof="doap:Project">
 		<span href="http://purl.org/dc/dcmitype/InteractiveResource" property="dc:title" rel="dc:type">Tropaion</span> {% trans %}by{% endtrans %} 
@@ -150,8 +171,8 @@
 	</p>
 	-->
 
-		<nav id="main-footer-menu">
-			<ul>
+		<nav id="main-footer-menu" class="span6">
+			<ul class="nav nav-pills">
 				<li><a href="{{ path('home_help') }}">
 					{% trans %}Hilfe / Über{% endtrans %}</a>
 				</li>
@@ -169,6 +190,10 @@
 				</li>
 			</ul>
 		</nav>
+
+		<div class="span6">
+			<p>{% trans %}Powered by{% endtrans %} <img src="{{ asset('bundles/tobiontropaion/img/trophy/trophy_32px_24bit.png') }}" alt="{% trans %}Trophäe{% endtrans %}" /> <a href="https://github.com/Tobion/Tropaion" title="{% trans %}Tropaion - Der soziale und semantische Sportergebnisdienst{% endtrans %}">Tropaion</a></p>
+		</div>
 	</footer>
 
 	{% block tail_javascripts %}{% endblock %}

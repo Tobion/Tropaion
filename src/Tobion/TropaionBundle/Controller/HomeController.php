@@ -37,7 +37,7 @@ class HomeController extends Controller
 	}
 
 	/**
-	 * @Route("/match-browser", name="home_matches") 
+	 * @Route("/matches", name="home_matches")
 	 * @Template()
 	 */
 	public function matchesAction()
@@ -50,6 +50,15 @@ class HomeController extends Controller
 	 * @Template()
 	 */
 	public function clubsAction()
+	{
+
+	}
+
+	/**
+	 * @Route("/players", name="home_athletes")
+	 * @Template()
+	 */
+	public function athletesAction()
 	{
 
 	}

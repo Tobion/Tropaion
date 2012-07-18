@@ -99,7 +99,7 @@
 	</time></dd>
 	{% if teammatch.movedAt %}
 	<dt>{% trans %}Verlegter Termin{% endtrans %}{# Rearranged date #}</dt>
-	<dd><img src="{{ asset('bundles/tobiontropaion/images/icons/status/rearranged.png') }}" width="16" height="16" alt="" /> {{ teammatch.movedAt | date('d.m.Y - H:i') }}</dd>
+	<dd><img src="{{ asset('bundles/tobiontropaion/img/icons/status/rearranged.png') }}" width="16" height="16" alt="" /> {{ teammatch.movedAt | date('d.m.Y - H:i') }}</dd>
 	{% endif %}
 	{% if teammatch.hasDifferentSchedule %}
 	<dt>{% trans %}Angesetzter Termin{% endtrans %}</dt>
@@ -123,13 +123,13 @@
 	{% endif %}
 	{% if teammatch.annulled %}
 	<dt>{% trans %}Annulliert{% endtrans %}</dt>
-	<dd><img src="{{ asset('bundles/tobiontropaion/images/icons/status/annulled.png') }}" width="16" height="16" alt="" /> {% trans %}Das Spiel wurde gestrichen und aus der Wertung genommen.{% endtrans %}</dd>
+	<dd><img src="{{ asset('bundles/tobiontropaion/img/icons/status/annulled.png') }}" width="16" height="16" alt="" /> {% trans %}Das Spiel wurde gestrichen und aus der Wertung genommen.{% endtrans %}</dd>
 	{% endif %}
 	{% if teammatch.revaluationWrongdoer %}
 	<dt>{% trans %}Umwertung{% endtrans %}</dt>
 	<dd id="revaluation-reason">
-		<img src="{{ asset('bundles/tobiontropaion/images/icons/status/revaluation.png') }}" width="16" height="16" alt="" />
-		{# <object type="image/svg+xml" data="{{ asset('bundles/tobiontropaion/images/attention.svg') }}" height="17" width="20"><img src="{{ asset('bundles/tobiontropaion/images/attention.png') }}" height="17" width="20" alt="{% trans %}Achtung Symbol{% endtrans %}" /></object> #}
+		<img src="{{ asset('bundles/tobiontropaion/img/icons/status/revaluation.png') }}" width="16" height="16" alt="" />
+		{# <object type="image/svg+xml" data="{{ asset('bundles/tobiontropaion/img/attention.svg') }}" height="17" width="20"><img src="{{ asset('bundles/tobiontropaion/img/attention.png') }}" height="17" width="20" alt="{% trans %}Achtung Symbol{% endtrans %}" /></object> #}
 		<span title="{{ teammatch.description }}">
 		{% transchoice teammatch.revaluationWrongdoer %}
 			{1} gegen <em>Heim</em>|{2} gegen <em>Gast</em>|{3} gegen <em>beide</em>
@@ -142,11 +142,11 @@
 	{% endif %}
 	{% if teammatch.noFight %}
 	<dt>{% trans %}Kampflos{% endtrans %}</dt>
-	<dd><img src="{{ asset('bundles/tobiontropaion/images/icons/status/nofight.png') }}" width="16" height="16" alt="" /> {% trans %}Das Ergebnis ist kampflos zustande gekommen, da eine Mannschaft nicht angetreten ist.{% endtrans %}</dd>
+	<dd><img src="{{ asset('bundles/tobiontropaion/img/icons/status/nofight.png') }}" width="16" height="16" alt="" /> {% trans %}Das Ergebnis ist kampflos zustande gekommen, da eine Mannschaft nicht angetreten ist.{% endtrans %}</dd>
 	{% endif %}
 	{% if teammatch.revisedScore %}
 	<dt>{% trans %}Revidiert{% endtrans %}</dt>
-	<dd><img src="{{ asset('bundles/tobiontropaion/images/icons/status/revised.png') }}" width="16" height="16" alt="" /> {% trans %}Das Mannschaftsspiel enthält Individualspiele, deren Ergebnisse geändert wurden.{% endtrans %}</dd>
+	<dd><img src="{{ asset('bundles/tobiontropaion/img/icons/status/revised.png') }}" width="16" height="16" alt="" /> {% trans %}Das Mannschaftsspiel enthält Individualspiele, deren Ergebnisse geändert wurden.{% endtrans %}</dd>
 	{% endif %}
 	<dt>{% trans %}Saisonabschnitt{% endtrans %}{# Season period: First round | Second round #}</dt> 
 	<dd>{% if teammatch.stage == 1 %}{% trans %}Hinrunde{% endtrans %}{% else %}{% trans %}Rückrunde{% endtrans %}{% endif %}</dd>
@@ -184,7 +184,7 @@
 	{% endif %}
 	{% if teammatch.confirmedBy %}
 	<dt property="dc:dateAccepted" datatype="xsd:dateTime" content="{{ teammatch.confirmedAt | date('c') }}">{% trans %}Ergebnis bestätigt{% endtrans %}</dt>
-	<dd><img src="{{ asset('bundles/tobiontropaion/images/icons/status/confirmed.png') }}" width="16" height="16" alt="" />
+	<dd><img src="{{ asset('bundles/tobiontropaion/img/icons/status/confirmed.png') }}" width="16" height="16" alt="" />
 		{% if teammatch.confirmedAt %}{% trans with {
 			'%link%': path('profile_user', teammatch.confirmedBy.routingParams ),
 			'%user%': teammatch.confirmedBy.fullName,
@@ -196,7 +196,7 @@
 	{% endif %}
 	{% if teammatch.approvedBy %}
 	<dt>{% trans %}Ergebnis genehmigt{% endtrans %}</dt>
-	<dd><img src="{{ asset('bundles/tobiontropaion/images/icons/status/approved.png') }}" width="16" height="16" alt="" />
+	<dd><img src="{{ asset('bundles/tobiontropaion/img/icons/status/approved.png') }}" width="16" height="16" alt="" />
 		{% if teammatch.approvedAt %}{% trans with {
 			'%link%': path('profile_user', teammatch.approvedBy.routingParams ),
 			'%user%': teammatch.approvedBy.username,
@@ -207,7 +207,7 @@
 		} %}von <a href="%link%">%user%</a>{% endtrans %}{% endif %}</dd>
 	{% endif %}
 	<dt>{% trans %}Editieren{% endtrans %}</dt> 
-	<dd><a rel="edit" href="{{ path('tournament_teammatch_edit', teammatch.routingParams) }}"><img src="{{ asset('bundles/tobiontropaion/images/icons/action/submit.png') }}" width="16" height="16" alt="" /> {% trans %}Ergebnis eingeben/bearbeiten{% endtrans %}</a></dd>
+	<dd><a rel="edit" href="{{ path('tournament_teammatch_edit', teammatch.routingParams) }}"><img src="{{ asset('bundles/tobiontropaion/img/icons/action/submit.png') }}" width="16" height="16" alt="" /> {% trans %}Ergebnis eingeben/bearbeiten{% endtrans %}</a></dd>
 </dl>
 
 </header>
@@ -229,7 +229,7 @@
 		<span property="dc:coverage" datatype=""><abbr property="dc:format" content="application/json" title="JavaScript Object Notation">JSON</abbr> als Datenaustausch</span>
 	</a></li>
 	<li><a rel="alternate foaf:isPrimaryTopicOf" type="text/calendar" href="{{ path('tournament_teammatch', teammatch.routingParams|merge({ '_format': 'ics' }) ) }}">
-		<span property="dc:coverage" datatype=""><img src="/images/calendar_icon.png" alt="ICS" width="32" height="32" /><abbr property="dc:format" content="text/calendar" title="iCalendar">ICS</abbr> für Terminplaner</span>
+		<span property="dc:coverage" datatype=""><img src="{{ asset('bundles/tobiontropaion/img/logos/calendar_icon.png') }}" alt="ICS" width="32" height="32" /><abbr property="dc:format" content="text/calendar" title="iCalendar">ICS</abbr> für Terminplaner</span>
 	</a></li>
 </ul>
 </footer>

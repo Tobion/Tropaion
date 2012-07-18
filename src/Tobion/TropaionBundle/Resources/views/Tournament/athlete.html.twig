@@ -7,7 +7,7 @@
 {% block stylesheets %}
 	{{ parent() }}
 	<link rel="stylesheet" href="{{ asset('bundles/tobiontropaion/css/teammatch.css') }}" />
-	<link rel="stylesheet" href="{{ asset('bundles/tobiontropaion/css/jquery-ui-1.8.14.custom.css') }}" />
+	<link rel="stylesheet" href="{{ asset('bundles/tobiontropaion/lib/jquery-ui/jquery-ui-1.8.14.custom.css') }}" />
 {% endblock %}
 
 {% block tail_javascripts %}
@@ -15,9 +15,9 @@
 
 {% if matches %}
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-	<script src="{{ asset('bundles/tobiontropaion/js/Placeholder-jQuery-Plugin/jquery.placeholder.min.js') }}"></script>
-	<script src="{{ asset('bundles/tobiontropaion/js/DataTables-1.8.1/media/js/jquery.dataTables.min.js') }}"></script>
-	<script src="{{ asset('bundles/tobiontropaion/js/Sparkline-JQuery-Plugin/jquery.sparkline.min.js') }}"></script>
+	<script src="{{ asset('bundles/tobiontropaion/lib/placeholder-jquery/jquery.placeholder.min.js') }}"></script>
+	<script src="{{ asset('bundles/tobiontropaion/lib/dataTables/media/js/jquery.dataTables.min.js') }}"></script>
+	<script src="{{ asset('bundles/tobiontropaion/lib/sparkline-jquery/jquery.sparkline.min.js') }}"></script>
 	
 	<script>
 	//<![CDATA[

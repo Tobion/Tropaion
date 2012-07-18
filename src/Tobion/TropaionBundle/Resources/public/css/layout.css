@@ -8,25 +8,64 @@ Tabellenhintergrund in Auswertungen: #FFFF66;
 http://colorschemedesigner.com/#5C32qrZmaw0w0
 */
 
-
-article,aside,canvas,details,figcaption,figure,
-footer,header,hgroup,menu,nav,section,summary { 
+menu, summary {
     display: block;
 }
 
 body {
-	font: 14px/1.15 "Droid Sans",  Arial, sans-serif, Verdana;
+	font-family: "Droid Sans", "Helvetica Neue", Helvetica, Arial, sans-serif, Verdana;
 }
+
+#main-header .navbar-inner {
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+#main-header .brand {
+	padding-left: 0;
+}
+#main-header .brand img {
+	float: left;
+	margin-right: 10px;
+}
+#main-header h2 {
+	font-size: 14px;
+	line-height: 16px;
+}
+
+#main-menu {
+	display: table;
+/*	margin-left: auto;
+	margin-right: auto; */
+}
+#main-menu .nav {
+	display: table-row;
+}
+#main-search-form {
+	display: table-row;
+	float: none;
+}
+#main-search-form .btn {
+	margin: 0;
+	/*background-color: #626262;*/
+	border: 1px solid #151515;
+}
+#main-search-field {
+	width: 80%;
+	max-width: 350px;
+}
+
+#tournament-header h1 {
+	font-size: 20px;
+}
+
+
 
 table {
 	font-size: inherit;
 	font: 100%;
     border-collapse: collapse;
     border-spacing: 0;
-}
-
-img {
-	border: 0;
 }
 
 dl {
@@ -62,11 +101,6 @@ dt:first-child, dt:first-child+dd {
 	float: left;
 	list-style-type: none;
 	margin-right: 20px;
-}
-
-#content {
-	padding-top: 20px;
-	clear: both;
 }
 
 .opensearch {

@@ -75,19 +75,19 @@
 		{% if profileView == 'club' and teammatch.isSameClub %}
 			<span class="sameclub" title="{% trans %}Ein Spiel zwischen zwei Mannschaften des gleichen Vereins. Dessen Ergebnis aus Sicht des Vereins wäre daher sowohl ein Sieg als auch eine Niederlage.{% endtrans %}">==</span>
 		{% elseif teammatch.isDraw %}
-			<img class="draw" src="{{ asset('bundles/tobiontropaion/images/icons/status/thumb-sideways.png') }}" width="16" height="9" alt="{% trans %}U{% endtrans %}" title="{% trans %}Unentschieden{% endtrans %}" />
+			<img class="draw" src="{{ asset('bundles/tobiontropaion/img/icons/status/thumb-sideways.png') }}" width="16" height="9" alt="{% trans %}U{% endtrans %}" title="{% trans %}Unentschieden{% endtrans %}" />
 		{% elseif teammatch.isTeam1Winner %}
 			{% set movRotateDeg = (8 - teammatch.team1Score) * 22.5 %}
-			<img class="win" src="{{ asset('bundles/tobiontropaion/images/icons/status/thumb-up.png') }}" {% 
+			<img class="win" src="{{ asset('bundles/tobiontropaion/img/icons/status/thumb-up.png') }}" {%
 				if movRotateDeg > 0 %}style="-webkit-transform:rotate({{ movRotateDeg }}deg); -moz-transform:rotate({{ movRotateDeg }}deg); -o-transform:rotate({{ movRotateDeg }}deg); -ms-transform:rotate({{ movRotateDeg }}deg);" {% 
 				endif %}width="9" height="16" alt="{% trans %}S{% endtrans %}" title="{% trans %}Sieg{% endtrans %}" />
 		{% elseif teammatch.hasResult %}
 			{% set movRotateDeg = teammatch.team1Score * 22.5 %}
-			<img class="loss" src="{{ asset('bundles/tobiontropaion/images/icons/status/thumb-down.png') }}" {% 
+			<img class="loss" src="{{ asset('bundles/tobiontropaion/img/icons/status/thumb-down.png') }}" {%
 				if movRotateDeg > 0 %}style="-webkit-transform:rotate(-{{ movRotateDeg }}deg); -moz-transform:rotate(-{{ movRotateDeg }}deg); -o-transform:rotate(-{{ movRotateDeg }}deg); -ms-transform:rotate(-{{ movRotateDeg }}deg);" {% 
 				endif %}width="9" height="16" alt="{% trans %}N{% endtrans %}" title="{% trans %}Niederlage{% endtrans %}" />
 		{% elseif teammatch.isSubmissionDue %}
-			<img class="submission-due" title="{% trans %}Ergebniseingabe ausstehend{% endtrans %}" src="{{ asset('bundles/tobiontropaion/images/icons/status/submission-due.png') }}" width="16" height="16" alt="{% trans %}Offen{% endtrans %}" />
+			<img class="submission-due" title="{% trans %}Ergebniseingabe ausstehend{% endtrans %}" src="{{ asset('bundles/tobiontropaion/img/icons/status/submission-due.png') }}" width="16" height="16" alt="{% trans %}Offen{% endtrans %}" />
 		{% endif %}
 			<a href="{{ path('tournament_teammatch', teammatch.routingParams ) }}" data-mov="{{ teammatch.marginOfVictorySortableString(teammatch.team1) }}" title="{% trans %}Zum Spielbericht{% endtrans %}">
 				{{ teammatch.team1Score is none ? (teammatch.submittedBy ? '‒' : '?') : teammatch.team1Score }}:{{ teammatch.team2Score is none ? (teammatch.submittedBy ? '‒' : '?') : teammatch.team2Score }}
@@ -100,20 +100,20 @@
 			<td class="games" title="{{ macros.signed(teammatch.team1Games - teammatch.team2Games) }}">{{ teammatch.team1Games | pad(2, '&#8199;', constant('STR_PAD_LEFT')) }}:{{ teammatch.team2Games | pad(2, '&#8199;', constant('STR_PAD_RIGHT')) }}</td>
 			<td class="points" title="{{ macros.signed(teammatch.team1Points - teammatch.team2Points) }}">{{ teammatch.team1Points | pad(3, '&#8199;', constant('STR_PAD_LEFT')) }}:{{ teammatch.team2Points | pad(3, '&#8199;', constant('STR_PAD_RIGHT')) }}</td>
 		{% elseif teammatch.hasResult %}
-			<td class="games"><img class="missing-detailed-result" title="{% trans %}Fehlendes Detailergebnis{% endtrans %}" src="{{ asset('bundles/tobiontropaion/images/icons/status/submission-due.png') }}" width="16" height="16" alt="{% trans %}Fehlend{% endtrans %}" /></td>
-			<td class="points"><img class="missing-detailed-result" title="{% trans %}Fehlendes Detailergebnis{% endtrans %}" src="{{ asset('bundles/tobiontropaion/images/icons/status/submission-due.png') }}" width="16" height="16" alt="{% trans %}Fehlend{% endtrans %}" /></td>
+			<td class="games"><img class="missing-detailed-result" title="{% trans %}Fehlendes Detailergebnis{% endtrans %}" src="{{ asset('bundles/tobiontropaion/img/icons/status/submission-due.png') }}" width="16" height="16" alt="{% trans %}Fehlend{% endtrans %}" /></td>
+			<td class="points"><img class="missing-detailed-result" title="{% trans %}Fehlendes Detailergebnis{% endtrans %}" src="{{ asset('bundles/tobiontropaion/img/icons/status/submission-due.png') }}" width="16" height="16" alt="{% trans %}Fehlend{% endtrans %}" /></td>
 		{% else %}
 			<td class="games no-result"></td>
 			<td class="points no-result"></td>
 		{% endif %}
-		<td class="status">{% if teammatch.annulled %}<img src="{{ asset('bundles/tobiontropaion/images/icons/status/annulled.png') }}" width="16" height="16" alt="{% trans %}Annulliert{% endtrans %}" title="{% trans %}Spiel wurde gestrichen und aus der Wertung genommen{% endtrans %}" />{% endif %}
-			{% if teammatch.revaluationWrongdoer %}<img src="{{ asset('bundles/tobiontropaion/images/icons/status/revaluation.png') }}" width="16" height="16" alt="{% trans %}Umwertung{% endtrans %}" title="{% trans %}Spiel wurde umgewertet{% endtrans %}" />{% endif %}
-			{% if teammatch.noFight %}<img src="{{ asset('bundles/tobiontropaion/images/icons/status/nofight.png') }}" width="16" height="16" alt="{% trans %}Kampflos{% endtrans %}" title="{% trans %}Ergebnis ist kampflos zustande gekommen{% endtrans %}" />{% endif %}
-			{% if teammatch.revisedScore %}<img src="{{ asset('bundles/tobiontropaion/images/icons/status/revised.png') }}" width="16" height="16" alt="{% trans %}Geändert{% endtrans %}" title="{% trans %}Mannschaftsspiel enthält Individualspiele, deren Ergebnisse geändert wurden{% endtrans %}" />{% endif %}
-			{% if teammatch.confirmedBy %}<img src="{{ asset('bundles/tobiontropaion/images/icons/status/confirmed.png') }}" width="16" height="16" alt="{% trans %}Bestätigt{% endtrans %}" title="{% trans %}Ergebnis bestätigt{% endtrans %}" />{% endif %}
-			{% if teammatch.approvedBy %}<img src="{{ asset('bundles/tobiontropaion/images/icons/status/approved.png') }}" width="16" height="16" alt="{% trans %}Genehmigt{% endtrans %}" title="{% trans %}Ergebnis genehmigt{% endtrans %}" />{% endif %}
-			{% if teammatch.incompleteLineup %}<img src="{{ asset('bundles/tobiontropaion/images/icons/status/incomplete-lineup.png') }}" width="16" height="16" alt="{% trans %}Unvollständig{% endtrans %}" title="{% trans %}Unvollständige Aufstellung (fehlende Spieler){% endtrans %}" />{% endif %}
-			{% if teammatch.movedAt %}<img src="{{ asset('bundles/tobiontropaion/images/icons/status/rearranged.png') }}" width="16" height="16" alt="{% trans %}Verlegt{% endtrans %}" title="{% trans with { '%scheduled_at%': teammatch.scheduledAt | date('d.m.Y H:i') } %}Verlegter Termin | Ursprünglich angesetzt am %scheduled_at%{% endtrans %}" />{% endif %}
+		<td class="status">{% if teammatch.annulled %}<img src="{{ asset('bundles/tobiontropaion/img/icons/status/annulled.png') }}" width="16" height="16" alt="{% trans %}Annulliert{% endtrans %}" title="{% trans %}Spiel wurde gestrichen und aus der Wertung genommen{% endtrans %}" />{% endif %}
+			{% if teammatch.revaluationWrongdoer %}<img src="{{ asset('bundles/tobiontropaion/img/icons/status/revaluation.png') }}" width="16" height="16" alt="{% trans %}Umwertung{% endtrans %}" title="{% trans %}Spiel wurde umgewertet{% endtrans %}" />{% endif %}
+			{% if teammatch.noFight %}<img src="{{ asset('bundles/tobiontropaion/img/icons/status/nofight.png') }}" width="16" height="16" alt="{% trans %}Kampflos{% endtrans %}" title="{% trans %}Ergebnis ist kampflos zustande gekommen{% endtrans %}" />{% endif %}
+			{% if teammatch.revisedScore %}<img src="{{ asset('bundles/tobiontropaion/img/icons/status/revised.png') }}" width="16" height="16" alt="{% trans %}Geändert{% endtrans %}" title="{% trans %}Mannschaftsspiel enthält Individualspiele, deren Ergebnisse geändert wurden{% endtrans %}" />{% endif %}
+			{% if teammatch.confirmedBy %}<img src="{{ asset('bundles/tobiontropaion/img/icons/status/confirmed.png') }}" width="16" height="16" alt="{% trans %}Bestätigt{% endtrans %}" title="{% trans %}Ergebnis bestätigt{% endtrans %}" />{% endif %}
+			{% if teammatch.approvedBy %}<img src="{{ asset('bundles/tobiontropaion/img/icons/status/approved.png') }}" width="16" height="16" alt="{% trans %}Genehmigt{% endtrans %}" title="{% trans %}Ergebnis genehmigt{% endtrans %}" />{% endif %}
+			{% if teammatch.incompleteLineup %}<img src="{{ asset('bundles/tobiontropaion/img/icons/status/incomplete-lineup.png') }}" width="16" height="16" alt="{% trans %}Unvollständig{% endtrans %}" title="{% trans %}Unvollständige Aufstellung (fehlende Spieler){% endtrans %}" />{% endif %}
+			{% if teammatch.movedAt %}<img src="{{ asset('bundles/tobiontropaion/img/icons/status/rearranged.png') }}" width="16" height="16" alt="{% trans %}Verlegt{% endtrans %}" title="{% trans with { '%scheduled_at%': teammatch.scheduledAt | date('d.m.Y H:i') } %}Verlegter Termin | Ursprünglich angesetzt am %scheduled_at%{% endtrans %}" />{% endif %}
 		</td>
 	</tr>
 {% endfor %}

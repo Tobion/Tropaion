@@ -131,15 +131,15 @@
 		<td class="match score">
 			<div>
 		{% if match.isOriginalFallbackEffectiveDraw %}
-			<img class="draw" src="{{ asset('bundles/tobiontropaion/images/icons/status/thumb-sideways.png') }}" width="16" height="9" alt="{% trans %}U{% endtrans %}" title="{% trans %}Unentschieden{% endtrans %}" />
+			<img class="draw" src="{{ asset('bundles/tobiontropaion/img/icons/status/thumb-sideways.png') }}" width="16" height="9" alt="{% trans %}U{% endtrans %}" title="{% trans %}Unentschieden{% endtrans %}" />
 		{% elseif match.isTeam1OriginalFallbackEffectiveWinner %}
 			{% set movRotateDeg = match.team1OriginalFallbackEffectiveScore > 0 ? match.team2OriginalFallbackEffectiveScore / match.team1OriginalFallbackEffectiveScore * 90 : 0 %}
-			<img class="win" src="{{ asset('bundles/tobiontropaion/images/icons/status/thumb-up.png') }}" {% 
+			<img class="win" src="{{ asset('bundles/tobiontropaion/img/icons/status/thumb-up.png') }}" {%
 				if movRotateDeg > 0 %}style="-webkit-transform:rotate({{ movRotateDeg }}deg); -moz-transform:rotate({{ movRotateDeg }}deg); -o-transform:rotate({{ movRotateDeg }}deg); -ms-transform:rotate({{ movRotateDeg }}deg);" {% 
 				endif %}width="9" height="16" alt="{% trans %}S{% endtrans %}" title="{% trans %}Sieg{% endtrans %}" />
 		{% elseif match.hasOriginalFallbackEffectiveResult %}
 			{% set movRotateDeg = match.team2OriginalFallbackEffectiveScore > 0 ? match.team1OriginalFallbackEffectiveScore / match.team2OriginalFallbackEffectiveScore * 90 : 0 %}
-			<img class="loss" src="{{ asset('bundles/tobiontropaion/images/icons/status/thumb-down.png') }}" {% 
+			<img class="loss" src="{{ asset('bundles/tobiontropaion/img/icons/status/thumb-down.png') }}" {%
 				if movRotateDeg > 0 %}style="-webkit-transform:rotate(-{{ movRotateDeg }}deg); -moz-transform:rotate(-{{ movRotateDeg }}deg); -o-transform:rotate(-{{ movRotateDeg }}deg); -ms-transform:rotate(-{{ movRotateDeg }}deg);" {% 
 				endif %}width="9" height="16" alt="{% trans %}N{% endtrans %}" title="{% trans %}Niederlage{% endtrans %}" />
 		{% endif %}
@@ -220,11 +220,11 @@
 		<td class="team opponent">
 			<a href="{{ path('tournament_team', teammatch.team2.routingParams ) }}">{{ teammatch.team2.club.code }} {{ teammatch.team2.teamNumber }}</a>
 		</td>
-		<td class="status">{% if match.noFight %}<img src="{{ asset('bundles/tobiontropaion/images/icons/status/nofight.png') }}" width="16" height="16" alt="{% trans %}Kampflos{% endtrans %}" title="{% trans %}Ergebnis ist kampflos zustande gekommen{% endtrans %}" />{% endif %}
-			{% if match.revisedScore %}<img src="{{ asset('bundles/tobiontropaion/images/icons/status/revised.png') }}" width="16" height="16" alt="{% trans %}Geändert{% endtrans %}" title="{% trans %}Ergebnis wurde geändert{% endtrans %}" />{% endif %}
-			{% if match.givenUpBy %}<img src="{{ asset('bundles/tobiontropaion/images/icons/status/given-up.png') }}" width="16" height="16" alt="{% trans %}Aufgabe{% endtrans %}" title="{% trans %}Spiel ist durch Aufgabe entschieden worden{% endtrans %}" />{% endif %}
-			{% if teammatch.confirmedBy %}<img src="{{ asset('bundles/tobiontropaion/images/icons/status/confirmed.png') }}" width="16" height="16" alt="{% trans %}Bestätigt{% endtrans %}" title="{% trans %}Ergebnis bestätigt{% endtrans %}" />{% endif %}
-			{% if teammatch.approvedBy %}<img src="{{ asset('bundles/tobiontropaion/images/icons/status/approved.png') }}" width="16" height="16" alt="{% trans %}Genehmigt{% endtrans %}" title="{% trans %}Ergebnis genehmigt{% endtrans %}" />{% endif %}
+		<td class="status">{% if match.noFight %}<img src="{{ asset('bundles/tobiontropaion/img/icons/status/nofight.png') }}" width="16" height="16" alt="{% trans %}Kampflos{% endtrans %}" title="{% trans %}Ergebnis ist kampflos zustande gekommen{% endtrans %}" />{% endif %}
+			{% if match.revisedScore %}<img src="{{ asset('bundles/tobiontropaion/img/icons/status/revised.png') }}" width="16" height="16" alt="{% trans %}Geändert{% endtrans %}" title="{% trans %}Ergebnis wurde geändert{% endtrans %}" />{% endif %}
+			{% if match.givenUpBy %}<img src="{{ asset('bundles/tobiontropaion/img/icons/status/given-up.png') }}" width="16" height="16" alt="{% trans %}Aufgabe{% endtrans %}" title="{% trans %}Spiel ist durch Aufgabe entschieden worden{% endtrans %}" />{% endif %}
+			{% if teammatch.confirmedBy %}<img src="{{ asset('bundles/tobiontropaion/img/icons/status/confirmed.png') }}" width="16" height="16" alt="{% trans %}Bestätigt{% endtrans %}" title="{% trans %}Ergebnis bestätigt{% endtrans %}" />{% endif %}
+			{% if teammatch.approvedBy %}<img src="{{ asset('bundles/tobiontropaion/img/icons/status/approved.png') }}" width="16" height="16" alt="{% trans %}Genehmigt{% endtrans %}" title="{% trans %}Ergebnis genehmigt{% endtrans %}" />{% endif %}
 		</td>
 	</tr>
 {% endfor %}
