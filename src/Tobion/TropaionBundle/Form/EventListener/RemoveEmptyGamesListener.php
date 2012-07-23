@@ -13,7 +13,6 @@ use Tobion\TropaionBundle\Entity\Match;
  * This listener removes empty games from the games collection of matches.
  * It also reassigns the game_sequence of games.
  * 
- *
  * @author Tobias Schultze <http://www.tobion.de>
  */
 class RemoveEmptyGamesListener implements EventSubscriberInterface

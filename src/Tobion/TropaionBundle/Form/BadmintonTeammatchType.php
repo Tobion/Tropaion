@@ -56,6 +56,7 @@ class BadmintonTeammatchType extends AbstractType
 		));
 
 		$builder->add('matches', 'collection', array(
+			'property_path' => 'Matches',
 			'type' => new BadmintonMatchType($this->registry),
 			'allow_add' => false,
 			'allow_delete' => false,

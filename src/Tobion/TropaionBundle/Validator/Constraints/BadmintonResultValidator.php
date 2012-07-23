@@ -20,22 +20,19 @@ class BadmintonResultValidator extends ConstraintValidator
 			throw new UnexpectedTypeException($match, 'Tobion\TropaionBundle\Entity\Match');
 		}
 
-		if ($match->noresult) {
-			// wenn noresult -> gewert. Ergebnis muss leer sein
-			if (count($match->getEffectiveGames()) > 0) {
-                //var_dump($this->context->getPropertyPath());
-                $this->context->addViolationAtSubPath('noresult', $constraint->contradictoryNoResult, array(), $match->noresult);
-			}
-		} else {
-			if (!$this->isBadmintonMatchResultValid($match)) {
-                $this->context->addViolationAtSubPath('[games]', $constraint->invalidMatchResult);
-			}
+		// wenn noresult -> gewert. Ergebnis muss leer sein
+		if ($match->noresult && count($match->getEffectiveGames()) > 0) {
+			$this->context->addViolationAtSubPath('noresult', $constraint->contradictoryNoResult, array(), $match->noresult);
+		}
 
-			foreach ($match->getGames() as $index => $game) {
-				if (!$game->getAnnulled()) { // do not validate annulled / given-up game
-					if (!$this->isBadmintonGameResultValid($game)) {
-                        $this->context->addViolationAtSubPath("[games][$index]", $constraint->invalidGameResult, array(), $game);
-					}
+		if (!$this->isBadmintonMatchResultValid($match, $match->noresult)) {
+			$this->context->addViolationAtSubPath('Games', $constraint->invalidMatchResult);
+		}
+
+		foreach ($match->getGames() as $index => $game) {
+			if (!$game->getAnnulled()) { // do not validate annulled / given-up game
+				if (!$this->isBadmintonGameResultValid($game)) {
+					$this->context->addViolationAtSubPath("Games[$index]", $constraint->invalidGameResult, array(), $game);
 				}
 			}
 		}
@@ -66,13 +63,17 @@ class BadmintonResultValidator extends ConstraintValidator
 	 * @see isGameSequenceValid
 	 *
 	 * @param Match $match
+	 * @param boolean $allowNoResult
+	 *
 	 * @return boolean
 	 */
-	private function isBadmintonMatchResultValid(Match $match)
+	private function isBadmintonMatchResultValid(Match $match, $allowNoResult = false)
 	{
 		$numberGames = count($match->getEffectiveGames());
 
-		if ($numberGames === 2) {
+		if ($numberGames === 0) {
+			return $allowNoResult;
+		} else if ($numberGames === 2) {
 			return ($match->getTeam1Score() === 2 && $match->getTeam2Score() === 0)
 				|| ($match->getTeam1Score() === 0 && $match->getTeam2Score() === 2);
 

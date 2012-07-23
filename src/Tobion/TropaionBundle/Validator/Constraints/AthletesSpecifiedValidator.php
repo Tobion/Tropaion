@@ -29,35 +29,35 @@ class AthletesSpecifiedValidator extends ConstraintValidator
 
 		if (!$match->team1_noplayer) {
 			if ($match->team1_player_readable_id === null || $match->team1_player_readable_id === '') {
-                $this->context->addViolationAtSubPath('team1_player_readable_id', $constraint->invalidBlankAthlete, array(), $match->team1_player_readable_id);
+				$this->context->addViolationAtSubPath('team1_player_readable_id', $constraint->invalidBlankAthlete, array(), $match->team1_player_readable_id);
 			}
 			if ($match->getMatchType()->getXOnX() != 1 &&
 				($match->team1_partner_readable_id === null || $match->team1_partner_readable_id === '')) {
-                $this->context->addViolationAtSubPath('team1_partner_readable_id', $constraint->invalidBlankAthlete, array(), $match->team1_partner_readable_id);
+				$this->context->addViolationAtSubPath('team1_partner_readable_id', $constraint->invalidBlankAthlete, array(), $match->team1_partner_readable_id);
 			}
 		} else {
 			if (!($match->team1_player_readable_id === null || $match->team1_player_readable_id === '')) {
-                $this->context->addViolationAtSubPath('team1_player_readable_id', $constraint->invalidFilledAthlete, array(), $match->team1_player_readable_id);
+				$this->context->addViolationAtSubPath('team1_player_readable_id', $constraint->invalidFilledAthlete, array(), $match->team1_player_readable_id);
 			}
 			if (!($match->team1_partner_readable_id === null || $match->team1_partner_readable_id === '')) {
-                $this->context->addViolationAtSubPath('team1_partner_readable_id', $constraint->invalidFilledAthlete, array(), $match->team1_partner_readable_id);
+				$this->context->addViolationAtSubPath('team1_partner_readable_id', $constraint->invalidFilledAthlete, array(), $match->team1_partner_readable_id);
 			}
 		}
 
 		if (!$match->team2_noplayer) {
 			if ($match->team2_player_readable_id === null || $match->team2_player_readable_id === '') {
-                $this->context->addViolationAtSubPath('team2_player_readable_id', $constraint->invalidBlankAthlete, array(), $match->team2_player_readable_id);
+				$this->context->addViolationAtSubPath('team2_player_readable_id', $constraint->invalidBlankAthlete, array(), $match->team2_player_readable_id);
 			}
 			if ($match->getMatchType()->getXOnX() != 1 &&
 				($match->team2_partner_readable_id === null || $match->team2_partner_readable_id === '')) {
-                $this->context->addViolationAtSubPath('team2_partner_readable_id', $constraint->invalidBlankAthlete, array(), $match->team2_partner_readable_id);
+				$this->context->addViolationAtSubPath('team2_partner_readable_id', $constraint->invalidBlankAthlete, array(), $match->team2_partner_readable_id);
 			}
 		} else {
 			if (!($match->team2_player_readable_id === null || $match->team2_player_readable_id === '')) {
-                $this->context->addViolationAtSubPath('team2_player_readable_id', $constraint->invalidFilledAthlete, array(), $match->team2_player_readable_id);
+				$this->context->addViolationAtSubPath('team2_player_readable_id', $constraint->invalidFilledAthlete, array(), $match->team2_player_readable_id);
 			}
 			if (!($match->team2_partner_readable_id === null || $match->team2_partner_readable_id === '')) {
-                $this->context->addViolationAtSubPath('team2_partner_readable_id', $constraint->invalidFilledAthlete, array(), $match->team2_partner_readable_id);
+				$this->context->addViolationAtSubPath('team2_partner_readable_id', $constraint->invalidFilledAthlete, array(), $match->team2_partner_readable_id);
 			}
 		}
 	}

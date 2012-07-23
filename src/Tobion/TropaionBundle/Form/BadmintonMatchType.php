@@ -59,6 +59,7 @@ class BadmintonMatchType extends AbstractType
 
 
 		$builder->add('games', 'collection', array(
+			'property_path' => 'Games',
 			'type' => new BadmintonGameType(),
 			'allow_add' => false,
 			'allow_delete' => false,
@@ -77,6 +78,7 @@ class BadmintonMatchType extends AbstractType
 	{
 		$resolver->setDefaults(array(
 			'data_class' => 'Tobion\TropaionBundle\Entity\Match',
+			'error_bubbling' => false,
 		));
 	}
 

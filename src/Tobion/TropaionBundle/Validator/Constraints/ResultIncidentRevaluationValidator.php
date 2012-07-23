@@ -22,7 +22,7 @@ class ResultIncidentRevaluationValidator extends ConstraintValidator
 			
 		if ($match->result_incident == 'team1_wonbydefault' && !$match->revaluation_against) {
 			if (!$match->isTeam1Winner()) {
-                //$this->context->addViolationAtSubPath('noresult', $constraint->contradictoryNoResult, array(), $match->result_incident);
+				//$this->context->addViolationAtSubPath('noresult', $constraint->contradictoryNoResult, array(), $match->result_incident);
 			}
 		}
 		
