@@ -1,0 +1,14 @@
+; top-most EditorConfig file
+root = true
+
+[*.php]
+indent_style = tab
+
+[*.js]
+indent_style = tab
+
+[*.twig]
+indent_style = tab
+
+[*.html]
+indent_style = tab
