@@ -231,7 +231,7 @@
 					<legend title="{{ form_errors(matchForm.games) }}">{% trans %}Gewertetes Ergebnis{% endtrans %}</legend>
 					<ol class="effective">
 					{% for gameForm in matchForm.games %}
-						{% if not gameForm.annulled.getVar('value') %}
+						{% if not gameForm.annulled.vars.value %}
 						<li tabindex="-1"{% if gameForm.vars.errors|length > 0 %} class="error" title="{{ form_errors(gameForm) }}"{% endif %}>
 							{# form_widget(gameForm.annulled) #}
 							{{ form_widget(gameForm.team1_score) }}
@@ -246,7 +246,7 @@
 					<legend>{% trans %}Usprüngliches Ergebnis{% endtrans %}</legend>
 					<ol class="annulled">
 					{% for gameForm in matchForm.games %}
-						{% if gameForm.annulled.getVar('value') %}
+						{% if gameForm.annulled.vars.value %}
 						<li tabindex="-1"{% if gameForm.vars.errors|length > 0 %} class="error"{% endif %}>
 							{{ form_widget(gameForm.annulled) }}
 							{{ form_widget(gameForm.team1_score) }}
