@@ -55,7 +55,7 @@ ORDER BY u.athlete_id ASC
 	/**
 	 * Gibt den aktuellen Tabellenstand als Array zurück. 
 	 * Berücksichtigt auch zurückgezogene Teams (withdrawn) und Teammatches, das beide Mannschaften komplett verloren haben (beide scores = 0)
-	 * @TODO Die Verlustpunkte bei beiderseitiger Niederlage sind hardcoded.
+	 * @todo Die Verlustpunkte bei beiderseitiger Niederlage sind hardcoded.
 	 * @param int $leagueId
 	 * @param int $stage		1 = Hinrunde, 2 = Rückrunde, sonst alles
 	 * @param int $homeaway		1 = Heimspiele, 2 = Auswaertsspiele, sonst alles
