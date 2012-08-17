@@ -753,7 +753,7 @@ class TournamentController extends Controller
 
 		$this->prepareTeammatchResultProperties($teammatch);
 
-		$form = $this->createForm(new BadmintonTeammatchType($this->getDoctrine()), $teammatch);
+		$form = $this->createForm('bmtm', $teammatch);
         
 		$invalid = false;
 

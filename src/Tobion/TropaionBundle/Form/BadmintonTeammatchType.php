@@ -10,13 +10,6 @@ use Tobion\TropaionBundle\Form\EventListener\CalculateTeammatchStatisticsListene
 
 class BadmintonTeammatchType extends AbstractType
 {
-	protected $registry;
-
-	public function __construct(RegistryInterface $registry)	
-	{	
-		$this->registry = $registry;
-	}
-
 	public function buildForm(FormBuilderInterface $builder, array $options)
 	{
 		$builder->add('performed_at', 'datetime');
@@ -57,7 +50,7 @@ class BadmintonTeammatchType extends AbstractType
 
 		$builder->add('matches', 'collection', array(
 			'property_path' => 'Matches',
-			'type' => new BadmintonMatchType($this->registry),
+			'type' => 'bmm',
 			'allow_add' => false,
 			'allow_delete' => false,
 			'prototype' => false,

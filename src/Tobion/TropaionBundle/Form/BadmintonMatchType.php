@@ -60,7 +60,7 @@ class BadmintonMatchType extends AbstractType
 
 		$builder->add('games', 'collection', array(
 			'property_path' => 'Games',
-			'type' => new BadmintonGameType(),
+			'type' => 'bmg',
 			'allow_add' => false,
 			'allow_delete' => false,
 			'prototype' => false,
@@ -71,7 +71,6 @@ class BadmintonMatchType extends AbstractType
 		$builder->addEventSubscriber(new AddAthletesListener($builder->getFormFactory()));
 		$builder->addEventSubscriber(new TransformAthletesListener($this->registry));
 		$builder->addEventSubscriber(new RemoveEmptyGamesListener());
-
 	}
 
 	public function setDefaultOptions(OptionsResolverInterface $resolver)

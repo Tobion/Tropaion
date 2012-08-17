@@ -1,12 +1,22 @@
 <?xml version="1.0" ?>
 
 <container xmlns="http://symfony.com/schema/dic/services"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
-    <services>
-        <service id="twig.extension.tobion.tropaion" class="Tobion\TropaionBundle\Twig\Extension\TropaionExtension">
-            <tag name="twig.extension" />
-        </service>
-    </services>
+	<services>
+		<service id="twig.extension.tobion.tropaion" class="Tobion\TropaionBundle\Twig\Extension\TropaionExtension">
+			<tag name="twig.extension" />
+		</service>
+		<service id="form.type.bmtm" class="Tobion\TropaionBundle\Form\BadmintonTeammatchType">
+			<tag name="form.type" alias="bmtm" />
+		</service>
+		<service id="form.type.bmm" class="Tobion\TropaionBundle\Form\BadmintonMatchType">
+			<argument type="service" id="doctrine" />
+			<tag name="form.type" alias="bmm" />
+		</service>
+		<service id="form.type.bmg" class="Tobion\TropaionBundle\Form\BadmintonGameType">
+			<tag name="form.type" alias="bmg" />
+		</service>
+	</services>
 </container>
