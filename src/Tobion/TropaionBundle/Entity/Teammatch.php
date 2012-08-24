@@ -28,7 +28,7 @@ class Teammatch
 
 	/**
 	 * Ursprünglich geplantes Datum des Spiels, wenn abweichend von performed_at
-	 * @var datetime $scheduled_at
+	 * @var \DateTime $scheduled_at
 	 *
 	 * @ORM\Column(type="datetime")
 	 */
@@ -36,7 +36,7 @@ class Teammatch
 
 	/**
 	 * Verlegter Spieltermin
-	 * @var datetime $moved_at
+	 * @var \DateTime $moved_at
 	 *
 	 * @ORM\Column(type="datetime", nullable=true)
 	 */
@@ -44,7 +44,7 @@ class Teammatch
 
 	/**
 	 * Austragungsdatum des Spiels
-	 * @var datetime $performed_at
+	 * @var \DateTime $performed_at
 	 *
 	 * @ORM\Column(type="datetime")
 	 */
@@ -167,21 +167,21 @@ class Teammatch
 	private $incomplete_lineup;
 
 	/**
-	 * @var datetime $submitted_at
+	 * @var \DateTime $submitted_at
 	 *
 	 * @ORM\Column(type="datetime", nullable=true)
 	 */
 	private $submitted_at;
 
 	/**
-	 * @var datetime $confirmed_at
+	 * @var \DateTime $confirmed_at
 	 *
 	 * @ORM\Column(type="datetime", nullable=true)
 	 */
 	private $confirmed_at;
 
 	/**
-	 * @var datetime $approved_at
+	 * @var \DateTime $approved_at
 	 *
 	 * @ORM\Column(type="datetime", nullable=true)
 	 */
@@ -306,7 +306,7 @@ class Teammatch
 	/**
 	 * Set scheduled_at
 	 *
-	 * @param datetime $scheduledAt
+	 * @param \DateTime $scheduledAt
 	 */
 	public function setScheduledAt($scheduledAt)
 	{
@@ -316,7 +316,7 @@ class Teammatch
 	/**
 	 * Get scheduled_at
 	 *
-	 * @return datetime
+	 * @return \DateTime
 	 */
 	public function getScheduledAt()
 	{
@@ -326,7 +326,7 @@ class Teammatch
 	/**
 	 * Set moved_at
 	 *
-	 * @param datetime $movedAt
+	 * @param \DateTime $movedAt
 	 */
 	public function setMovedAt($movedAt)
 	{
@@ -336,7 +336,7 @@ class Teammatch
 	/**
 	 * Get moved_at
 	 *
-	 * @return datetime
+	 * @return \DateTime
 	 */
 	public function getMovedAt()
 	{
@@ -346,7 +346,7 @@ class Teammatch
 	/**
 	 * Set performed_at
 	 *
-	 * @param datetime $performedAt
+	 * @param \DateTime $performedAt
 	 */
 	public function setPerformedAt($performedAt)
 	{
@@ -356,7 +356,7 @@ class Teammatch
 	/**
 	 * Get performed_at
 	 *
-	 * @return datetime
+	 * @return \DateTime
 	 */
 	public function getPerformedAt()
 	{
@@ -366,7 +366,7 @@ class Teammatch
 	/**
 	 * Set stage
 	 *
-	 * @param smallint $stage
+	 * @param integer $stage
 	 */
 	public function setStage($stage)
 	{
@@ -376,7 +376,7 @@ class Teammatch
 	/**
 	 * Get stage
 	 *
-	 * @return smallint
+	 * @return integer
 	 */
 	public function getStage()
 	{
@@ -386,7 +386,7 @@ class Teammatch
 	/**
 	 * Set team1_score
 	 *
-	 * @param smallint $team1Score
+	 * @param integer $team1Score
 	 */
 	public function setTeam1Score($team1Score)
 	{
@@ -396,7 +396,7 @@ class Teammatch
 	/**
 	 * Get team1_score
 	 *
-	 * @return smallint
+	 * @return integer
 	 */
 	public function getTeam1Score()
 	{
@@ -406,7 +406,7 @@ class Teammatch
 	/**
 	 * Set team2_score
 	 *
-	 * @param smallint $team2Score
+	 * @param integer $team2Score
 	 */
 	public function setTeam2Score($team2Score)
 	{
@@ -416,7 +416,7 @@ class Teammatch
 	/**
 	 * Get team2_score
 	 *
-	 * @return smallint
+	 * @return integer
 	 */
 	public function getTeam2Score()
 	{
@@ -426,7 +426,7 @@ class Teammatch
 	/**
 	 * Set team1_games
 	 *
-	 * @param smallint $team1Games
+	 * @param integer $team1Games
 	 */
 	public function setTeam1Games($team1Games)
 	{
@@ -436,7 +436,7 @@ class Teammatch
 	/**
 	 * Get team1_games
 	 *
-	 * @return smallint
+	 * @return integer
 	 */
 	public function getTeam1Games()
 	{
@@ -446,7 +446,7 @@ class Teammatch
 	/**
 	 * Set team2_games
 	 *
-	 * @param smallint $team2Games
+	 * @param integer $team2Games
 	 */
 	public function setTeam2Games($team2Games)
 	{
@@ -456,7 +456,7 @@ class Teammatch
 	/**
 	 * Get team2_games
 	 *
-	 * @return smallint
+	 * @return integer
 	 */
 	public function getTeam2Games()
 	{
@@ -466,7 +466,7 @@ class Teammatch
 	/**
 	 * Set team1_points
 	 *
-	 * @param smallint $team1Points
+	 * @param integer $team1Points
 	 */
 	public function setTeam1Points($team1Points)
 	{
@@ -476,7 +476,7 @@ class Teammatch
 	/**
 	 * Get team1_points
 	 *
-	 * @return smallint
+	 * @return integer
 	 */
 	public function getTeam1Points()
 	{
@@ -486,7 +486,7 @@ class Teammatch
 	/**
 	 * Set team2_points
 	 *
-	 * @param smallint $team2Points
+	 * @param integer $team2Points
 	 */
 	public function setTeam2Points($team2Points)
 	{
@@ -496,7 +496,7 @@ class Teammatch
 	/**
 	 * Get team2_points
 	 *
-	 * @return smallint
+	 * @return integer
 	 */
 	public function getTeam2Points()
 	{
@@ -566,7 +566,7 @@ class Teammatch
 	/**
 	 * Set revaluation_wrongdoer
 	 *
-	 * @param smallint $revaluationWrongdoer
+	 * @param integer $revaluationWrongdoer
 	 */
 	public function setRevaluationWrongdoer($revaluationWrongdoer)
 	{
@@ -576,7 +576,7 @@ class Teammatch
 	/**
 	 * Get revaluation_wrongdoer
 	 *
-	 * @return smallint
+	 * @return integer
 	 */
 	public function getRevaluationWrongdoer()
 	{
@@ -586,7 +586,7 @@ class Teammatch
 	/**
 	 * Set revaluation_reason
 	 *
-	 * @param smallint $revaluationReason
+	 * @param integer $revaluationReason
 	 */
 	public function setRevaluationReason($revaluationReason)
 	{
@@ -596,7 +596,7 @@ class Teammatch
 	/**
 	 * Get revaluation_reason
 	 *
-	 * @return smallint
+	 * @return integer
 	 */
 	public function getRevaluationReason()
 	{
@@ -626,7 +626,7 @@ class Teammatch
 	/**
 	 * Set submitted_at
 	 *
-	 * @param datetime $submittedAt
+	 * @param \DateTime $submittedAt
 	 */
 	public function setSubmittedAt($submittedAt)
 	{
@@ -636,7 +636,7 @@ class Teammatch
 	/**
 	 * Get submitted_at
 	 *
-	 * @return datetime
+	 * @return \DateTime
 	 */
 	public function getSubmittedAt()
 	{
@@ -646,7 +646,7 @@ class Teammatch
 	/**
 	 * Set confirmed_at
 	 *
-	 * @param datetime $confirmedAt
+	 * @param \DateTime $confirmedAt
 	 */
 	public function setConfirmedAt($confirmedAt)
 	{
@@ -656,7 +656,7 @@ class Teammatch
 	/**
 	 * Get confirmed_at
 	 *
-	 * @return datetime
+	 * @return \DateTime
 	 */
 	public function getConfirmedAt()
 	{
@@ -666,7 +666,7 @@ class Teammatch
 	/**
 	 * Set approved_at
 	 *
-	 * @param datetime $approvedAt
+	 * @param \DateTime $approvedAt
 	 */
 	public function setApprovedAt($approvedAt)
 	{
@@ -676,7 +676,7 @@ class Teammatch
 	/**
 	 * Get approved_at
 	 *
-	 * @return datetime
+	 * @return \DateTime
 	 */
 	public function getApprovedAt()
 	{
@@ -686,7 +686,7 @@ class Teammatch
 	/**
 	 * Set description
 	 *
-	 * @param text $description
+	 * @param string $description
 	 */
 	public function setDescription($description)
 	{
@@ -696,7 +696,7 @@ class Teammatch
 	/**
 	 * Get description
 	 *
-	 * @return text
+	 * @return string
 	 */
 	public function getDescription()
 	{
@@ -706,7 +706,7 @@ class Teammatch
 		/**
 	 * Set created_at
 	 *
-	 * @param datetime $createdAt
+	 * @param \DateTime $createdAt
 	 */
 	public function setCreatedAt($createdAt)
 	{
@@ -716,7 +716,7 @@ class Teammatch
 	/**
 	 * Get created_at
 	 *
-	 * @return datetime
+	 * @return \DateTime
 	 */
 	public function getCreatedAt()
 	{
@@ -726,7 +726,7 @@ class Teammatch
 	/**
 	 * Set updated_at
 	 *
-	 * @param datetime $updatedAt
+	 * @param \DateTime $updatedAt
 	 */
 	public function setUpdatedAt($updatedAt)
 	{
@@ -736,7 +736,7 @@ class Teammatch
 	/**
 	 * Get updated_at
 	 *
-	 * @return datetime
+	 * @return \DateTime
 	 */
 	public function getUpdatedAt()
 	{
@@ -886,7 +886,7 @@ class Teammatch
 
 	/**
 	 *
-	 * @return string 
+	 * @return string
 	 */
 	public function getRevaluationReasonMessage()
 	{
@@ -904,13 +904,13 @@ class Teammatch
 	}
 
 	/**
-	 * Proxymethod for getTeam1()->getLeague()
-	 * Team1 and Team2 of this Teammatch should play in the same league. That means 
-	 * getTeam1()->getLeague() should return the same as getTeam2()->getLeague(), but 
-	 * that is not evaluated in this call for performance reasons. So it's enough to 
+	 * Proxymethod for getTeam1()->getLeague().
+	 * Team1 and Team2 of this Teammatch should play in the same league. That means
+	 * getTeam1()->getLeague() should return the same as getTeam2()->getLeague(), but
+	 * that is not evaluated in this call for performance reasons. So it's enough to
 	 * join Team1 with its league.
 	 *
-	 * @return League 	The league that this teammatch is part of.
+	 * @return League The league that this teammatch is part of.
 	 */
 	public function getLeague()
 	{
@@ -930,14 +930,14 @@ class Teammatch
 	}
 
 	/**
-	 * Gets the slug
+	 * Gets the slug.
 	 * Only unique in the right context (per league).
 	 *
 	 * @return string
 	 */
 	public function getSlug()
 	{
-		return 
+		return
 			$this->Team1->getClub()->getCode() . '-' . $this->Team1->getTeamNumber() .
 			'_' .
 			$this->Team2->getClub()->getCode() . '-' . $this->Team2->getTeamNumber() ;
@@ -947,6 +947,7 @@ class Teammatch
 	 * Splits the slug into its components
 	 *
 	 * @param string $slug
+	 *
 	 * @return array|false
 	 */
 	public static function parseSlug($slug)
@@ -966,7 +967,7 @@ class Teammatch
 
 		unset($params[0]);
 		return array_combine(
-			array('team1_club_code', 'team1_number', 'team2_club_code', 'team2_number'), 
+			array('team1_club_code', 'team1_number', 'team2_club_code', 'team2_number'),
 			$params
 		);
 	}
@@ -1046,7 +1047,7 @@ class Teammatch
 	public function isWinnerTeam(Team $team)
 	{
 		return is_object($team) && ($team === $this->getWinnerTeam());
-	} 
+	}
 
 	public function isTeam1Winner()
 	{
@@ -1112,7 +1113,9 @@ class Teammatch
 
 
 	/**
-	 * Ob Ergebniseingabe fällig ist
+	 * Ob Ergebniseingabe fällig ist.
+	 *
+	 * @return boolean	
 	 */
 	public function isSubmissionDue()
 	{
@@ -1122,7 +1125,8 @@ class Teammatch
 
 
 	/**
-	 * Ob ursprünglicher Termin ungleich aktueller Termin
+	 * Ob ursprünglicher Termin ungleich aktueller Termin.
+	 *
 	 * @return boolean
 	 */
 	public function hasDifferentSchedule()
@@ -1147,7 +1151,7 @@ class Teammatch
 
 	public function getResultVisible()
 	{
-		return $this->getTeam1ScoreVisibly() . ':' . $this->getTeam2ScoreVisibly(); 
+		return $this->getTeam1ScoreVisibly() . ':' . $this->getTeam2ScoreVisibly();
 	}
 
 
@@ -1185,7 +1189,7 @@ class Teammatch
 
 	public function getTransformedViewHomeAway()
 	{
-		return isset($this->homeaway) ? $this->homeaway : null; 
+		return isset($this->homeaway) ? $this->homeaway : null;
 	}
 
 	public function swapTeamData()
@@ -1220,16 +1224,20 @@ class Teammatch
 	}
 
 	/**
-	* Team1 nicht angetreten
-	*/
+	 * Team1 nicht angetreten.
+	 *
+	 * @return boolean
+	 */
 	public function isTeam1NoFight()
 	{
 		return $this->getNoFight() && ($this->isTeam2Winner() || $this->isBothTeamsLost());
 	}
 
 	/**
-	* Team2 nicht angetreten
-	*/
+	 * Team2 nicht angetreten.
+	 *
+	 * @return boolean
+	 */
 	public function isTeam2NoFight()
 	{
 		return $this->getNoFight() && ($this->isTeam1Winner() || $this->isBothTeamsLost());
