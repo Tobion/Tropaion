@@ -350,7 +350,11 @@ class Teammatch
 	 */
 	public function setPerformedAt($performedAt)
 	{
-		$this->performed_at = $performedAt;
+		// Only set the new DateTime when it does not equal the given one (i.e. different instance but same content).
+		// Otherwise Doctrine would consider this entity as updated.
+		if ($performedAt != $this->performed_at) {
+			$this->performed_at =  $performedAt;
+		}
 	}
 
 	/**
