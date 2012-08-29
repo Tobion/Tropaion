@@ -6,6 +6,7 @@ app/phpunit.xml
 app/DoctrineMigrations/*
 web/bundles/*
 vendor/*
+bin/
 composer.phar
 *.php~
 nbproject/private/
