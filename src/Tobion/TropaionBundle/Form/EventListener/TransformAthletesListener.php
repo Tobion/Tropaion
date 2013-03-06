@@ -165,7 +165,7 @@ class TransformAthletesListener implements EventSubscriberInterface
 		}
 
 		if ($id !== null) { // find by ID
-			$athlete = $this->registry->getEntityManager()->getRepository('TobionTropaionBundle:Athlete')->find($id);	
+			$athlete = $this->registry->getManager()->getRepository('TobionTropaionBundle:Athlete')->find($id);
 			if (!$athlete) {
 				throw new NotValidException('Athlete not found by it\'s ID');
 			} else if (stripos($athlete->getFullName(), $name) === false) {

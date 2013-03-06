@@ -64,7 +64,7 @@ class TournamentController extends Controller
 
 
 
-		$em = $this->getDoctrine()->getEntityManager();
+		$em = $this->getDoctrine()->getManager();
 		$em->persist($athlete1);
 		$em->persist($athlete2);
 		$em->persist($club1);
@@ -80,7 +80,7 @@ class TournamentController extends Controller
 
 	private function getTournament()
 	{
-		$em = $this->getDoctrine()->getEntityManager();
+		$em = $this->getDoctrine()->getManager();
 
 		$qb = $em->createQueryBuilder();
 		$qb->select(array('r','o'))
@@ -165,7 +165,7 @@ class TournamentController extends Controller
 	{
 		$tournament = $this->getTournament();
 
-		$em = $this->getDoctrine()->getEntityManager();
+		$em = $this->getDoctrine()->getManager();
 
 		$qb = $em->createQueryBuilder();
 		$qb->select(array('t','c','l'))
@@ -261,7 +261,7 @@ class TournamentController extends Controller
 	{
 		$tournament = $this->getTournament();
 
-		$em = $this->getDoctrine()->getEntityManager();
+		$em = $this->getDoctrine()->getManager();
 		$rep = $this->getDoctrine()->getRepository('TobionTropaionBundle:League');
 
 		$leagueParts = \Tobion\TropaionBundle\Entity\League::parseSlug($this->getRequest()->get('league'));
@@ -345,7 +345,7 @@ class TournamentController extends Controller
 	{
 		$tournament = $this->getTournament();
 
-		$em = $this->getDoctrine()->getEntityManager();
+		$em = $this->getDoctrine()->getManager();
 		$rep = $this->getDoctrine()->getRepository('TobionTropaionBundle:Teammatch');
 
 		/*
@@ -429,7 +429,7 @@ class TournamentController extends Controller
 
 		$tournament = $this->getTournament();
 
-		$em = $this->getDoctrine()->getEntityManager();
+		$em = $this->getDoctrine()->getManager();
 
 		$qb = $em->createQueryBuilder();
 		$qb->select(array('t','c','l','lu','a'))
@@ -495,7 +495,7 @@ class TournamentController extends Controller
 
 		$tournament = $this->getTournament();
 
-		$em = $this->getDoctrine()->getEntityManager();
+		$em = $this->getDoctrine()->getManager();
 
 		$qb = $em->createQueryBuilder();
 		$qb->select(array('c','t','l','lu','a'))
@@ -559,7 +559,7 @@ class TournamentController extends Controller
 
 		$tournament = $this->getTournament();
 
-		$em = $this->getDoctrine()->getEntityManager();
+		$em = $this->getDoctrine()->getManager();
 
 		$athlete = $em->getRepository('TobionTropaionBundle:Athlete')->find(
 			$this->getRequest()->get('id')
@@ -691,7 +691,7 @@ class TournamentController extends Controller
 	{
 		if (count($teammatch->getMatches()) == 0)
 		{
-			$em = $this->getDoctrine()->getEntityManager();
+			$em = $this->getDoctrine()->getManager();
 
 			$badmintonMatchTypes = array(1, 2, 3, 4, 5, 6, 7, 8);
 
@@ -770,7 +770,7 @@ class TournamentController extends Controller
 
 			if ($form->isValid()) {
 				// save the teammatch to the database
-				$em = $this->getDoctrine()->getEntityManager();
+				$em = $this->getDoctrine()->getManager();
 
 				$em->persist($teammatch);
 				$em->flush();
@@ -830,7 +830,7 @@ class TournamentController extends Controller
 		// Dann nach aufsteigender Teamnummer sortieren, da ein Spieler der 3. Mannschaft eher in der 2. Mannschaft aushilft, als ein Spieler der 5. Mannschaft
 		// Auch nach Position sotieren, um Stammspieler der selben Mannschaft entsprechend zu priotisieren, da Spieler an Pos. 1 eher die ersten Spiele machen (z.B. 1.HD, 1.HE)
 
-		$conn = $this->getDoctrine()->getEntityManager()->getConnection();
+		$conn = $this->getDoctrine()->getManager()->getConnection();
 		$stmt = $conn->prepare($query);
 
 		$sqlParams = array();
