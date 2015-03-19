@@ -28,7 +28,7 @@ class HomeController extends Controller
 	}
 
 	/**
-	 * @Route("/tournaments", name="home_tournaments") 
+	 * @Route("/tournaments", name="home_tournaments")
 	 * @Template()
 	 */
 	public function tournamentsAction()
